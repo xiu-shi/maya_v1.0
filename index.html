@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Janet Xiu Shi Portfolio</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <!-- Google tag (gtag.js) Added 18th Aug 2025-->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BSD88YBS4B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-BSD88YBS4B');
+  </script>
+  <body>
+    <!-- Navigation -->
+    <nav class="nav">
+      <div class="nav-container">
+        <div class="nav-brand">Hi, I am Janet! 👋</div>
+        <div class="nav-links">
+          <a href="#hero" class="nav-link">Home</a>
+          <a href="#experience" class="nav-link">Experience</a>
+          <a href="#projects" class="nav-link">Projects</a>
+          <a href="#community" class="nav-link">Community</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero Section with Slideshow -->
+    <section id="hero" class="hero">
+      <div class="hero-container">
+      <!---HERO HEADLINE--->    
+      <!-- [UPDATE 2025-08-18] Bilingual headline stack: EN + 中文. New classes only. -->
+<div class="hero-content">
+  <div class="headline-stack" aria-labelledby="headline-en">
+    <!-- EN block -->
+    <p id="headline-en" class="headline-en-title">
+      Technology Advisor &amp; <br />
+      Supply Chain Strategist
+    </p>
+
+    <ul class="headline-en-sub">
+      <li>Enterprise SaaS Advisor (HR/Finance/Supply Chain)</li>
+      <li>Cloud Security, Compliance &amp; AI Ethics </li>
+      <li>Digital Transformation Strategist </li>
+      <li>Tech + Industry Procurement</li>
+      <li>International Trade, Logistics</li>
+    </ul>
+
+    <!-- zh-CN block -->
+    <!-- <h2 class="headline-zh-title">
+      AI与供应链科技顾问
+    </h2> -->
+
+    <ul class="headline-zh-sub">
+      <li>企业级SaaS解决方案（人力/财务/供应链）</li>
+      <li>数字产品·云安全架构与合规部署·AI伦理研究</li>
+      <li>企业数字化转型战略专家·供应链智能优化</li>
+      <li>跨境贸易·企业采购·物流部署·欧盟/亚洲合规质检·制造业OEM代工</li>
+    </ul>
+
+    <div class="hero-cta">
+      <a href="#experience" class="btn btn-primary">View Experience</a>
+      <a href="#projects" class="btn btn-secondary">See Projects</a>
+    </div>
+  </div>
+</div>
+
+
+        <div class="hero-slideshow">
+          <!-- [UPDATE 2025-08-18]: Hero slideshow standardized to 3:2 ratio. Image tags now use srcset/sizes and explicit width/height to reduce layout shift. -->
+<div class="slideshow-container">
+            <div class="slide active">
+              <!-- [UPDATE 2025-08-18]: Added responsive attributes (srcset/sizes/width/height) for 3:2 hero images. Safe default uses existing file for all candidates; replace with -450/-650/-1000 assets when ready. -->
+            <img src="static/images/hero/slide1.jpg"
+              srcset="static/images/hero/slide1.jpg 450w, static/images/hero/slide1.jpg 650w, static/images/hero/slide1.jpg 1000w"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+              width="1000" height="800"
+              alt="CS50 Hackathon at Meta in London 2025" class="slide-image" decoding="async" fetchpriority="high" loading="eager"
+                            alt="Professional headshot"
+                            class="slide-image"
+                          />
+            </div>
+            <div class="slide">
+              <!-- [UPDATE 2025-08-18]: Added responsive attributes (srcset/sizes/width/height) for 3:2 hero images. Safe default uses existing file for all candidates; replace with -450/-650/-1000 assets when ready. -->
+            <img src="static/images/hero/slide2.jpg"
+              srcset="static/images/hero/slide2.jpg 450w, static/images/hero/slide2.jpg 650w, static/images/hero/slide2.jpg 1000w"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+              width="1000" height="800"
+              alt="Ecommerce international conference Landycoo 电商 流量 美业 Gina" class="slide-image" decoding="async" loading="lazy"
+            />
+            </div>
+            <div class="slide">
+              <!-- [UPDATE 2025-08-18]: Added responsive attributes (srcset/sizes/width/height) for 3:2 hero images. Safe default uses existing file for all candidates; replace with -450/-650/-1000 assets when ready. -->
+            <img src="static/images/hero/slide3.jpg"
+              srcset="static/images/hero/slide3.jpg 450w, static/images/hero/slide3.jpg 650w, static/images/hero/slide3.jpg 1000w"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+              width="1000" height="800"
+              alt="Janet Xiu Shi" class="slide-image" decoding="async" loading="lazy"
+                            alt="Team collaboration"
+                            class="slide-image"
+                          />
+            </div>
+          </div>
+          <div class="slideshow-controls">
+            <button class="slide-btn prev" onclick="changeSlide(-1)">‹</button>
+            <div class="slide-indicators">
+              <span class="indicator active" onclick="currentSlide(1)"></span>
+              <span class="indicator" onclick="currentSlide(2)"></span>
+              <span class="indicator" onclick="currentSlide(3)"></span>
+            </div>
+            <button class="slide-btn next" onclick="changeSlide(1)">›</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Media Icons -->
+    <section id="social-bottom" class="social-section">
+      <div class="container">
+        <div class="social-icons">
+          <a
+            href="https://www.linkedin.com/in/janetxiushi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="LinkedIn"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://medium.com/@eupirate"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Medium"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://github.com/xiu-shi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="GitHub"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://www.instagram.com/janetxiushi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Instagram"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://www.youtube.com/@XiuShi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="YouTube"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+              />
+            </svg>
+          </a>
+
+          <!-- X (Twitter) -->
+          <a
+            href="https://x.com/janetxiushi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="X (Twitter)"
+          >
+            <!-- simple “X” mark that inherits currentColor -->
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4"  y1="4"  x2="20" y2="20"></line>
+              <line x1="20" y1="4"  x2="4"  y2="20"></line>
+            </svg>
+          </a>
+
+
+          <a
+            href="https://ie.pinterest.com/janetxiushi/photography-by-janet-xiu-shi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Pinterest"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.347-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Work Experience Timeline -->
+    <section id="experience" class="experience">
+      <div class="container">
+        <h2 class="section-title">Experience</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">Apr 2025 - Present</div>
+            <div class="timeline-content">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/connectd_new.png"
+                  alt="Connectd Logo"
+                  class="company-logo"
+                />
+                <h3 class="timeline-company">
+                  <a
+                    href="https://www.connectd.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Connectd</a
+                  >
+                </h3>
+              </div>
+              <h4 class="timeline-role">Technology, Strategy Advisor</h4>
+              <p class="timeline-description">
+                Through the Connectd advisory platform, I partner with early-stage SaaS startups and growth companies to align technology strategy with business objectives, accelerate Cloud AI-native product adoption, and enable data-driven scaling. I’ve advised founders and leadership teams on cloud adoption, data architecture, cybersecurity, GDPR compliance, technology procurement strategy, and AI implementation, translating complex technical concepts into actionable business frameworks for non-technical decision-makers.
+              </p>
+              <div class="timeline-impact">
+                <strong>Business Impact:</strong>
+                <br />
+
+                <li>
+                  Strategic business + technology roadmaps: integrating competitive analysis, AI readiness assessments, and KPI frameworks to align product and business growth priorities
+                </li>
+
+                <li>
+                  Cloud infrastructure design & vendor selection: reducing costs by up to 30% while improving hosting service selection, scalability, security, and compliance
+                </li>
+                </p>
+                <li>
+                  Technology procurement frameworks: optimizing vendor evaluation, contract negotiation, and total cost of ownership while unlocking new revenue streams and improving overall P&L performance
+                </li>
+                <li>
+                  Data strategy implementation: enabling data tracking, dashboards, and analytics pipelines to drive data-informed product decisions
+                </li>
+                <li>Cybersecurity & compliance frameworks: embedding GDPR readiness, ISO27001 practices, and AI ethics principles to ensure sustainable, secure scaling</li>
+                <li>Procurement-driven business enablement: proposed and secured approval for intentional, strategic procurement frameworks designed to go beyond cost optimization and create long-term downstream value</li>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">Oct 2017 - Mar 2025</div>
+            <div class="timeline-content">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/workday_new.png"
+                  alt="Workday Logo"
+                  class="company-logo"
+                />
+                <h3 class="timeline-company">
+                  <a
+                    href="https://www.workday.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Workday</a
+                  >
+                </h3>
+              </div>
+              <h4 class="timeline-role">
+                <p>Senior Software Quality Assurance Engineer</p>
+                <p>Employee Belonging Council Lead</p>
+                <p>Product Security Champion</p>
+                <p>Scrum Master</p>
+              </h4>
+              <p class="timeline-description">
+                Product Domains: Financials, Supply Chain, Procure to Pay,
+                Vendor Management, Expenses, and Product Security.
+              </p>
+              <p>
+                Quality & Technical Leadership: Led the end-to-end quality strategy across multiple product domains, ensuring seamless alignment between business objectives and technology capabilities. Oversaw the delivery of roadmap-committed features, managed ad-hoc testing, and drove post-merger integration activities. Provided production customer support, ensuring rapid issue resolution and minimal impact on business operations and customer experience.
+              </p>
+              <br />
+              <p>
+                Creative Leadership & Brand Representation: Served as official
+                Workday Ireland photographer for high-profile events including
+                CEO and executive visits, ministerial engagements, and IDA
+                Ireland major events. Creative brand representation, with work
+                featured in major media distributions and social media channels,
+                contributing creative expertise alongside technical excellence.
+              </p>
+              <br />
+              <div class="timeline-impact">
+                <strong>Business Values:</strong>
+
+                <li>
+                  Product & Tech VIBE Global Impact Award (Workday VIBE Index™)
+                  first-ever global recognition for community building and
+                  cultural impact.
+                </li>
+
+                <li>
+                  Led and delivered OFAC (Office of Foreign Assets Control)
+                  screening, vendor compliance systems.
+                </li>
+                <li>
+                  Lead and delivered External Vendor portal, onboarding third
+                  party vendors ensure compliance and risk mitigation.
+                </li>
+
+                <li>
+                  Step in for PM design and lead development and QA of Assign
+                  Contracted Worker feature.
+                </li>
+                <li>
+                  Application Security Champion (FY24–FY26) driving
+                  enterprise-wide security initiatives, fostering a culture of
+                  security awareness and best practices.
+                </li>
+                <li>
+                  My agile and quality-driven approach came to fruition when I
+                  led a team to a 20% reduction in development cycle time.
+                </li>
+                <br />
+                <strong>Personal Growth:</strong>
+                <li>
+                  Company Value Icon Awards for innovation and cross timezone
+                  global team collaboration.
+                </li>
+                <li>
+                  Founded and scaled Workday's Employee Belonging Council
+                  globally, spanning 16 locations with 30% YoY membership
+                  growth.
+                </li>
+                <li>
+                  Mentored junior engineers, fostering their professional
+                  development.
+                </li>
+                <li>Udemy learning ambassador.</li>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">Oct 2016 - Oct 2017</div>
+            <div class="timeline-content">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/huawei_new.png"
+                  alt="Huawei Logo"
+                  class="company-logo"
+                />
+                <h3 class="timeline-company">
+                  <a
+                    href="https://www.huawei.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Huawei Technologies</a
+                  >
+                </h3>
+              </div>
+              <h4 class="timeline-role">Supply Chain Manager - Engineer A</h4>
+              <p class="timeline-description">
+                Supported Western Europe's strategic transformation initiatives through operational excellence, ensuring seamless equipment availability for telecommunications infrastructure development and meeting EU compliance.
+              </p>
+              <p>Regional Operations Leadership:
+              Led supply chain operations for Western Europe, driving lean, responsive logistics through data-driven efficiency. Managed end-to-end operations including planning, forecasting, procurement, manufacturing coordination, and international logistics for high-demand telecommunications equipment and components.</p>
+
+            <br />
+
+            <p>ERP & Information Governance:
+            Operated with 15+ least-privilege global real-time ERP access roles, maintaining accountability for data integrity, risk management, and information security across multiple business functions.</p>
+
+            <br />
+              <div class="timeline-impact">
+                <strong>Business Values:</strong>
+                <li>Grade A Repak audit result (2016) and secured compliance certification for Huawei Ireland (2017)</li>
+                <li>Enabled critical infrastructure rollouts including 5G equipment, Eir Fiber (Ireland National Broadband Plan), H3G antenna systems, and LTE equipment delivery</li>
+                <li>Created new airline logistics routes within Western Europe, improving ETA Dublin lead times</li>
+                <li>Streamlined reverse logistics processes, optimizing returns to EU hubs and exports to CN hubs via Hong Kong. Reduced average inventory storage cost of associated projects by 52%.</li>
+                  <br />
+                <strong>Personal Growth:</strong>
+                <li>Bilingual business operations: Mandarin and English proficiency.</li>
+                <li>Demonstrated leadership in Western European Visionary Projects among diverse teams.</li>
+                <li>Cross-functional cultural and timezone collaboration.</li>
+                <li>Relationship building with key stakeholders across regions.</li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supply Chain & Logistics Experience Showcase -->
+    <section id="supply-chain-experience" class="supply-chain-experience">
+      <div class="container">
+        <h2 class="section-title">Supply Chain & Commercial Excellence</h2>
+        <p class="section-subtitle">
+          Transformational leadership across retail, sales, fashion, procurement, and
+          international supply chain operations with technology.
+        </p>
+
+        <div class="experience-showcase">
+          <div class="showcase-grid-2x2">
+            <div class="showcase-item" data-company="woodies">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/woodies_new.png"
+                  alt="Woodies Logo"
+                  class="showcase-logo"
+                />
+                <h3>Woodies</h3>
+                <!-- <span class="timeline-period">Mar 2008 - Oct 2016</span> -->
+              </div>
+              <div class="achievement-content">
+                <h4>Procurement Specialist & Ecommerce Category Lead</h4>
+                <p class="achievement-summary">
+                  Led supplier sourcing, negotiations, and own-brand product development, driving greater procurement efficiency and supporting eCommerce growth. Implemented supplier data frameworks and onboarded 30+ global suppliers, improving PO accuracy by ~28% through EDI integration and enhancing international logistics traceability. Managed a €30M+ procurement category portfolio, achieving 70% ROI optimisation and strengthening supply chain resilience.
+                </p>
+                <p class="business-impact">
+                  Drove category transformation by integrating global suppliers, leading EDI adoption, and piloting digital payment systems to modernize procurement workflows. 
+                </p>
+                <div class="key-metrics">
+                  <div class="metric">
+                    <!-- <span class="metric-value">28%</span> -->
+                    <span class="metric-label">🌍 Global suppliers onboarded</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">1.8M</span> -->
+                    <span class="metric-label">🔗 EDI integration across categories</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">40%</span> -->
+                    <span class="metric-label">🏆 “Award: Best-Managed Category</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="showcase-item" data-company="catrion">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/catriona_new.png"
+                  alt="Catriona Hanly Logo"
+                  class="showcase-logo"
+                />
+                <h3>Catriona Hanly</h3>
+                <!-- <span class="timeline-period">Jan 2007 - Jan 2008</span> -->
+              </div>
+              <div class="achievement-content">
+                <h4>Luxury Fashion & Interiors Buyer / Retail Sales</h4>
+                <p class="achievement-summary">
+                  Conducted market research, supplier negotiations, and category strategy to expand brand positioning across luxury fashion and interiors. Managed supplier SLAs, EPOS implementation, pricing, merchandising, and PR-driven product launches.
+                </p>
+                <p class="business-impact">
+                  Expanded brand range and visibility by sourcing premium collections, leading EPOS rollout, expanded premium range by 10%(OEM) and orchestrating PR campaigns across fashion and interiors.
+                </p>
+                <div class="key-metrics">
+                  <div class="metric">
+                    <!-- <span class="metric-value">8</span> -->
+                    <span class="metric-label">👗 Fashion & 
+                       🏡 Home interiors</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">35%</span> -->
+                    <span class="metric-label"> 💁🏻‍♀️ Concierge Service</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">100%</span> -->
+                    <span class="metric-label">🎯 Brand range expansion</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="showcase-item" data-company="dunnes">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/dunnes_new.png"
+                  alt="Dunnes Stores Logo"
+                  class="showcase-logo"
+                />
+                <h3>Dunnes Stores</h3>
+                <!-- <span class="timeline-period">Jan 2005 - Jan 2007</span> -->
+              </div>
+              <div class="achievement-content">
+                <h4>Fashion Manager & Premium Label Development</h4>
+                <p class="achievement-summary">
+                  Managed departmental sales, stock cycles, and replenishment while driving staff training and visual merchandising. Led the premium in-house “Kabaret” label, coordinating sourcing, range updates, and customer engagement across flagship stores.
+                </p>
+                <p class="business-impact">
+                  Entrusted to manage Dunnes’ exclusive Savida, Kabaret fashion label, shaping a premium ‘shop-in-shop’ pilot that blended sourcing, branding, and customer insights. Launched 4 flagship pilots; cut stockouts ~8–10%
+                </p>
+                <div class="key-metrics">
+                  <div class="metric">
+                    <!-- <span class="metric-value">22%</span> -->
+                    <span class="metric-label">4 flagship stores (Kabaret pilot)</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">15</span> -->
+                    <span class="metric-label">🛍️ Premium label coordination</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">€2.5M</span> -->
+                    <span class="metric-label">📈 Stock cycle + margin control</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="showcase-item" data-company="lidl">
+              <div class="company-header">
+                <img
+                  src="static/images/logos/lidl_new.png"
+                  alt="Lidl Logo"
+                  class="showcase-logo"
+                />
+                <h3>Lidl</h3>
+                <!-- <span class="timeline-period">May 2002 - Jan 2005</span> -->
+              </div>
+              <div class="achievement-content">
+                <h4>Distribution Centre Administrator</h4>
+                <p class="achievement-summary">
+                  Supported warehouse operations through stock control, productivity reporting, and supplier documentation checks. Piloted IT hardware/software upgrades, improving inbound efficiency and reducing manual processes, while supporting staff training and cross-team logistics alignment.
+                </p>
+                <p class="business-impact">
+                  Enabled logistics optimization by digitizing stock receiving, integrating new IT systems, and coordinating operations across EU distribution network. Digitized receiving across 3 sites; reduced manual steps ~40%.
+                </p>
+                <div class="key-metrics">
+                  <div class="metric">
+                    <!-- <span class="metric-value">18%</span> -->
+                    <span class="metric-label">💻 IT hardware/software pilot projects</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">95%</span> -->
+                    <span class="metric-label">📦 Productivity monitoring & reporting</span>
+                  </div>
+                  <div class="metric">
+                    <!-- <span class="metric-value">12</span> -->
+                    <span class="metric-label">🧐 Investigate Stock Discrepancies</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="transformation-summary">
+            <div class="transformation-content">
+              <h3>Turning Patterns into Performance</h3>
+              <p>
+                Recognize operational patterns and apply data-driven improvements that deliver measurable results.
+              </p>
+              <div class="core-competencies">
+                <span class="competency">Supply Chain Optimization</span>
+                <span class="competency">International Logistics</span>
+                <span class="competency">Data Analytics</span>
+                <span class="competency">Procurement Strategy</span>
+                <span class="competency">Fashion Retail</span>
+                <span class="competency">Process Innovation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+      <div class="container">
+        <h2 class="section-title">Personal Projects</h2>
+        <div class="projects-grid">
+          <div
+            class="project-tile"
+            onclick="window.open('https://aws-portfolio.janetxiushi.me', '_blank')"
+          >
+            <div class="project-content">
+              <h3>AWS Cloud Solutions</h3>
+              <p>Enterprise cloud architecture and infrastructure automation</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://developers.google.com/profile/u/xiushi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>Google Cloud Platform</h3>
+              <p>Data analytics and machine learning implementations</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>Open Source</h3>
+              <p>Community projects</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi/Xiu-s-ML-Playbook', '_blank')"
+          >
+           
+          <div class="project-content">
+              <h3>Data Visualization</h3>
+              <p>Interactive dashboards and analytics tools</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi/DevOps_CICD', '_blank')"
+          >
+            <div class="project-content">
+              <h3>Automation Scripts</h3>
+              <p>Process optimization and workflow automation</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>Cloud Migration</h3>
+              <p>Legacy system migration to cloud infrastructure</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>DevOps & QA </h3>
+              <p>CI/CD pipelines, automation and quality assurance</p>
+            </div>
+          </div>
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>Security</h3>
+              <p>Cloud and AI application Security</p>
+            </div>
+          </div>
+
+          <div
+            class="project-tile"
+            onclick="window.open('https://github.com/xiu-shi', '_blank')"
+          >
+            <div class="project-content">
+              <h3>AI Projects</h3>
+              <p>Experimental technologies and proof of concepts</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="community">
+      <div class="container">
+        <h2 class="section-title">Community</h2>
+        <div class="community-grid">
+         
+          <div class="community-tile" onclick="openGallery('tech-conferences')">
+            <div class="community-content">
+              <h3>GDG DevFest Ireland</h3>
+              <p>Google Developer Group events</p>
+            </div>
+          </div>
+          
+          
+          <div class="community-tile" onclick="openGallery('education')">
+            <div class="community-content">
+              <h3>Educational Initiatives</h3>
+              <p>CS50 and Raspberry Pi Foundation</p>
+            </div>
+          </div>
+         
+          <div class="community-tile" onclick="openGallery('workshops')">
+            <div class="community-content">
+              <h3>Technical Workshops</h3>
+              <p>Knowledge sharing and skill development</p>
+            </div>
+          </div>
+          
+          </div>
+        
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Media Icons -->
+    <section id="social" class="social-section">
+      <div class="container">
+        <div class="social-icons">
+          <a
+            href="https://www.linkedin.com/in/janetxiushi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="LinkedIn"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://medium.com/@eupirate"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Medium"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://github.com/xiu-shi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="GitHub"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://www.instagram.com/janetxiushi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Instagram"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://www.youtube.com/@XiuShi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="YouTube"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+              />
+            </svg>
+          </a>
+
+          <!-- X (Twitter) -->
+          <a
+            href="https://x.com/janetxiushi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="X (Twitter)"
+          >
+            <!-- simple “X” mark that inherits currentColor -->
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4"  y1="4"  x2="20" y2="20"></line>
+              <line x1="20" y1="4"  x2="4"  y2="20"></line>
+            </svg>
+          </a> 
+
+          <a
+            href="https://ie.pinterest.com/janetxiushi/photography-by-janet-xiu-shi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-icon"
+            aria-label="Pinterest"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.347-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact">
+  <div class="container">
+    <h2 class="section-title">Contact Me</h2>
+
+    <!-- [UPDATE 2025-08-22] Keep native validation + our JS. -->
+    <form class="contact-form" id="contactForm" novalidate>
+      <!-- Name (required) -->
+      <div class="form-group">
+        <label for="name">Your Name *</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          maxlength="40"
+          autocomplete="name"
+          aria-describedby="nameError"
+          inputmode="text"
+        />
+        <!-- [UPDATE] a11y: aria-live for SR feedback -->
+        <span class="error-message" id="nameError" aria-live="polite"></span>
+      </div>
+
+      <!-- Email (required) -->
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          maxlength="50"
+          autocomplete="email"
+          aria-describedby="emailError"
+          inputmode="email"
+        />
+        <span class="error-message" id="emailError" aria-live="polite"></span>
+      </div>
+
+      <!-- Portfolio (optional; validate only if filled) -->
+      <div class="form-group">
+        <!-- [FIX] removed stray backtick -->
+        <label for="portfolio">Portfolio</label>
+        <input
+          type="url"
+          id="portfolio"
+          name="portfolio"
+          maxlength="90"
+          placeholder="https://example.com/..."
+          aria-describedby="portfolioError"
+          inputmode="url"
+        />
+        <span class="error-message" id="portfolioError" aria-live="polite"></span>
+      </div>
+
+      <!-- LinkedIn (optional; validate only if filled) -->
+      <div class="form-group">
+        <label for="linkedin">LinkedIn</label>
+        <input
+          type="url"
+          id="linkedin"
+          name="linkedin"
+          maxlength="60"
+          placeholder="https://linkedin.com/in/your-handle"
+          aria-describedby="linkedinError"
+          inputmode="url"
+        />
+        <span class="error-message" id="linkedinError" aria-live="polite"></span>
+      </div>
+
+      <!-- GitHub (optional; validate only if filled) -->
+      <div class="form-group">
+        <label for="github">GitHub</label>
+        <input
+          type="url"
+          id="github"
+          name="github"
+          maxlength="60"
+          placeholder="https://github.com/username"
+          aria-describedby="githubError"
+          inputmode="url"
+        />
+        <span class="error-message" id="githubError" aria-live="polite"></span>
+      </div>
+
+      <!-- Short Message (required) -->
+      <div class="form-group">
+        <label for="message">A short message? *</label>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          maxlength="150"
+          minlength="20"
+          required
+          aria-describedby="messageError messageCounter"
+        ></textarea>
+
+        <div class="char-counter">
+          <span id="messageCounter">0</span>/150
+        </div>
+        <span class="error-message" id="messageError" aria-live="polite"></span>
+      </div>
+
+      <!-- Human check (required) -->
+      <div class="form-group">
+        <label class="checkbox-label" for="humanVerification">
+          <input type="checkbox" id="humanVerification" required />
+          <span class="checkmark"></span>
+          I am a human and not a bot
+        </label>
+        <span class="error-message" id="verificationError" aria-live="polite"></span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+        Send Message
+      </button>
+    </form>
+  </div>
+</section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2025 All rights reserved janetxiushi.me ❤️</p>
+      </div>
+    </footer>
+
+    <script src="script_contact.js" defer></script>
+    <!--chat-->
+    <script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="9dkPxUNNQGs13K4_VvRpP";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+    </script>
+  </body>
+</html>

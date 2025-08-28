@@ -1,0 +1,4 @@
+# real secrets & vendor stuff
+/private/
+/api/vendor/
+api/config.php          # if you ever put real values here locally

@@ -1,0 +1,13 @@
+# api/.htaccess
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Only allow POST and OPTIONS to contact.php
+<Files "contact.php">
+  <LimitExcept POST OPTIONS>
+    Require all denied
+  </LimitExcept>
+</Files>
