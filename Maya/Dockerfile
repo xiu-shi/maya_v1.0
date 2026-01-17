@@ -5,28 +5,20 @@
 FROM node:18-alpine
 
 # Install wget for health checks
-RUN apk add --no-cache wget
-
-# Create directory structure
-RUN mkdir -p /app/Maya/backend /app/Maya/knowledge /app/Maya/frontend
+RUN apk add --no-cache wget curl
 
 # Set working directory
+WORKDIR /app
+
+# Copy entire Maya directory structure
+COPY Maya/ ./Maya/
+
+# Set working directory to backend
 WORKDIR /app/Maya/backend
 
-# Copy package files first (for better Docker layer caching)
-COPY Maya/backend/package.json Maya/backend/package-lock.json ./
-
 # Install dependencies (production only)
-RUN npm ci --only=production --ignore-scripts || npm install --only=production --ignore-scripts
-
-# Copy backend source files (exclude node_modules, logs, etc via .dockerignore)
-COPY Maya/backend/ ./
-
-# Copy knowledge base
-COPY Maya/knowledge/ /app/Maya/knowledge/
-
-# Copy frontend
-COPY Maya/frontend/ /app/Maya/frontend/
+# Use npm install instead of npm ci for more flexibility
+RUN npm install --only=production --ignore-scripts
 
 # Expose port
 EXPOSE 3000
