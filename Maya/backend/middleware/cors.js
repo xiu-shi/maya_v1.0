@@ -28,19 +28,35 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    // In production, if origin matches the deployment domain pattern, allow it
+    // In production, allow same-origin requests
     // This handles cases where browser sends Origin header for same-origin requests
     if (config.isProduction) {
       try {
         const originUrl = new URL(origin);
-        // Check if any allowed origin has the same hostname
+        const originHostname = originUrl.hostname;
+        
+        // Explicitly allow maya-agent.ai-builders.space and *.ai-builders.space subdomains
+        const allowedProductionDomains = [
+          'maya-agent.ai-builders.space',
+          'ai-builders.space'
+        ];
+        
+        const isProductionDomain = allowedProductionDomains.some(domain => {
+          return originHostname === domain || originHostname.endsWith('.' + domain);
+        });
+        
+        if (isProductionDomain) {
+          return callback(null, true);
+        }
+        
+        // Also check if any allowed origin has the same hostname
         const hostnameMatch = config.allowedOrigins.some(allowed => {
           try {
             const allowedUrl = new URL(allowed);
-            return allowedUrl.hostname === originUrl.hostname;
+            return allowedUrl.hostname === originHostname;
           } catch {
             // If allowed origin is not a full URL, check if it matches hostname pattern
-            return allowed.includes(originUrl.hostname);
+            return allowed.includes(originHostname);
           }
         });
         
