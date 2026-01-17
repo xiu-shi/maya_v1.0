@@ -120,30 +120,18 @@
       padding-right: var(--spacing-lg);
     }
 
-    .maya-hero-title-container {
-      display: flex;
-      align-items: baseline;
-      gap: var(--spacing-sm);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-md);
-    }
-
     .maya-hero-title {
       font-size: var(--font-size-4xl);
       font-weight: 700;
       color: var(--text-primary);
-      margin: 0; /* Remove all margins */
-      line-height: 1.1; /* Tighter line height */
-      display: inline-block;
+      margin-bottom: var(--spacing-sm);
     }
 
     .maya-hero-subtitle {
       font-size: var(--font-size-lg);
       color: var(--text-secondary);
       font-weight: 500;
-      margin: 0; /* Remove all margins */
-      line-height: 1.2; /* Tighter line height */
-      display: inline-block;
+      margin-bottom: var(--spacing-md);
     }
 
     .maya-hero-description {
@@ -682,10 +670,8 @@
           <img src="static/images/hero/maya_tall_portrait.jpg" alt="Maya - Janet's Digital Twin" class="maya-hero-image" />
         </div>
         <div class="maya-hero-bio">
-          <div class="maya-hero-title-container">
-            <h1 class="maya-hero-title">Maya</h1>
-            <p class="maya-hero-subtitle">Janet's Digital Twin</p>
-          </div>
+          <h1 class="maya-hero-title">Maya</h1>
+          <p class="maya-hero-subtitle">Janet's Digital Twin</p>
           <div class="maya-hero-description">
             <p>
               <strong>Turning Complexity into Your Lasting Advantage.</strong>
@@ -700,6 +686,10 @@
               <li><strong>For Founders & Senior Leaders:</strong> I align your AI and cloud strategy with business goals, turning technical complexity into competitive advantage. I help you move fast without compromising security or compliance, from early cloud decisions to scaling AI adoption.</li>
               <li><strong>For Educators & Institutions:</strong> I design future-ready AI learning by integrating AI into curriculum and assessment, making complex concepts accessible. My approach combines enterprise experience with pedagogical rigor, preparing students and emerging leaders to lead responsibly.</li>
             </ul>
+            <p style="margin-top: var(--spacing-lg); padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid var(--accent-color);">
+              <strong style="font-size: var(--font-size-lg); display: block; margin-bottom: var(--spacing-sm);">Ready to turn complexity into your competitive advantage?</strong>
+              Let's explore how AI and cloud strategy can drive measurable business outcomes for your organization. Book a free strategy session to discuss your specific challenges and opportunities.
+            </p>
             <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg); flex-wrap: wrap;">
               <a href="https://janetxiushi.me/#contact" style="display: inline-block; padding: var(--spacing-md) var(--spacing-xl); background: var(--accent-color); color: var(--bg-primary); text-decoration: none; border-radius: 8px; font-weight: 600; transition: all var(--transition-normal); text-align: center; min-width: 200px;">
                 📅 Book a Free Strategy Call
@@ -816,9 +806,9 @@
     const emptyState = document.getElementById('emptyState');
     const chatHistory = document.getElementById('chatHistory');
 
-    // Chat state - Start fresh on each page load
+    // Chat state
     let currentChatId = null;
-    let chats = []; // Always start with empty chats for fresh experience
+    let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
 
     // API Configuration
@@ -857,96 +847,30 @@
       fullUrl: window.location.href
     });
 
-    // Initialize - Start fresh, scroll to top
+    // Initialize
     function init() {
-      // Always start with fresh state (no chat history loaded)
-      currentChatId = null;
-      messageHistory = [];
-      chats = [];
-      
-      // Don't load from localStorage - start fresh each time
-      // localStorage.removeItem('mayaChats'); // Optional: uncomment to clear on each visit
-      
-      // Render empty chat history
       renderChatHistory();
-      
-      // Show empty state (no messages)
-      clearMessages();
-      
-      // Scroll to top of page immediately
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      if (document.documentElement) {
-        document.documentElement.scrollTop = 0;
+      if (chats.length > 0) {
+        loadChat(chats[0].id);
       }
-      if (document.body) {
-        document.body.scrollTop = 0;
-      }
-      
-      // Also scroll chat messages container to top
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-      }
-      
-      // Don't focus input on initial load - it causes page to scroll to bottom
-      // User can click/focus when ready
-    }
-
-    // Ensure elements exist before attaching event listeners
-    if (!chatInput || !submitBtn || !newChatBtn) {
-      console.error('❌ Critical elements not found:', {
-        chatInput: !!chatInput,
-        submitBtn: !!submitBtn,
-        newChatBtn: !!newChatBtn
-      });
     }
 
     // Auto-resize textarea
-    if (chatInput) {
-      chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-      });
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
 
-      // Send on Enter (Shift+Enter for new line)
-      chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          // Use setTimeout to ensure sendMessage is defined (it's defined later in the code)
-          setTimeout(() => {
-            if (typeof sendMessage === 'function') {
-              sendMessage();
-            } else {
-              console.error('❌ sendMessage function not available');
-            }
-          }, 0);
-        }
-      });
-    }
-
-    if (submitBtn) {
-      submitBtn.addEventListener('click', function(e) {
+    // Send on Enter (Shift+Enter for new line)
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        // Use setTimeout to ensure sendMessage is defined (it's defined later in the code)
-        setTimeout(() => {
-          if (typeof sendMessage === 'function') {
-            sendMessage();
-          } else {
-            console.error('❌ sendMessage function not available');
-          }
-        }, 0);
-      });
-    }
+        sendMessage();
+      }
+    });
 
-    if (newChatBtn) {
-      newChatBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (typeof createNewChat === 'function') {
-          createNewChat();
-        } else {
-          console.error('❌ createNewChat function not available');
-        }
-      });
-    }
+    submitBtn.addEventListener('click', sendMessage);
+    newChatBtn.addEventListener('click', createNewChat);
 
     // Create new chat
     function createNewChat() {
@@ -977,28 +901,13 @@
       messageHistory = chat.messages || [];
       renderMessages();
       renderChatHistory();
-      // Scroll to bottom when loading an existing chat (user clicked on history)
-      if (messageHistory.length > 0) {
-        scrollToBottom();
-      }
       chatInput.focus();
     }
 
     // Send message
     async function sendMessage() {
-      // Defensive checks
-      if (!chatInput) {
-        console.error('❌ chatInput element not found');
-        return;
-      }
-      
       const message = chatInput.value.trim();
-      if (!message) {
-        console.log('⚠️ Empty message, ignoring');
-        return;
-      }
-
-      console.log('📤 sendMessage called with:', message);
+      if (!message) return;
 
       // Check chat limit: 30 messages total (15 user inputs + 15 responses)
       const userMessageCount = messageHistory.filter(msg => msg.role === 'user').length;
@@ -1044,9 +953,7 @@
       }
 
       // Show typing indicator
-      console.log('💬 Showing typing indicator...');
       const typingId = showTypingIndicator();
-      console.log('💬 Typing indicator shown with ID:', typingId);
 
       try {
         // Call backend API
@@ -1066,42 +973,28 @@
 
         console.log('📥 Response status:', response.status, response.statusText);
 
-        // Remove typing indicator before processing response
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
+        // Remove typing indicator
         removeTypingIndicator(typingId);
 
-        // Check if response is OK first, before parsing JSON
         if (!response.ok) {
-          // Try to parse error response JSON, but handle cases where body might be empty/invalid
-          let errorData = {};
-          try {
-            const text = await response.text();
-            if (text) {
-              errorData = JSON.parse(text);
-            }
-          } catch (parseError) {
-            // If JSON parsing fails, use empty object (we'll use status code)
-            console.warn('⚠️ Could not parse error response as JSON:', parseError);
-          }
-          
           // Log more details for debugging (especially 503 errors)
           console.error('❌ API Error Response:', {
             status: response.status,
             statusText: response.statusText,
-            error: errorData.error,
-            message: errorData.message,
-            details: errorData.details
+            error: data.error,
+            message: data.message,
+            details: data.details
           });
           
           // Throw error with more context
-          const error = new Error(errorData.error || errorData.message || `API error: ${response.status} ${response.statusText}`);
+          const error = new Error(data.error || data.message || `API error: ${response.status} ${response.statusText}`);
           error.status = response.status;
-          error.data = errorData;
+          error.data = data;
           throw error;
         }
-
-        // Response is OK, parse JSON
-        const data = await response.json();
-        console.log('📥 Response data:', data);
 
         // Add Maya's response
         const mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
@@ -1204,17 +1097,10 @@
         // Ensure scroll after error message
         setTimeout(() => scrollToBottom(true), 100);
       } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-        }
-        if (chatInput) {
-          chatInput.focus();
-        }
+        submitBtn.disabled = false;
+        chatInput.focus();
       }
     }
-
-    // Event listeners are already attached above (lines 904-943)
-    // They check for function availability before calling, so they're safe
 
     // Add message to UI
     function addMessage(role, content, messageId = null) {
@@ -1367,11 +1253,6 @@
 
     // Show typing indicator
     function showTypingIndicator() {
-      if (!chatMessages) {
-        console.error('❌ chatMessages element not found for typing indicator');
-        return 'typing-error';
-      }
-
       const typingId = 'typing-' + Date.now();
       const typingDiv = document.createElement('div');
       typingDiv.id = typingId;
@@ -1381,15 +1262,6 @@
       avatar.src = 'static/images/hero/maya.jpg';
       avatar.alt = 'Maya';
       avatar.className = 'maya-message-avatar';
-      avatar.onerror = function() {
-        console.warn('⚠️ Maya avatar image failed to load');
-        // Fallback: use text avatar
-        this.style.display = 'none';
-        const textAvatar = document.createElement('div');
-        textAvatar.className = 'maya-message-avatar';
-        textAvatar.textContent = 'M';
-        typingDiv.insertBefore(textAvatar, typingDiv.firstChild);
-      };
       
       const dotsDiv = document.createElement('div');
       dotsDiv.className = 'maya-typing-dots';
@@ -1399,7 +1271,6 @@
       typingDiv.appendChild(dotsDiv);
       
       chatMessages.appendChild(typingDiv);
-      console.log('✅ Typing indicator added to DOM');
       
       // Scroll to bottom after DOM update
       scrollToBottom();
@@ -1466,10 +1337,8 @@
         const messageId = msg.id || `msg-${index}`;
         addMessage(msg.role === 'user' ? 'user' : 'maya', msg.content, messageId);
       });
-      // Only scroll to bottom if there are messages (not on initial load)
-      if (messageHistory.length > 0) {
-        scrollToBottom();
-      }
+      // Scroll to bottom after rendering all messages
+      scrollToBottom();
     }
 
     // Clear messages
@@ -1582,62 +1451,8 @@
       localStorage.setItem('mayaChats', JSON.stringify(chats));
     }
 
-    // Initialize on load - ensure page scrolls to top
-    function ensureTopAndInit() {
-      // Force scroll to top multiple times to ensure it sticks
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      if (document.documentElement) {
-        document.documentElement.scrollTop = 0;
-      }
-      if (document.body) {
-        document.body.scrollTop = 0;
-      }
-      
-      // Initialize after ensuring we're at top
-      init();
-      
-      // Re-enforce scroll to top after init (in case anything scrolled)
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        if (document.documentElement) {
-          document.documentElement.scrollTop = 0;
-        }
-        if (document.body) {
-          document.body.scrollTop = 0;
-        }
-      }, 50);
-      
-      // One more check after a longer delay
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }, 200);
-    }
-    
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', ensureTopAndInit);
-    } else {
-      // Already loaded, ensure top and init immediately
-      ensureTopAndInit();
-    }
-    
-    // Also handle page visibility changes (when user returns to tab)
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        // When page becomes visible, ensure we're at top
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
-    });
-    
-    // Prevent any auto-scroll on page load
-    window.addEventListener('load', function() {
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      if (document.documentElement) {
-        document.documentElement.scrollTop = 0;
-      }
-      if (document.body) {
-        document.body.scrollTop = 0;
-      }
-    });
+    // Initialize on load
+    init();
   </script>
 
   <!-- Social Media Icons -->
