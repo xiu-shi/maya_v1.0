@@ -120,21 +120,30 @@
       padding-right: var(--spacing-lg);
     }
 
+    .maya-hero-title-container {
+      display: flex;
+      align-items: baseline;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-md);
+    }
+
     .maya-hero-title {
       font-size: var(--font-size-4xl);
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 0; /* No bottom margin - subtitle sits directly below */
+      margin: 0; /* Remove all margins */
       line-height: 1.1; /* Tighter line height */
+      display: inline-block;
     }
 
     .maya-hero-subtitle {
       font-size: var(--font-size-lg);
       color: var(--text-secondary);
       font-weight: 500;
-      margin-top: 0; /* No top margin - sits directly below title */
-      margin-bottom: var(--spacing-md);
+      margin: 0; /* Remove all margins */
       line-height: 1.2; /* Tighter line height */
+      display: inline-block;
     }
 
     .maya-hero-description {
@@ -673,8 +682,10 @@
           <img src="static/images/hero/maya_tall_portrait.jpg" alt="Maya - Janet's Digital Twin" class="maya-hero-image" />
         </div>
         <div class="maya-hero-bio">
-          <h1 class="maya-hero-title">Maya</h1>
-          <p class="maya-hero-subtitle">Janet's Digital Twin</p>
+          <div class="maya-hero-title-container">
+            <h1 class="maya-hero-title">Maya</h1>
+            <p class="maya-hero-subtitle">Janet's Digital Twin</p>
+          </div>
           <div class="maya-hero-description">
             <p>
               <strong>Turning Complexity into Your Lasting Advantage.</strong>
