@@ -891,22 +891,56 @@
       // User can click/focus when ready
     }
 
+    // Ensure elements exist before attaching event listeners
+    if (!chatInput || !submitBtn || !newChatBtn) {
+      console.error('❌ Critical elements not found:', {
+        chatInput: !!chatInput,
+        submitBtn: !!submitBtn,
+        newChatBtn: !!newChatBtn
+      });
+    }
+
     // Auto-resize textarea
-    chatInput.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-    });
+    if (chatInput) {
+      chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
 
-    // Send on Enter (Shift+Enter for new line)
-    chatInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      // Send on Enter (Shift+Enter for new line)
+      chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (typeof sendMessage === 'function') {
+            sendMessage();
+          } else {
+            console.error('❌ sendMessage function not available');
+          }
+        }
+      });
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        sendMessage();
-      }
-    });
+        if (typeof sendMessage === 'function') {
+          sendMessage();
+        } else {
+          console.error('❌ sendMessage function not available');
+        }
+      });
+    }
 
-    submitBtn.addEventListener('click', sendMessage);
-    newChatBtn.addEventListener('click', createNewChat);
+    if (newChatBtn) {
+      newChatBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof createNewChat === 'function') {
+          createNewChat();
+        } else {
+          console.error('❌ createNewChat function not available');
+        }
+      });
+    }
 
     // Create new chat
     function createNewChat() {
@@ -946,8 +980,19 @@
 
     // Send message
     async function sendMessage() {
+      // Defensive checks
+      if (!chatInput) {
+        console.error('❌ chatInput element not found');
+        return;
+      }
+      
       const message = chatInput.value.trim();
-      if (!message) return;
+      if (!message) {
+        console.log('⚠️ Empty message, ignoring');
+        return;
+      }
+
+      console.log('📤 sendMessage called with:', message);
 
       // Check chat limit: 30 messages total (15 user inputs + 15 responses)
       const userMessageCount = messageHistory.filter(msg => msg.role === 'user').length;
@@ -993,7 +1038,9 @@
       }
 
       // Show typing indicator
+      console.log('💬 Showing typing indicator...');
       const typingId = showTypingIndicator();
+      console.log('💬 Typing indicator shown with ID:', typingId);
 
       try {
         // Call backend API
@@ -1307,6 +1354,11 @@
 
     // Show typing indicator
     function showTypingIndicator() {
+      if (!chatMessages) {
+        console.error('❌ chatMessages element not found for typing indicator');
+        return 'typing-error';
+      }
+
       const typingId = 'typing-' + Date.now();
       const typingDiv = document.createElement('div');
       typingDiv.id = typingId;
@@ -1316,6 +1368,15 @@
       avatar.src = 'static/images/hero/maya.jpg';
       avatar.alt = 'Maya';
       avatar.className = 'maya-message-avatar';
+      avatar.onerror = function() {
+        console.warn('⚠️ Maya avatar image failed to load');
+        // Fallback: use text avatar
+        this.style.display = 'none';
+        const textAvatar = document.createElement('div');
+        textAvatar.className = 'maya-message-avatar';
+        textAvatar.textContent = 'M';
+        typingDiv.insertBefore(textAvatar, typingDiv.firstChild);
+      };
       
       const dotsDiv = document.createElement('div');
       dotsDiv.className = 'maya-typing-dots';
@@ -1325,6 +1386,7 @@
       typingDiv.appendChild(dotsDiv);
       
       chatMessages.appendChild(typingDiv);
+      console.log('✅ Typing indicator added to DOM');
       
       // Scroll to bottom after DOM update
       scrollToBottom();
