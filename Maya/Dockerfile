@@ -1,27 +1,29 @@
 # Maya Backend Dockerfile
 # For deployment on AI Builder Space / Koyeb platform
-# Build context should be repository root
+# Build context: repository root
 
 FROM node:18-alpine
 
-# Create app directory structure
-WORKDIR /app
+# Install wget for health checks
+RUN apk add --no-cache wget
+
+# Set working directory to backend
+WORKDIR /app/Maya/backend
 
 # Copy package files first (for better Docker layer caching)
-COPY Maya/backend/package*.json ./Maya/backend/
+COPY Maya/backend/package*.json ./
 
-# Install dependencies
-WORKDIR /app/Maya/backend
-RUN npm install --production
+# Install dependencies (production only, ignore scripts to avoid build issues)
+RUN npm ci --only=production --ignore-scripts
 
 # Copy backend application files
 COPY Maya/backend/ ./
 
-# Copy knowledge base (needed at runtime)
-COPY Maya/knowledge/ ../knowledge/
+# Copy knowledge base (needed at runtime) - maintain relative structure
+COPY Maya/knowledge/ /app/Maya/knowledge/
 
-# Copy frontend (needed for static file serving)
-COPY Maya/frontend/ ../frontend/
+# Copy frontend (needed for static file serving) - maintain relative structure  
+COPY Maya/frontend/ /app/Maya/frontend/
 
 # Expose port
 EXPOSE 3000
@@ -30,9 +32,9 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Health check (optional but recommended)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+# Health check - wait longer for startup, then check health endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # Start server
 CMD ["node", "server.js"]
