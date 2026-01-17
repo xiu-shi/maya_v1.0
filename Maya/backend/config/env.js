@@ -30,9 +30,18 @@ function getEnv(key, defaultValue = null, required = false) {
 
 /**
  * Validate AI_BUILDER_TOKEN format
+ * Allows null during build/startup - will be validated when actually used
  */
 function validateToken(token) {
+  // During Docker build or initial startup, token might not be set yet
+  // Allow null/undefined - will be validated when MCP client is actually used
   if (!token) {
+    // In production, log warning but don't fail immediately
+    // Token will be validated when MCP client tries to connect
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️  Warning: AI_BUILDER_TOKEN is not set. Service may not function correctly.');
+      return null; // Return null instead of throwing
+    }
     throw new Error('AI_BUILDER_TOKEN is required');
   }
   
@@ -64,8 +73,8 @@ function parseOrigins(originsString) {
 
 // Environment configuration
 const config = {
-  // Required
-  aiBuilderToken: validateToken(getEnv('AI_BUILDER_TOKEN', null, true)),
+  // Required (but allow null during build - will be validated at runtime)
+  aiBuilderToken: validateToken(getEnv('AI_BUILDER_TOKEN', null, false)), // Changed to false - don't require during build
   
   // Server
   nodeEnv: getEnv('NODE_ENV', 'development'),

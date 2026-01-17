@@ -1,16 +1,17 @@
 # Maya Backend Dockerfile
 # For deployment on AI Builder Space / Koyeb platform
-# Build context: repository root
+# Build context should be repository root
 
 FROM node:18-alpine
 
-# Set working directory to backend
-WORKDIR /app/Maya/backend
+# Create app directory structure
+WORKDIR /app
 
-# Copy package files first (for better caching)
-COPY Maya/backend/package*.json ./
+# Copy package files first (for better Docker layer caching)
+COPY Maya/backend/package*.json ./Maya/backend/
 
 # Install dependencies
+WORKDIR /app/Maya/backend
 RUN npm install --production
 
 # Copy backend application files
@@ -25,9 +26,13 @@ COPY Maya/frontend/ ../frontend/
 # Expose port
 EXPOSE 3000
 
-# Set environment
+# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+
+# Health check (optional but recommended)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start server
 CMD ["node", "server.js"]
