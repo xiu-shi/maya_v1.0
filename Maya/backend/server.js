@@ -41,6 +41,20 @@ app.use(customSecurityHeaders);
 // CORS (before routes)
 app.use(corsMiddleware);
 
+// Root endpoint - MUST be BEFORE static middleware
+// Express static middleware returns 404 if file not found, doesn't call next()
+// So we need to handle root path explicitly BEFORE static middleware
+// Use app.all() to catch all HTTP methods for root path
+app.all('/', (req, res, next) => {
+  logInfo('Root route handler called', { 
+    method: req.method, 
+    path: req.path,
+    url: req.url,
+    originalUrl: req.originalUrl
+  });
+  res.redirect(301, '/maya.html');
+});
+
 // Serve static files from frontend directory (for development)
 // This must be BEFORE body parsing to avoid interfering with static file requests
 // This allows accessing maya.html via http://localhost:3000 instead of file://
@@ -56,7 +70,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(frontendPath));
+// Serve static files (index: false prevents serving index.html automatically)
+app.use(express.static(frontendPath, {
+  index: false // Don't serve index.html automatically
+}));
 
 // Body parsing with size limits (only for API routes)
 app.use(express.json({ limit: config.maxRequestSize }));
@@ -113,11 +130,6 @@ async function getMCPClient() {
 
 logInfo('Setting up routes...');
 
-// Root endpoint - redirect to frontend
-app.get('/', (req, res) => {
-  res.redirect('/maya.html');
-});
-
 // Health check endpoint
 app.get('/health', async (req, res) => {
   // Don't wait for MCP client to avoid blocking health checks
@@ -139,6 +151,7 @@ app.get('/health', async (req, res) => {
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
     mcpConnected: client?.connected || false,
+    tokenConfigured: !!config.aiBuilderToken, // Added: helps diagnose connection issues
     kb: kbStatus || { status: 'not_available' }
   });
 });
@@ -436,9 +449,26 @@ app.post('/api/chat',
       logInfo('Input warnings', { warnings });
     }
     
+    // Check if AI_BUILDER_TOKEN is configured
+    if (!config.aiBuilderToken) {
+      logError('AI_BUILDER_TOKEN is not configured', null, {
+        nodeEnv: config.nodeEnv,
+        hasToken: !!process.env.AI_BUILDER_TOKEN
+      });
+      return res.status(503).json({
+        error: 'Service configuration error',
+        message: 'AI service is not properly configured. Please contact the administrator.',
+        details: config.isDevelopment ? 'AI_BUILDER_TOKEN environment variable is not set' : undefined
+      });
+    }
+    
     // Ensure MCP client is loaded and connected (lazy loading)
     const client = await getMCPClient();
     if (!client) {
+      logError('MCP client initialization failed', null, {
+        hasToken: !!config.aiBuilderToken,
+        tokenLength: config.aiBuilderToken ? config.aiBuilderToken.length : 0
+      });
       return res.status(503).json({
         error: 'Service temporarily unavailable',
         message: 'Unable to initialize AI service. Please try again in a moment.'
@@ -449,7 +479,10 @@ app.post('/api/chat',
       try {
         await client.connect();
       } catch (error) {
-        logError('Failed to connect to MCP server', error);
+        logError('Failed to connect to MCP server', error, {
+          hasToken: !!config.aiBuilderToken,
+          tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none'
+        });
         return res.status(503).json({
           error: 'Service temporarily unavailable',
           message: 'Unable to connect to AI service. Please try again in a moment.'
@@ -458,23 +491,85 @@ app.post('/api/chat',
     }
     
     try {
-      // Get response from MCP client
-      const result = await client.chat(message, history);
+      // Validate MCP client has chat method
+      if (typeof client.chat !== 'function') {
+        logError('MCP client chat method not available', null, {
+          clientType: typeof client,
+          clientMethods: client ? Object.keys(client) : []
+        });
+        return res.status(503).json({
+          error: 'Service temporarily unavailable',
+          message: 'AI service is not properly configured. Please contact the administrator.'
+        });
+      }
+      
+      // Get response from MCP client with timeout protection
+      const chatTimeout = 60000; // 60 seconds timeout
+      const chatPromise = client.chat(message, history);
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Chat request timeout')), chatTimeout);
+      });
+      
+      const result = await Promise.race([chatPromise, timeoutPromise]);
+      
+      // Validate result structure
+      if (!result || typeof result !== 'object') {
+        logError('Invalid MCP client response', null, {
+          resultType: typeof result,
+          resultValue: result
+        });
+        return res.status(500).json({
+          error: 'Internal server error',
+          message: 'Invalid response from AI service. Please try again.'
+        });
+      }
+      
+      // Extract content safely
+      const content = result.content || result.response || result.message || '';
+      if (!content || typeof content !== 'string') {
+        logError('Empty or invalid content in MCP response', null, {
+          contentType: typeof content,
+          hasContent: !!content
+        });
+        return res.status(500).json({
+          error: 'Internal server error',
+          message: 'Empty response from AI service. Please try again.'
+        });
+      }
       
       // Return response
       res.json({
-        response: result.content,
+        response: content,
         warnings: warnings || []
       });
     } catch (error) {
+      // Handle timeout specifically
+      if (error.message === 'Chat request timeout') {
+        logError('Chat request timeout', error, {
+          timeout: chatTimeout,
+          messageLength: message.length,
+          historyLength: history.length
+        });
+        return res.status(504).json({
+          error: 'Request timeout',
+          message: 'The request took too long to process. Please try again with a shorter message.'
+        });
+      }
+      
+      // Handle other errors
       logError('Chat error', error, {
         message: error.message,
         stack: error.stack,
         name: error.name,
-        cause: error.cause
+        cause: error.cause,
+        messageLength: message.length,
+        historyLength: history.length
       });
-      res.status(500).json({
-        error: 'Internal server error',
+      
+      // Determine appropriate status code
+      const statusCode = error.statusCode || error.status || 500;
+      res.status(statusCode).json({
+        error: statusCode === 503 ? 'Service temporarily unavailable' : 'Internal server error',
         message: 'An error occurred while processing your request. Please try again.',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
@@ -508,23 +603,25 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Start server
-logInfo('About to start server...');
-const PORT = config.port;
-logInfo(`Calling app.listen on port ${PORT}...`);
-// Bind to 0.0.0.0 to accept connections from all interfaces (required for Docker/containers)
-app.listen(PORT, '0.0.0.0', () => {
-  logInfo(`Maya backend server started`, {
-    port: PORT,
-    host: '0.0.0.0',
-    environment: config.nodeEnv,
-    nodeVersion: process.version
+// Start server (skip in test environment to allow tests to control server)
+if (process.env.NODE_ENV !== 'test' && !process.env.SKIP_SERVER_START) {
+  logInfo('About to start server...');
+  const PORT = config.port;
+  logInfo(`Calling app.listen on port ${PORT}...`);
+  // Bind to 0.0.0.0 to accept connections from all interfaces (required for Docker/containers)
+  app.listen(PORT, '0.0.0.0', () => {
+    logInfo(`Maya backend server started`, {
+      port: PORT,
+      host: '0.0.0.0',
+      environment: config.nodeEnv,
+      nodeVersion: process.version
+    });
+    logInfo(`Frontend available at: http://0.0.0.0:${PORT}/maya.html`);
+    logInfo(`Health check: http://0.0.0.0:${PORT}/health`);
   });
-  logInfo(`Frontend available at: http://0.0.0.0:${PORT}/maya.html`);
-  logInfo(`Health check: http://0.0.0.0:${PORT}/health`);
-});
 
-logInfo('app.listen() called, server should be starting...');
+  logInfo('app.listen() called, server should be starting...');
+}
 
 export default app;
 

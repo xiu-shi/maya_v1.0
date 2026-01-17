@@ -487,20 +487,31 @@ export class MayaMCPClient {
         { role: 'user', content: message }
       ];
       
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.aiBuilderToken}`
-        },
-        body: JSON.stringify({
-          model: process.env.AI_BUILDERS_MODEL || 'grok-4-fast', // Fast model for better performance
-          messages: messages,
-          temperature: 0.2, // Lower temperature for more focused, consistent responses
-          max_tokens: 400 // English: ~300 words max (300 words × 1.33 tokens/word ≈ 400 tokens) | Chinese: ~250 chars max (250 chars × 1.2 tokens/char ≈ 300 tokens)
-          // Removed include_reasoning and show_reasoning - not supported by API
-        })
-      });
+      // Add timeout protection for fetch request
+      const fetchTimeout = 60000; // 60 seconds timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), fetchTimeout);
+      
+      let response;
+      try {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.aiBuilderToken}`
+          },
+          body: JSON.stringify({
+            model: process.env.AI_BUILDERS_MODEL || 'grok-4-fast', // Fast model for better performance
+            messages: messages,
+            temperature: 0.2, // Lower temperature for more focused, consistent responses
+            max_tokens: 400 // English: ~300 words max (300 words × 1.33 tokens/word ≈ 400 tokens) | Chinese: ~250 chars max (250 chars × 1.2 tokens/char ≈ 300 tokens)
+            // Removed include_reasoning and show_reasoning - not supported by API
+          }),
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!response.ok) {
         let errorData = {};
@@ -513,6 +524,8 @@ export class MayaMCPClient {
         }
         
         const errorMsg = errorData.error?.message || errorData.message || errorData.error || errorText || `API error: ${response.status}`;
+        
+        // Enhanced error logging with more context
         logError('AI Builders API error', {
           status: response.status,
           statusText: response.statusText,
@@ -520,16 +533,60 @@ export class MayaMCPClient {
           url: apiUrl,
           model: process.env.AI_BUILDERS_MODEL || 'grok-4-fast',
           errorData: errorData,
-          rawErrorText: errorText
+          rawErrorText: errorText,
+          messageLength: message.length,
+          historyLength: history.length,
+          hasToken: !!config.aiBuilderToken,
+          tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none'
         });
-        throw new Error(`AI Builders API error (${response.status}): ${errorMsg}`);
+        
+        // Create error with status code for better error handling upstream
+        const error = new Error(`AI Builders API error (${response.status}): ${errorMsg}`);
+        error.statusCode = response.status;
+        error.status = response.status;
+        error.data = errorData;
+        throw error;
       }
 
-      const data = await response.json();
-      let content = data.choices?.[0]?.message?.content || data.content || 'I apologize, but I encountered an error processing your request.';
+      // Parse response with error handling
+      let data;
+      try {
+        const responseText = await response.text();
+        if (!responseText) {
+          throw new Error('Empty response from AI Builders API');
+        }
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        logError('Failed to parse AI Builders API response', parseError, {
+          status: response.status,
+          statusText: response.statusText
+        });
+        throw new Error('Invalid response format from AI service');
+      }
+      
+      // Extract content with validation
+      let content = data.choices?.[0]?.message?.content || data.content || '';
+      
+      if (!content || typeof content !== 'string') {
+        logError('Empty or invalid content in AI Builders API response', null, {
+          hasChoices: !!data.choices,
+          choicesLength: data.choices?.length || 0,
+          hasContent: !!data.content,
+          dataKeys: Object.keys(data || {})
+        });
+        throw new Error('Empty or invalid response from AI service');
+      }
       
       // Clean response: Remove any internal reasoning or thinking process that might leak through
       content = cleanResponse(content);
+      
+      // Ensure cleaned content is still valid
+      if (!content || content.trim().length === 0) {
+        logError('Response cleaning removed all content', null, {
+          originalLength: (data.choices?.[0]?.message?.content || data.content || '').length
+        });
+        content = 'I apologize, but I encountered an error processing your request.';
+      }
       
       // Apply response guardrails to prevent information leakage
       const { validateResponse } = await import('./utils/response-guardrails.js');

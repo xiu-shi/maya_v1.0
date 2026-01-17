@@ -791,9 +791,9 @@
         return apiUrl;
       }
       
-      // Production
-      console.log('🌐 Detected production environment');
-      return 'https://api.janetxiushi.me'; // Update with your actual production API URL
+      // Production - use same origin (deployed service serves both frontend and API)
+      console.log('🌐 Detected production environment, using same origin');
+      return ''; // Empty string = same origin (will use current domain automatically)
     })();
     
     // Log API configuration on load
@@ -937,7 +937,20 @@
         removeTypingIndicator(typingId);
 
         if (!response.ok) {
-          throw new Error(data.error || `API error: ${response.status} ${response.statusText}`);
+          // Log more details for debugging (especially 503 errors)
+          console.error('❌ API Error Response:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: data.error,
+            message: data.message,
+            details: data.details
+          });
+          
+          // Throw error with more context
+          const error = new Error(data.error || data.message || `API error: ${response.status} ${response.statusText}`);
+          error.status = response.status;
+          error.data = data;
+          throw error;
         }
 
         // Add Maya's response
@@ -1022,13 +1035,20 @@
         console.error('❌ Chat error:', {
           message: error.message,
           name: error.name,
-          stack: error.stack,
+          status: error.status,
+          statusText: error.statusText,
           apiUrl: `${API_BASE_URL}/api/chat`,
+          errorData: error.data,
           timestamp: new Date().toISOString()
         });
         
         // Show user-friendly error message (never reveal technical details)
         let errorMessage = `I apologize, but I'm experiencing connection issues at the moment. Please try again in a few moments. If the issue persists, there may be a server-side problem that needs attention.`;
+        
+        // If it's a 503 error, log a helpful hint (but don't show to user)
+        if (error.status === 503) {
+          console.warn('⚠️ Service Unavailable (503) - This usually means AI_BUILDER_TOKEN is not configured in deployment environment variables');
+        }
         
         addMessage('maya', errorMessage);
         // Ensure scroll after error message
