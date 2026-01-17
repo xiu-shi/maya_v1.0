@@ -911,11 +911,14 @@
       chatInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
-          if (typeof sendMessage === 'function') {
-            sendMessage();
-          } else {
-            console.error('❌ sendMessage function not available');
-          }
+          // Use setTimeout to ensure sendMessage is defined (it's defined later in the code)
+          setTimeout(() => {
+            if (typeof sendMessage === 'function') {
+              sendMessage();
+            } else {
+              console.error('❌ sendMessage function not available');
+            }
+          }, 0);
         }
       });
     }
@@ -923,11 +926,14 @@
     if (submitBtn) {
       submitBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        if (typeof sendMessage === 'function') {
-          sendMessage();
-        } else {
-          console.error('❌ sendMessage function not available');
-        }
+        // Use setTimeout to ensure sendMessage is defined (it's defined later in the code)
+        setTimeout(() => {
+          if (typeof sendMessage === 'function') {
+            sendMessage();
+          } else {
+            console.error('❌ sendMessage function not available');
+          }
+        }, 0);
       });
     }
 
@@ -1207,17 +1213,8 @@
       }
     }
 
-    // Ensure event listeners are attached (call again in case setTimeout didn't work)
-    if (typeof attachEventListeners === 'function') {
-      // Already defined above, will be called by setTimeout
-    } else {
-      // Fallback: attach immediately if functions are ready
-      setTimeout(() => {
-        if (typeof sendMessage === 'function' && chatInput && submitBtn) {
-          attachEventListeners();
-        }
-      }, 100);
-    }
+    // Event listeners are already attached above (lines 904-943)
+    // They check for function availability before calling, so they're safe
 
     // Add message to UI
     function addMessage(role, content, messageId = null) {
