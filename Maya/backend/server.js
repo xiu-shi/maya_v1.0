@@ -17,6 +17,7 @@ import { errorHandler, notFoundHandler, asyncHandler } from './middleware/errorH
 import { auditLog } from './middleware/audit.js';
 import { logInfo, logError } from './utils/logger.js';
 import { sanitizeTestOutput, sanitizeJestResults } from './utils/sanitize-output.js';
+import { logChatMessage, getChatLogs, getChatLogsByConversation, getStorageStats } from './utils/chat-logger.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
@@ -84,6 +85,12 @@ app.use(validateRequestSize);
 
 // Audit logging
 app.use(auditLog);
+
+// Track request start time for response time calculation
+app.use((req, res, next) => {
+  req.startTime = Date.now();
+  next();
+});
 
 logInfo('Setting up routes...');
 
@@ -433,6 +440,130 @@ app.post('/api/admin/kb-refresh', asyncHandler(async (req, res) => {
   });
 }));
 
+// Admin endpoints for chat logs (before rate limiting - admin endpoints should have different limits)
+app.get('/api/admin/chat-logs', asyncHandler(async (req, res) => {
+  // TODO: Add authentication/authorization check here
+  // For now, this endpoint is accessible - consider adding API key or IP whitelist
+  
+  const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Default: last 7 days
+  const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+  const groupBy = req.query.groupBy || 'none'; // 'none', 'conversation', 'day', 'month', 'year'
+  const includeRemote = req.query.includeRemote === 'true'; // Option to include remote logs
+  const remoteServer = req.query.remoteServer || 'https://maya-agent.ai-builders.space'; // Remote server URL
+  
+  try {
+    let logs;
+    
+    if (groupBy === 'conversation') {
+      logs = await getChatLogsByConversation(startDate, endDate);
+    } else {
+      logs = await getChatLogs(startDate, endDate);
+    }
+    
+    // If includeRemote is true, fetch and merge remote logs
+    if (includeRemote && !config.isProduction) {
+      try {
+        const { fetchRemoteLogs, mergeLogs } = await import('./utils/remote-logs.js');
+        const remoteLogs = await fetchRemoteLogs(remoteServer, startDate, endDate, groupBy);
+        
+        if (groupBy === 'conversation') {
+          // Merge conversation objects
+          const localConvs = logs;
+          const remoteConvs = remoteLogs.reduce((acc, log) => {
+            if (!acc[log.conversationId]) {
+              acc[log.conversationId] = {
+                conversationId: log.conversationId,
+                messages: [],
+                firstMessage: log.timestamp,
+                lastMessage: log.timestamp,
+                totalMessages: 0,
+                ip: log.ip,
+                userAgent: log.userAgent,
+                remoteServer: log.remoteServer
+              };
+            }
+            acc[log.conversationId].messages.push(log);
+            acc[log.conversationId].totalMessages++;
+            return acc;
+          }, {});
+          
+          logs = { ...localConvs, ...remoteConvs };
+        } else {
+          // Merge arrays
+          logs = mergeLogs(Array.isArray(logs) ? logs : [], remoteLogs);
+        }
+      } catch (remoteError) {
+        logError('Failed to fetch remote logs (continuing with local only)', remoteError, {
+          remoteServer: remoteServer,
+          errorMessage: remoteError.message,
+          errorName: remoteError.name
+        });
+        // Continue with local logs only if remote fetch fails
+        // Log warning but don't fail the request
+      }
+    }
+    
+    res.json({
+      success: true,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      groupBy: groupBy,
+      includeRemote: includeRemote,
+      remoteFetched: includeRemote && !config.isProduction,
+      count: Array.isArray(logs) ? logs.length : Object.keys(logs).length,
+      logs: logs
+    });
+  } catch (error) {
+    logError('Failed to retrieve chat logs', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve chat logs',
+      message: error.message
+    });
+  }
+}));
+
+// Storage statistics endpoint
+app.get('/api/admin/chat-logs/stats', asyncHandler(async (req, res) => {
+  // TODO: Add authentication/authorization check here
+  
+  const includeRemote = req.query.includeRemote === 'true';
+  const remoteServer = req.query.remoteServer || 'https://maya-agent.ai-builders.space';
+  
+  try {
+    const stats = await getStorageStats();
+    
+    // If includeRemote is true, fetch and merge remote stats
+    if (includeRemote && !config.isProduction) {
+      try {
+        const { fetchRemoteStats, mergeStats } = await import('./utils/remote-logs.js');
+        const remoteStats = await fetchRemoteStats(remoteServer);
+        const mergedStats = mergeStats(stats, remoteStats);
+        
+        return res.json({
+          success: true,
+          stats: mergedStats
+        });
+      } catch (remoteError) {
+        logError('Failed to fetch remote stats (continuing with local only)', remoteError);
+        // Continue with local stats only if remote fetch fails
+      }
+    }
+    
+    res.json({
+      success: true,
+      stats: stats
+    });
+  } catch (error) {
+    logError('Failed to get storage stats', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get storage stats',
+      message: error.message
+    });
+  }
+}));
+
 // API routes with rate limiting
 app.use('/api', apiLimiter);
 
@@ -536,6 +667,24 @@ app.post('/api/chat',
           message: 'Empty response from AI service. Please try again.'
         });
       }
+      
+      // Log chat message (async, non-blocking)
+      const requestStartTime = req.startTime || Date.now();
+      const responseTime = Date.now() - requestStartTime;
+      
+      logChatMessage({
+        userMessage: message,
+        assistantResponse: content,
+        history: history,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        warnings: warnings || [],
+        responseTime: responseTime,
+        conversationId: req.body.conversationId // Optional: frontend can send conversationId
+      }).catch(err => {
+        // Log error but don't fail the request
+        logError('Failed to log chat message', err);
+      });
       
       // Return response
       res.json({

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya Chat Logs | Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="static/images/logos/jxs_fav.jpg" />
+  <style>
+    /* Chat Logs Specific Styles */
+    .chat-logs-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 70px;
+      background: var(--bg-primary);
+    }
+
+    .logs-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--spacing-xl) var(--spacing-lg);
+      width: 100%;
+    }
+
+    .logs-header {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .logs-title {
+      font-size: var(--font-size-4xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .logs-subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-lg);
+      transition: all var(--transition-normal);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .filters-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .filter-label {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .filter-input,
+    .filter-select {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family);
+      transition: all var(--transition-fast);
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-filter {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: var(--font-size-base);
+    }
+
+    .btn-filter:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-filter:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--text-secondary);
+    }
+
+    .error-state {
+      background: var(--bg-secondary);
+      border: 1px solid #dc3545;
+      border-radius: 12px;
+      padding: var(--spacing-lg);
+      color: #dc3545;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    /* Grouped View Styles */
+    .group-header {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .group-header:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .group-header.collapsed .group-icon {
+      transform: rotate(-90deg);
+    }
+
+    .group-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .group-count {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      margin-left: var(--spacing-sm);
+    }
+
+    .group-icon {
+      font-size: var(--font-size-xl);
+      transition: transform var(--transition-fast);
+    }
+
+    .group-content {
+      margin-left: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+      display: none;
+    }
+
+    .group-content.expanded {
+      display: block;
+    }
+
+    /* Conversation Card */
+    .conversation-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      transition: all var(--transition-fast);
+    }
+
+    .conversation-card:hover {
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .conversation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .conversation-id {
+      font-size: var(--font-size-sm);
+      font-family: monospace;
+      color: var(--text-secondary);
+    }
+
+    .conversation-meta {
+      display: flex;
+      gap: var(--spacing-md);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .message-item {
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-md);
+      background: var(--bg-primary);
+      border-radius: 8px;
+      border-left: 3px solid var(--border-color);
+    }
+
+    .message-item.user {
+      border-left-color: #007bff;
+    }
+
+    .message-item.assistant {
+      border-left-color: #28a745;
+    }
+
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .message-role {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .message-time {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+    }
+
+    .message-content {
+      color: var(--text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .message-warnings {
+      margin-top: var(--spacing-xs);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      background: #fff3cd;
+      border-radius: 4px;
+      font-size: var(--font-size-xs);
+      color: #856404;
+    }
+
+    [data-theme="dark"] .message-warnings {
+      background: #664d03;
+      color: #ffc107;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: var(--font-size-5xl);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    @media (max-width: 768px) {
+      .logs-container {
+        padding: var(--spacing-md);
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">Janet Xiu Shi</a>
+      <div class="nav-links">
+        <a href="/maya.html" class="nav-link">Chat with Maya</a>
+        <a href="/chat_logs.html" class="nav-link active">Chat Logs</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="chat-logs-page">
+    <div class="logs-container">
+      <!-- Header -->
+      <div class="logs-header">
+        <h1 class="logs-title">Maya Chat Logs</h1>
+        <p class="logs-subtitle">Monitor conversations and analyze Maya's performance</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-label">Total Messages</div>
+          <div class="stat-value" id="statTotalMessages">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Conversations</div>
+          <div class="stat-value" id="statTotalConversations">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Storage Used</div>
+          <div class="stat-value" id="statStorage">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Messages/Conv</div>
+          <div class="stat-value" id="statAvgMessages">-</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label class="filter-label" for="startDate">Start Date</label>
+            <input type="date" id="startDate" class="filter-input" />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="endDate">End Date</label>
+            <input type="date" id="endDate" class="filter-input" />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="groupBy">Group By</label>
+            <select id="groupBy" class="filter-select">
+              <option value="none">None (Chronological)</option>
+              <option value="conversation">Conversation</option>
+              <option value="day">Day</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="includeRemote">
+              <input type="checkbox" id="includeRemote" style="margin-right: 8px;" />
+              Include Production Logs
+            </label>
+          </div>
+          <div class="filter-group">
+            <button id="loadLogsBtn" class="btn-filter">Load Logs</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state" style="display: none;">
+        <p>Loading chat logs...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-state" style="display: none;">
+        <p id="errorMessage"></p>
+      </div>
+
+      <!-- Logs Content -->
+      <div id="logsContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle (reuse from main site)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+    
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+
+    // API Base URL (same origin in production)
+    const API_BASE_URL = (() => {
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
+      const port = window.location.port;
+      
+      // If page is served from file:// protocol, use localhost:3001
+      if (protocol === 'file:') {
+        return 'http://localhost:3001';
+      }
+      
+      // If served from same origin (localhost or production), use relative URLs (empty string)
+      // This ensures same-origin requests work correctly
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('ai-builders.space')) {
+        return ''; // Empty string = same origin (relative URL)
+      }
+      
+      // Fallback: use same origin
+      return '';
+    })();
+    
+    console.log('🌐 API Configuration:', {
+      hostname: window.location.hostname,
+      port: window.location.port,
+      protocol: window.location.protocol,
+      apiBaseUrl: API_BASE_URL || '(same origin)'
+    });
+
+    // Set default date range (last 7 days)
+    const today = new Date();
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    
+    document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
+    document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+    // Load storage stats on page load
+    async function loadStats() {
+      try {
+        const includeRemote = document.getElementById('includeRemote')?.checked || false;
+        let statsUrl = API_BASE_URL 
+          ? `${API_BASE_URL}/api/admin/chat-logs/stats`
+          : '/api/admin/chat-logs/stats';
+        
+        if (includeRemote) {
+          statsUrl += (statsUrl.includes('?') ? '&' : '?') + 'includeRemote=true';
+        }
+        
+        console.log('🔍 Fetching stats from:', statsUrl, includeRemote ? '(including production)' : '(local only)');
+        const response = await fetch(statsUrl);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          const stats = data.stats;
+          document.getElementById('statTotalMessages').textContent = stats.totalMessages.toLocaleString();
+          document.getElementById('statTotalConversations').textContent = stats.totalConversations.toLocaleString();
+          document.getElementById('statStorage').textContent = `${stats.totalSizeMB} MB`;
+          document.getElementById('statAvgMessages').textContent = stats.averageMessagesPerConversation;
+          
+          // Show sources if available
+          if (stats.sources && stats.sources.length > 0) {
+            console.log('📊 Stats sources:', stats.sources);
+          }
+        } else {
+          console.warn('Stats API returned success:false', data);
+        }
+      } catch (error) {
+        console.error('Failed to load stats:', {
+          error: error,
+          message: error.message,
+          url: statsUrl
+        });
+        // Don't show error to user for stats - just log it
+      }
+    }
+
+    // Load chat logs
+    async function loadLogs() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      const groupBy = document.getElementById('groupBy').value;
+      const includeRemote = document.getElementById('includeRemote').checked;
+      
+      const loadingState = document.getElementById('loadingState');
+      const errorState = document.getElementById('errorState');
+      const logsContent = document.getElementById('logsContent');
+      const loadBtn = document.getElementById('loadLogsBtn');
+      
+      loadingState.style.display = 'block';
+      errorState.style.display = 'none';
+      logsContent.innerHTML = '';
+      loadBtn.disabled = true;
+      
+      try {
+        // Build URL properly - handle both absolute and relative URLs
+        let url;
+        if (API_BASE_URL) {
+          // Absolute URL - construct with query parameters
+          const urlObj = new URL(`${API_BASE_URL}/api/admin/chat-logs`);
+          urlObj.searchParams.set('startDate', startDate);
+          urlObj.searchParams.set('endDate', endDate);
+          urlObj.searchParams.set('groupBy', groupBy);
+          if (includeRemote) {
+            urlObj.searchParams.set('includeRemote', 'true');
+          }
+          url = urlObj.toString();
+        } else {
+          // Relative URL - use fetch with query string directly
+          const params = new URLSearchParams({
+            startDate: startDate,
+            endDate: endDate,
+            groupBy: groupBy
+          });
+          if (includeRemote) {
+            params.set('includeRemote', 'true');
+          }
+          url = `/api/admin/chat-logs?${params.toString()}`;
+        }
+        
+        console.log('🔍 Fetching logs from:', url, includeRemote ? '(including production)' : '(local only)');
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { message: errorText || `HTTP ${response.status}: ${response.statusText}` };
+          }
+          throw new Error(errorData.message || errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.message || data.error || 'Failed to load logs');
+        }
+        
+        loadingState.style.display = 'none';
+        renderLogs(data.logs, groupBy);
+      } catch (error) {
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        const errorMsg = error.message || 'Unknown error occurred';
+        document.getElementById('errorMessage').textContent = `Error: ${errorMsg}`;
+        console.error('Failed to load logs:', {
+          error: error,
+          message: error.message,
+          stack: error.stack,
+          url: url
+        });
+      } finally {
+        loadBtn.disabled = false;
+      }
+    }
+
+    // Render logs based on grouping
+    function renderLogs(logs, groupBy) {
+      const logsContent = document.getElementById('logsContent');
+      
+      if (!logs || (Array.isArray(logs) && logs.length === 0) || (typeof logs === 'object' && Object.keys(logs).length === 0)) {
+        logsContent.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No chat logs found for the selected date range.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      if (groupBy === 'conversation') {
+        renderConversationGroup(logs);
+      } else if (groupBy === 'day' || groupBy === 'month' || groupBy === 'year') {
+        renderTimeGroup(logs, groupBy);
+      } else {
+        renderChronological(logs);
+      }
+    }
+
+    // Render chronological list
+    function renderChronological(logs) {
+      const logsContent = document.getElementById('logsContent');
+      logsContent.innerHTML = logs.map(log => renderMessageItem(log)).join('');
+    }
+
+    // Render grouped by conversation
+    function renderConversationGroup(logs) {
+      const logsContent = document.getElementById('logsContent');
+      const conversations = Object.values(logs);
+      
+      logsContent.innerHTML = conversations.map(conv => {
+        const firstMessage = new Date(conv.firstMessage);
+        const lastMessage = new Date(conv.lastMessage);
+        
+        return `
+          <div class="conversation-card">
+            <div class="conversation-header">
+              <div>
+                <div class="conversation-id">${conv.conversationId}</div>
+                <div class="conversation-meta">
+                  <span>${conv.totalMessages} messages</span>
+                  <span>•</span>
+                  <span>${formatDate(firstMessage)} - ${formatDate(lastMessage)}</span>
+                </div>
+              </div>
+              <div class="conversation-meta">
+                <span>IP: ${conv.ip}</span>
+              </div>
+            </div>
+            <div class="messages-list">
+              ${conv.messages.map(msg => renderMessageItem(msg)).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render grouped by time period
+    function renderTimeGroup(logs, groupBy) {
+      const logsContent = document.getElementById('logsContent');
+      const grouped = {};
+      
+      logs.forEach(log => {
+        const date = new Date(log.timestamp);
+        let key;
+        
+        if (groupBy === 'year') {
+          key = date.getFullYear().toString();
+        } else if (groupBy === 'month') {
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        } else { // day
+          key = date.toISOString().split('T')[0];
+        }
+        
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(log);
+      });
+      
+      const sortedKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+      
+      logsContent.innerHTML = sortedKeys.map(key => {
+        const groupLogs = grouped[key];
+        return `
+          <div class="group-header" onclick="toggleGroup('${key}')">
+            <div>
+              <span class="group-title">${formatGroupTitle(key, groupBy)}</span>
+              <span class="group-count">${groupLogs.length} messages</span>
+            </div>
+            <span class="group-icon">▼</span>
+          </div>
+          <div id="group-${key}" class="group-content">
+            ${groupLogs.map(log => renderMessageItem(log)).join('')}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle group expansion
+    function toggleGroup(key) {
+      const content = document.getElementById(`group-${key}`);
+      const header = content.previousElementSibling;
+      
+      if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        header.classList.add('collapsed');
+      } else {
+        content.classList.add('expanded');
+        header.classList.remove('collapsed');
+      }
+    }
+
+    // Render single message item
+    function renderMessageItem(log) {
+      const date = new Date(log.timestamp);
+      const warnings = log.warnings && log.warnings.length > 0 
+        ? `<div class="message-warnings">⚠️ ${log.warnings.join(', ')}</div>` 
+        : '';
+      
+      // Show environment/server indicator
+      const serverBadge = log.isRemote || log.remoteServer 
+        ? `<span style="font-size: 0.75em; color: var(--text-muted); margin-left: 8px;">🌐 Production</span>`
+        : log.environment === 'production'
+        ? `<span style="font-size: 0.75em; color: var(--text-muted); margin-left: 8px;">🌐 Production</span>`
+        : `<span style="font-size: 0.75em; color: var(--text-muted); margin-left: 8px;">💻 Local</span>`;
+      
+      return `
+        <div class="message-item user">
+          <div class="message-header">
+            <span class="message-role">User</span>
+            <span class="message-time">${formatDateTime(date)}${serverBadge}</span>
+          </div>
+          <div class="message-content">${escapeHtml(log.userMessage)}</div>
+          ${warnings}
+        </div>
+        <div class="message-item assistant">
+          <div class="message-header">
+            <span class="message-role">Maya</span>
+            <span class="message-time">${formatDateTime(date)}${log.responseTime ? ` • ${log.responseTime}ms` : ''}${serverBadge}</span>
+          </div>
+          <div class="message-content">${escapeHtml(log.assistantResponse)}</div>
+        </div>
+      `;
+    }
+
+    // Format helpers
+    function formatDate(date) {
+      return date.toLocaleDateString('en-GB', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+
+    function formatDateTime(date) {
+      return date.toLocaleString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function formatGroupTitle(key, groupBy) {
+      if (groupBy === 'year') {
+        return key;
+      } else if (groupBy === 'month') {
+        const [year, month] = key.split('-');
+        const date = new Date(year, parseInt(month) - 1);
+        return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long' });
+      } else {
+        const date = new Date(key);
+        return date.toLocaleDateString('en-GB', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Event listeners
+    document.getElementById('loadLogsBtn').addEventListener('click', loadLogs);
+    
+    // Load stats on page load
+    loadStats();
+  </script>
+</body>
+
+</html>
