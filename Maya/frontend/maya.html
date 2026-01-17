@@ -971,6 +971,7 @@
         // Call backend API
         const apiUrl = `${API_BASE_URL}/api/chat`;
         console.log('📤 Sending request to:', apiUrl);
+        console.log('📤 Request payload:', { message, history: messageHistory });
         
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -984,9 +985,21 @@
         });
 
         console.log('📥 Response status:', response.status, response.statusText);
+        console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
 
-        const data = await response.json();
-        console.log('📥 Response data:', data);
+        // Check if response has content
+        const responseText = await response.text();
+        console.log('📥 Response text (raw):', responseText);
+        
+        let data;
+        try {
+          data = JSON.parse(responseText);
+          console.log('📥 Response data (parsed):', data);
+        } catch (parseError) {
+          console.error('❌ Failed to parse JSON response:', parseError);
+          console.error('❌ Response text was:', responseText);
+          throw new Error('Invalid JSON response from server');
+        }
         
         // Remove typing indicator
         removeTypingIndicator(typingId);
@@ -1010,8 +1023,17 @@
 
         // Add Maya's response
         const mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
+        console.log('💬 Maya response extracted:', mayaResponse);
+        
+        if (!mayaResponse || mayaResponse.trim() === '') {
+          console.error('❌ Empty response from Maya');
+          throw new Error('Empty response from server');
+        }
+        
         const assistantMessageId = `assistant-${Date.now()}`;
+        console.log('💬 Adding message to UI with ID:', assistantMessageId);
         addMessage('maya', mayaResponse, assistantMessageId);
+        console.log('✅ Message added to UI');
         
         // Aggressive scrolling to ensure Maya's response AND input bar are visible
         // Multiple attempts to catch any async rendering delays
@@ -1094,6 +1116,7 @@
           statusText: error.statusText,
           apiUrl: `${API_BASE_URL}/api/chat`,
           errorData: error.data,
+          stack: error.stack,
           timestamp: new Date().toISOString()
         });
         
@@ -1105,7 +1128,16 @@
           console.warn('⚠️ Service Unavailable (503) - This usually means AI_BUILDER_TOKEN is not configured in deployment environment variables');
         }
         
+        // If it's a network error, provide more specific message
+        if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('Failed to fetch')) {
+          console.error('❌ Network error detected');
+          errorMessage = `I'm having trouble connecting to the server. Please check your internet connection and try again.`;
+        }
+        
+        console.log('💬 Adding error message to UI');
         addMessage('maya', errorMessage);
+        console.log('✅ Error message added');
+        
         // Ensure scroll after error message
         setTimeout(() => scrollToBottom(true), 100);
       } finally {
