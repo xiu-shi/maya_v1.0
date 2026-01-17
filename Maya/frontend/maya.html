@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/jpeg" href="static/images/logos/jxs_fav.jpg" />
+  <meta name="copyright" content="© 2026 Janet Xiu Shi. All rights reserved." />
+  <meta name="robots" content="noarchive, nosnippet" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BSD88YBS4B"></script>
   <script>
@@ -18,7 +20,48 @@
     gtag('js', new Date());
     gtag('config', 'G-BSD88YBS4B');
   </script>
+  <!-- Code Protection CSS -->
   <style>
+    /* Prevent text selection (with exceptions for accessibility) */
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    /* Allow selection in form fields, editable content, links, and buttons */
+    input, textarea, [contenteditable="true"], a, button, .nav-link, .btn, .maya-chat-input {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    
+    /* Ensure links and buttons are clickable */
+    a, button {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    
+    /* Prevent image dragging */
+    img {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      pointer-events: auto;
+    }
+    
+    /* Disable text highlighting */
+    ::selection {
+      background: transparent;
+    }
+    ::-moz-selection {
+      background: transparent;
+    }
+    
     /* Maya-specific styles */
     .maya-page {
       min-height: 100vh;
@@ -1505,6 +1548,284 @@
       border-color: #bd081c;
     }
   </style>
+  
+  <!-- Enhanced URL Cleaning & Security - Removes Tracking Parameters -->
+  <script>
+    (function() {
+      'use strict';
+      
+      // Comprehensive tracking parameter removal
+      function cleanUrl(url) {
+        try {
+          let urlToProcess = url;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            urlToProcess = 'https://' + url;
+          }
+          
+          const urlObj = new URL(urlToProcess);
+          
+          // Comprehensive list of tracking parameters
+          const trackingParams = [
+            '_gl', '_ga', '_ga_', '_gid', '_gac', '_gcl_au', '_gcl_aw', '_gcl_dc',
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id',
+            'fbclid', 'gclid', 'msclkid', 'twclid', 'li_fat_id',
+            'ref', 'source', 'campaign', 'medium',
+            'mc_cid', 'mc_eid', '_hsenc', '_hsmi',
+            'igshid', 'igsh', 'igshid',
+            'yclid', 'openstat',
+            'affiliate_id', 'aff_id', 'affiliate',
+            'clickid', 'click_id',
+            'srsltid', 'ved', 'ei'
+          ];
+          
+          // Remove all tracking parameters
+          const keysToRemove = [];
+          urlObj.searchParams.forEach((value, key) => {
+            // Check if key starts with any tracking parameter
+            if (trackingParams.some(tp => key.toLowerCase().startsWith(tp.toLowerCase()))) {
+              keysToRemove.push(key);
+            }
+            // Also remove any parameter containing tracking keywords
+            if (key.toLowerCase().includes('tracking') || 
+                key.toLowerCase().includes('analytics') ||
+                key.toLowerCase().includes('campaign') ||
+                key.toLowerCase().includes('referrer')) {
+              keysToRemove.push(key);
+            }
+          });
+          
+          keysToRemove.forEach(key => urlObj.searchParams.delete(key));
+          
+          // Build clean URL: origin + pathname + hash (no query params)
+          let cleanPath = urlObj.pathname === '/' ? '' : urlObj.pathname;
+          const hash = urlObj.hash || '';
+          
+          return urlObj.origin + cleanPath + hash;
+        } catch (e) {
+          // Fallback: remove everything after ?
+          const urlWithoutQuery = url.split('?')[0];
+          const hashIndex = url.indexOf('#');
+          if (hashIndex !== -1) {
+            return urlWithoutQuery + url.substring(hashIndex);
+          }
+          return urlWithoutQuery;
+        }
+      }
+      
+      // Clean current page URL on load
+      function cleanCurrentUrl() {
+        if (window.location.search) {
+          const clean = cleanUrl(window.location.href);
+          if (clean !== window.location.href) {
+            // Replace URL without page reload (cleaner UX)
+            window.history.replaceState({}, document.title, clean);
+          }
+        }
+      }
+      
+      // Clean URLs for all navigation links
+      function cleanNavigationLinks() {
+        const allLinks = document.querySelectorAll('a[href]');
+        allLinks.forEach(function(link) {
+          const href = link.getAttribute('href');
+          if (href && (href.includes('janetxiushi.me') || href.startsWith('http'))) {
+            const cleanHref = cleanUrl(href);
+            if (cleanHref !== href) {
+              link.setAttribute('href', cleanHref);
+            }
+            
+            // Intercept clicks to ensure clean navigation
+            link.addEventListener('click', function(e) {
+              const currentHref = this.getAttribute('href');
+              if (currentHref && (currentHref.includes('janetxiushi.me') || currentHref.startsWith('http'))) {
+                const finalClean = cleanUrl(currentHref);
+                if (finalClean !== currentHref) {
+                  e.preventDefault();
+                  window.location.href = finalClean;
+                  return false;
+                }
+              }
+            }, false);
+          }
+        });
+      }
+      
+      // Clean URL on page load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          cleanCurrentUrl();
+          cleanNavigationLinks();
+        });
+      } else {
+        cleanCurrentUrl();
+        cleanNavigationLinks();
+      }
+      
+      // Clean URL on popstate (back/forward navigation)
+      window.addEventListener('popstate', function() {
+        cleanCurrentUrl();
+      });
+      
+      // Monitor for URL changes (for SPAs or dynamic content)
+      let lastUrl = window.location.href;
+      setInterval(function() {
+        if (window.location.href !== lastUrl) {
+          lastUrl = window.location.href;
+          cleanCurrentUrl();
+        }
+      }, 100);
+      
+    })();
+  </script>
+  
+  <!-- Code Protection and Security Measures - Enhanced -->
+  <script>
+    (function() {
+      'use strict';
+      
+      // Prevent iframe embedding
+      if (window.top !== window.self) {
+        window.top.location = window.self.location;
+      }
+      
+      // Copyright notice
+      console.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 14px; font-weight: bold;');
+      console.log('%cUnauthorized copying, reproduction, or distribution of this code is prohibited.', 'color: #ff6b6b; font-size: 12px;');
+      
+      // Disable console methods (obfuscated) - only in production
+      const _0x=['log','warn','error','info','debug','trace'];
+      _0x.forEach(function(m){const _=console[m];console[m]=function(){if(window.location.hostname!=='localhost'&&window.location.hostname!=='127.0.0.1'){console.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');return;}return _.apply(console,arguments);}});
+      
+      // Disable right-click context menu
+      document.addEventListener('contextmenu', function(e) {
+        const target = e.target;
+        if (target.tagName === 'INPUT' || 
+            target.tagName === 'TEXTAREA' || 
+            target.tagName === 'A' ||
+            target.tagName === 'BUTTON' ||
+            target.closest('a') ||
+            target.closest('button') ||
+            target.isContentEditable ||
+            target.closest('.maya-chat-input') ||
+            target.closest('.maya-chat-messages')) {
+          return true;
+        }
+        e.preventDefault();
+        return false;
+      }, false);
+      
+      // Disable text selection
+      document.addEventListener('selectstart', function(e) {
+        if (e.target.tagName === 'INPUT' || 
+            e.target.tagName === 'TEXTAREA' || 
+            e.target.isContentEditable ||
+            e.target.closest('.maya-chat-input') ||
+            e.target.closest('.maya-chat-messages')) {
+          return true;
+        }
+        e.preventDefault();
+        return false;
+      }, false);
+      
+      // Disable drag and drop
+      document.addEventListener('dragstart', function(e) {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+          e.preventDefault();
+          return false;
+        }
+      }, false);
+      
+      // Disable keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        const target = e.target;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+          return true;
+        }
+        
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          return true;
+        }
+        
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S (save page)
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'K')) ||
+          (e.ctrlKey && (e.key === 'U' || e.key === 'S'))
+        ) {
+          e.preventDefault();
+          return false;
+        }
+      }, false);
+      
+      // Enhanced dev tools detection
+      let devtools = {open: false, orientation: null};
+      const threshold = 160;
+      const checkDevTools = setInterval(function() {
+        if (window.outerHeight - window.innerHeight > threshold || 
+            window.outerWidth - window.innerWidth > threshold) {
+          if (!devtools.open) {
+            devtools.open = true;
+            console.clear();
+            console.log('%c⚠️ Developer Tools Detected', 'color: #ff6b6b; font-size: 16px; font-weight: bold;');
+            console.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 12px;');
+            console.log('%cUnauthorized code copying is prohibited.', 'color: #ff6b6b; font-size: 12px;');
+          }
+        } else {
+          devtools.open = false;
+        }
+      }, 500);
+      
+      // Detect debugger
+      setInterval(function() {
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          (function() {
+            try {
+              return !/./.test(decodeURIComponent('%2F'));
+            } catch(e) {
+              return false;
+            }
+          })() && (function(){}).constructor('debugger')();
+        }
+      }, 1000);
+      
+      // Prevent copy with copyright notice
+      document.addEventListener('copy', function(e) {
+        const target = e.target;
+        if (target.tagName === 'INPUT' || 
+            target.tagName === 'TEXTAREA' || 
+            target.isContentEditable ||
+            target.closest('.maya-chat-input') ||
+            target.closest('.maya-chat-messages')) {
+          return true;
+        }
+        
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 10) {
+          const selectedText = selection.toString();
+          e.clipboardData.setData('text/plain', selectedText + '\n\n© 2026 Janet Xiu Shi. All rights reserved. Unauthorized copying prohibited.');
+          e.preventDefault();
+        }
+      }, false);
+      
+      // Prevent print screen (basic)
+      document.addEventListener('keyup', function(e) {
+        if (e.key === 'PrintScreen') {
+          navigator.clipboard.writeText('');
+          console.log('%c⚠️ Screenshot detected. Content protected.', 'color: #ff6b6b; font-size: 12px;');
+        }
+      }, false);
+      
+      // Obfuscate sensitive code sections
+      Object.defineProperty(window, 'eval', {
+        value: function() {
+          console.log('%c⚠️ eval() access restricted', 'color: #ff6b6b; font-size: 12px;');
+          return null;
+        },
+        writable: false
+      });
+      
+    })();
+  </script>
 </body>
 
 </html>
