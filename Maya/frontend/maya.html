@@ -1198,9 +1198,25 @@
         // Ensure scroll after error message
         setTimeout(() => scrollToBottom(true), 100);
       } finally {
-        submitBtn.disabled = false;
-        chatInput.focus();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+        if (chatInput) {
+          chatInput.focus();
+        }
       }
+    }
+
+    // Ensure event listeners are attached (call again in case setTimeout didn't work)
+    if (typeof attachEventListeners === 'function') {
+      // Already defined above, will be called by setTimeout
+    } else {
+      // Fallback: attach immediately if functions are ready
+      setTimeout(() => {
+        if (typeof sendMessage === 'function' && chatInput && submitBtn) {
+          attachEventListeners();
+        }
+      }, 100);
     }
 
     // Add message to UI
