@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya - Janet's Digital Twin | Chat</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/jpeg" href="static/images/logos/jxs_fav.jpg" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BSD88YBS4B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-BSD88YBS4B');
+  </script>
+  <style>
+    /* Maya-specific styles */
+    .maya-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 70px; /* Account for fixed nav */
+    }
+
+    /* Hero Section */
+    .maya-hero {
+      background: var(--bg-secondary);
+      padding: var(--spacing-3xl) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .maya-hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: var(--spacing-3xl);
+      align-items: center;
+      padding-bottom: var(--spacing-2xl);
+    }
+
+    .maya-hero-container > div:first-child {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: var(--spacing-2xl) var(--spacing-sm) var(--spacing-md) 0;
+    }
+
+    .maya-hero-image {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      max-height: 500px;
+      min-height: 450px;
+      object-fit: contain;
+      object-position: center center;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      border: 3px solid var(--border-color);
+      background: var(--bg-secondary);
+      padding: var(--spacing-sm);
+      display: block;
+      margin: 0;
+      margin-left: -var(--spacing-md);
+    }
+
+    .maya-hero-bio {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      padding-left: var(--spacing-xl);
+      padding-right: var(--spacing-lg);
+    }
+
+    .maya-hero-title {
+      font-size: var(--font-size-4xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .maya-hero-subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .maya-hero-description {
+      font-size: var(--font-size-base);
+      line-height: 1.9;
+      color: var(--text-primary);
+    }
+
+    .maya-hero-description p {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .maya-hero-description strong {
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+
+    .maya-hero-description ul {
+      margin-left: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      margin-top: var(--spacing-sm);
+    }
+
+    .maya-hero-description li {
+      margin-bottom: var(--spacing-md);
+      line-height: 1.8;
+    }
+
+    /* Chat Intro Section */
+    .maya-chat-intro {
+      background: var(--bg-primary);
+      padding: var(--spacing-xl) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .maya-chat-intro-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .maya-chat-intro-title {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .maya-chat-intro-description {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 800px;
+      margin: 0 auto;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .maya-chat-intro-disclaimer {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: var(--spacing-md);
+      padding-top: var(--spacing-sm);
+      border-top: 1px solid var(--border-color);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Chat Container */
+    .maya-chat-container {
+      flex: 1;
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      height: calc(100vh - 200px);
+    }
+
+    /* Sidebar */
+    .maya-sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .maya-sidebar-header {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .maya-new-chat-btn {
+      width: 100%;
+      padding: var(--spacing-md);
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 8px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+    }
+
+    .maya-new-chat-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .maya-chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-md);
+    }
+
+    .maya-history-group {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .maya-history-group-title {
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .maya-history-item {
+      padding: var(--spacing-md);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-bottom: var(--spacing-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .maya-history-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .maya-history-item.active {
+      background: var(--bg-tertiary);
+      border-left: 3px solid var(--accent-color);
+    }
+
+    .maya-history-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+    }
+
+    .maya-history-text {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Main Chat Area */
+    .maya-chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+    }
+
+    .maya-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xl);
+      scroll-behavior: smooth;
+    }
+
+    .maya-message {
+      display: flex;
+      gap: var(--spacing-md);
+      max-width: 800px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .maya-message.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+
+    .maya-message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      object-fit: cover;
+      object-position: center center;
+      border: 2px solid var(--border-color);
+    }
+
+    .maya-message.user .maya-message-avatar {
+      background: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-primary);
+      font-weight: 600;
+      border: none;
+    }
+
+    .maya-message-content {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .maya-message.user .maya-message-content {
+      background: var(--accent-color);
+      color: var(--bg-primary);
+    }
+
+    .maya-message-actions {
+      position: absolute;
+      top: var(--spacing-xs);
+      right: var(--spacing-xs);
+      display: flex;
+      gap: var(--spacing-xs);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .maya-message:hover .maya-message-actions {
+      opacity: 1;
+    }
+
+    .maya-message-action-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-fast);
+      padding: 0;
+    }
+
+    .maya-message.user .maya-message-action-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--bg-primary);
+    }
+
+    .maya-message-action-btn:hover {
+      background: var(--bg-tertiary);
+      transform: scale(1.1);
+    }
+
+    .maya-message.user .maya-message-action-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Copy notification toast */
+    .maya-copy-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--shadow);
+      z-index: 10000;
+      animation: fadeInUp 0.3s ease, fadeOut 0.3s ease 1.7s;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    .maya-message-content p {
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .maya-message-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .maya-message-content code {
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: 'Courier New', monospace;
+    }
+
+    .maya-message.user .maya-message-content code {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Typing Indicator */
+    .maya-typing-indicator {
+      display: flex;
+      gap: var(--spacing-md);
+      max-width: 800px;
+    }
+
+    .maya-typing-dots {
+      display: flex;
+      gap: 4px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--bg-secondary);
+      border-radius: 12px;
+    }
+
+    .maya-typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: typing 1.4s infinite;
+    }
+
+    .maya-typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .maya-typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.7;
+      }
+      30% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    /* Input Area */
+    .maya-input-container {
+      padding: var(--spacing-lg);
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-primary);
+    }
+
+    .maya-input-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: flex-end;
+    }
+
+    .maya-input-box {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: var(--font-size-base);
+      font-family: var(--font-family);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      resize: none;
+      min-height: 52px;
+      max-height: 200px;
+      transition: all var(--transition-fast);
+    }
+
+    .maya-input-box:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .maya-submit-btn {
+      padding: var(--spacing-md) var(--spacing-xl);
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 12px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      min-width: 100px;
+      height: 52px;
+    }
+
+    .maya-submit-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .maya-submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .maya-empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-3xl);
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .maya-empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .maya-empty-state-text {
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .maya-hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .maya-hero-bio {
+        padding-left: 0;
+      }
+
+      .maya-hero-image {
+        margin: 0 auto;
+      }
+
+      .maya-chat-container {
+        flex-direction: column;
+      }
+
+      .maya-sidebar {
+        width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .maya-chat-main {
+        height: calc(100vh - 270px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="https://janetxiushi.me" style="text-decoration: none; color: inherit;">Hi, I am Janet! 👋</a>
+      </div>
+      <div class="nav-links">
+        <a href="https://janetxiushi.me" class="nav-link">Home</a>
+        <a href="https://janetxiushi.me/#experience" class="nav-link">Experience</a>
+        <a href="https://janetxiushi.me/#honors-awards" class="nav-link">Honors & Awards</a>
+        <a href="https://janetxiushi.me/#community" class="nav-link">Community</a>
+        <a href="https://janetxiushi.me/#contact" class="nav-link">Contact</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Maya Page -->
+  <div class="maya-page">
+    <!-- Hero Section -->
+    <section class="maya-hero">
+      <div class="maya-hero-container">
+        <div>
+          <img src="static/images/hero/maya_tall_portrait.jpg" alt="Maya - Janet's Digital Twin" class="maya-hero-image" />
+        </div>
+        <div class="maya-hero-bio">
+          <h1 class="maya-hero-title">Maya</h1>
+          <p class="maya-hero-subtitle">Janet's Digital Twin</p>
+          <div class="maya-hero-description">
+            <p>
+              <strong>Turning Complexity into Your Lasting Advantage.</strong>
+            </p>
+            <p>
+              I'm <strong>Maya</strong>, Janet Xiu Shi's digital twin. Janet is a business technologist who blends human psychology with AI fluency to solve real business problems. She works directly with founders and senior leaders to map operations, uncover hidden risks, and rapidly prototype AI-powered workflows, with responsible governance embedded from day one.
+            </p>
+            <p>
+              <strong>How I Help:</strong>
+            </p>
+            <ul>
+              <li><strong>For Founders & Senior Leaders:</strong> I align your AI and cloud strategy with business goals, turning technical complexity into competitive advantage. I help you move fast without compromising security or compliance, from early cloud decisions to scaling AI adoption.</li>
+              <li><strong>For Educators & Institutions:</strong> I design future-ready AI learning by integrating AI into curriculum and assessment, making complex concepts accessible. My approach combines enterprise experience with pedagogical rigor, preparing students and emerging leaders to lead responsibly.</li>
+            </ul>
+            <p style="margin-top: var(--spacing-lg); padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid var(--accent-color);">
+              <strong style="font-size: var(--font-size-lg); display: block; margin-bottom: var(--spacing-sm);">Ready to turn complexity into your competitive advantage?</strong>
+              Let's explore how AI and cloud strategy can drive measurable business outcomes for your organization. Book a free strategy session to discuss your specific challenges and opportunities.
+            </p>
+            <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg); flex-wrap: wrap;">
+              <a href="https://janetxiushi.me/#contact" style="display: inline-block; padding: var(--spacing-md) var(--spacing-xl); background: var(--accent-color); color: var(--bg-primary); text-decoration: none; border-radius: 8px; font-weight: 600; transition: all var(--transition-normal); text-align: center; min-width: 200px;">
+                📅 Book a Free Strategy Call
+              </a>
+              <a href="mailto:info@janetxiushi.me?subject=Strategy%20Session%20Inquiry" style="display: inline-block; padding: var(--spacing-md) var(--spacing-xl); background: transparent; color: var(--accent-color); text-decoration: none; border: 2px solid var(--accent-color); border-radius: 8px; font-weight: 600; transition: all var(--transition-normal); text-align: center; min-width: 200px;">
+                📩 Email Me Directly
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Intro Section -->
+    <section class="maya-chat-intro">
+      <div class="maya-chat-intro-container">
+        <h2 class="maya-chat-intro-title">Try Meya - all based on Janet's 20+ years of enterprise experience.</h2>
+        <p class="maya-chat-intro-description">
+          Chat with Meya - Like ChatGPT, but trained on Janet's real-world expertise. Ask questions, explore solutions, and get instant insights about AI strategy, cloud architecture, and digital transformation or just explore one of Janet's agents - Meya.
+        </p>
+        <p class="maya-chat-intro-disclaimer">
+          AI can make mistakes, always verify.
+        </p>
+      </div>
+    </section>
+
+    <!-- Chat Container -->
+    <div class="maya-chat-container">
+      <!-- Sidebar -->
+      <aside class="maya-sidebar">
+        <div class="maya-sidebar-header">
+          <button class="maya-new-chat-btn" id="newChatBtn">
+            <span>+</span>
+            <span>New Chat</span>
+          </button>
+        </div>
+        <div class="maya-chat-history" id="chatHistory">
+          <!-- Chat history will be populated here -->
+        </div>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main class="maya-chat-main">
+        <div class="maya-chat-messages" id="chatMessages">
+          <!-- Empty state -->
+          <div class="maya-empty-state" id="emptyState">
+            <div class="maya-empty-state-icon">💬</div>
+            <div class="maya-empty-state-text">Start a conversation</div>
+            <div style="font-size: var(--font-size-base); color: var(--text-secondary); margin-top: var(--spacing-md); max-width: 600px; line-height: 1.6;">
+              <p style="margin-bottom: var(--spacing-md);">Ask me anything about AI strategy, cloud architecture, or digital transformation. Try one of the prompts below or type your own question.</p>
+              <div style="background: var(--bg-secondary); padding: var(--spacing-lg); border-radius: 12px; margin-top: var(--spacing-lg); text-align: left;">
+                <p style="font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-primary);">💡 Try asking:</p>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='I run a [your industry] business. How can AI help me reduce costs and improve efficiency?'; document.getElementById('chatInput').focus();">
+                    "I run a [your industry] business. How can AI help me reduce costs and improve efficiency?"
+                  </li>
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='What are the biggest risks I should consider before adopting AI in my organization?'; document.getElementById('chatInput').focus();">
+                    "What are the biggest risks I should consider before adopting AI in my organization?"
+                  </li>
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='How do I create an AI strategy that aligns with my business goals?'; document.getElementById('chatInput').focus();">
+                    "How do I create an AI strategy that aligns with my business goals?"
+                  </li>
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='Can you help me understand cloud migration costs and ROI?'; document.getElementById('chatInput').focus();">
+                    "Can you help me understand cloud migration costs and ROI?"
+                  </li>
+                </ul>
+                <p style="margin-top: var(--spacing-md); font-size: var(--font-size-sm); color: var(--text-muted);">
+                  Click any question above to start, or type your own. After exploring, <strong>book a strategy call</strong> to dive deeper into your specific situation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="maya-input-container">
+          <div class="maya-input-wrapper">
+            <textarea 
+              id="chatInput" 
+              class="maya-input-box" 
+              placeholder="Type your message here... (支持中文输入)"
+              rows="1"
+            ></textarea>
+            <button id="submitBtn" class="maya-submit-btn">Send</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle (reuse from main site)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+    
+    // Load theme preference
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Chat functionality
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const emptyState = document.getElementById('emptyState');
+    const chatHistory = document.getElementById('chatHistory');
+
+    // Chat state
+    let currentChatId = null;
+    let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
+    let messageHistory = [];
+
+    // API Configuration
+    const API_BASE_URL = (() => {
+      const protocol = window.location.protocol;
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      
+      // If served from same origin (e.g., http://localhost:3002/maya.html), use relative URL
+      if (protocol === 'http:' && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+        // Use empty string for same-origin requests (cleaner)
+        const currentPort = port || '3000'; // Use current port or default to 3000
+        console.log(`🌐 Detected same-origin (localhost:${currentPort}), using relative API URL`);
+        return ''; // Empty string = same origin (will use current port automatically)
+      }
+      
+      // If opened from file:// (local file), use localhost backend with current port or default
+      if (protocol === 'file:' || !hostname || hostname === '') {
+        // Try to detect port from localStorage or use default
+        const savedPort = localStorage.getItem('maya_api_port') || '3001'; // Default to 3001
+        const apiUrl = `http://localhost:${savedPort}`;
+        console.log(`🌐 Detected file:// protocol, using localhost backend: ${apiUrl}`);
+        return apiUrl;
+      }
+      
+      // Production
+      console.log('🌐 Detected production environment');
+      return 'https://api.janetxiushi.me'; // Update with your actual production API URL
+    })();
+    
+    // Log API configuration on load
+    console.log('🔧 Maya Chat Configuration:', {
+      apiBaseUrl: API_BASE_URL,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      fullUrl: window.location.href
+    });
+
+    // Initialize
+    function init() {
+      renderChatHistory();
+      if (chats.length > 0) {
+        loadChat(chats[0].id);
+      }
+    }
+
+    // Auto-resize textarea
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
+
+    // Send on Enter (Shift+Enter for new line)
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    submitBtn.addEventListener('click', sendMessage);
+    newChatBtn.addEventListener('click', createNewChat);
+
+    // Create new chat
+    function createNewChat() {
+      currentChatId = Date.now().toString();
+      messageHistory = [];
+      chats.unshift({
+        id: currentChatId,
+        title: 'New Chat',
+        createdAt: Date.now(),
+        messages: []
+      });
+      saveChats();
+      renderChatHistory();
+      clearMessages();
+      // Re-enable input when creating new chat
+      chatInput.disabled = false;
+      submitBtn.disabled = false;
+      chatInput.placeholder = 'Type your message here... (支持中文输入)';
+      chatInput.focus();
+    }
+
+    // Load chat
+    function loadChat(chatId) {
+      const chat = chats.find(c => c.id === chatId);
+      if (!chat) return;
+
+      currentChatId = chatId;
+      messageHistory = chat.messages || [];
+      renderMessages();
+      renderChatHistory();
+      chatInput.focus();
+    }
+
+    // Send message
+    async function sendMessage() {
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      // Check chat limit: 30 messages total (15 user inputs + 15 responses)
+      const userMessageCount = messageHistory.filter(msg => msg.role === 'user').length;
+      const assistantMessageCount = messageHistory.filter(msg => msg.role === 'assistant').length;
+      const totalMessages = messageHistory.length;
+      
+      if (totalMessages >= 30) {
+        // Chat limit reached - show message and disable input
+        const limitMessage = `You've reached the chat limit of 30 messages. For continued conversation, please email Janet directly at info@janetxiushi.me - she'd be happy to continue the discussion!`;
+        addMessage('assistant', limitMessage, `limit-${Date.now()}`, false);
+        chatInput.disabled = true;
+        submitBtn.disabled = true;
+        chatInput.placeholder = 'Chat limit reached. Please email info@janetxiushi.me';
+        return;
+      }
+
+      // Create new chat if none exists
+      if (!currentChatId) {
+        createNewChat();
+      }
+
+      // Hide empty state
+      if (emptyState) {
+        emptyState.style.display = 'none';
+      }
+
+      // Add user message with ID
+      const userMessageId = `user-${Date.now()}`;
+      const userMessage = {
+        id: userMessageId,
+        role: 'user',
+        content: message,
+        timestamp: Date.now()
+      };
+      addMessage('user', message, userMessageId, false);
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      submitBtn.disabled = true;
+
+      // Update chat title if first message
+      if (messageHistory.length === 0) {
+        updateChatTitle(message.substring(0, 50));
+      }
+
+      // Show typing indicator
+      const typingId = showTypingIndicator();
+
+      try {
+        // Call backend API
+        const apiUrl = `${API_BASE_URL}/api/chat`;
+        console.log('📤 Sending request to:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message,
+            history: messageHistory
+          })
+        });
+
+        console.log('📥 Response status:', response.status, response.statusText);
+
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
+        // Remove typing indicator
+        removeTypingIndicator(typingId);
+
+        if (!response.ok) {
+          throw new Error(data.error || `API error: ${response.status} ${response.statusText}`);
+        }
+
+        // Add Maya's response
+        const mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
+        const assistantMessageId = `assistant-${Date.now()}`;
+        addMessage('maya', mayaResponse, assistantMessageId);
+        
+        // Aggressive scrolling to ensure Maya's response AND input bar are visible
+        // Multiple attempts to catch any async rendering delays
+        const chatMessages = document.getElementById('chatMessages');
+        const inputContainer = document.querySelector('.maya-input-container');
+        
+        if (chatMessages) {
+          // Function to scroll to bottom and ensure input bar is visible
+          const scrollToBottomWithInput = () => {
+            // Scroll messages to absolute bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Ensure input bar is visible
+            if (inputContainer) {
+              const inputRect = inputContainer.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+              
+              // If input bar is below viewport, scroll it into view
+              if (inputRect.bottom > viewportHeight) {
+                inputContainer.scrollIntoView({ behavior: 'auto', block: 'end' });
+              }
+            }
+          };
+          
+          // Immediate scroll
+          scrollToBottomWithInput();
+          
+          // Multiple delayed scrolls to ensure input bar stays visible
+          setTimeout(scrollToBottomWithInput, 50);
+          setTimeout(scrollToBottomWithInput, 150);
+          setTimeout(scrollToBottomWithInput, 300);
+          setTimeout(scrollToBottomWithInput, 600);
+          setTimeout(scrollToBottomWithInput, 1000);
+        }
+        
+        // Also use the helper function
+        scrollToBottom(true);
+        
+        // Update history
+        messageHistory.push(
+          userMessage,
+          { 
+            id: assistantMessageId,
+            role: 'assistant', 
+            content: mayaResponse,
+            timestamp: Date.now()
+          }
+        );
+
+        // Check if chat limit is approaching or reached
+        const totalMessages = messageHistory.length;
+        if (totalMessages >= 28) {
+          // Warn user when approaching limit
+          const remainingMessages = 30 - totalMessages;
+          const warningMessage = remainingMessages > 0 
+            ? `Note: You have ${remainingMessages} message${remainingMessages > 1 ? 's' : ''} remaining in this chat. For continued conversation, please email Janet directly at info@janetxiushi.me.`
+            : `You've reached the chat limit of 30 messages. For continued conversation, please email Janet directly at info@janetxiushi.me - she'd be happy to continue the discussion!`;
+          
+          setTimeout(() => {
+            addMessage('assistant', warningMessage, `warning-${Date.now()}`, false);
+            if (totalMessages >= 30) {
+              chatInput.disabled = true;
+              submitBtn.disabled = true;
+              chatInput.placeholder = 'Chat limit reached. Please email info@janetxiushi.me';
+            }
+          }, 1000);
+        }
+
+        // Save chat
+        saveChat();
+
+      } catch (error) {
+        removeTypingIndicator(typingId);
+        
+        // Log detailed error information
+        console.error('❌ Chat error:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          apiUrl: `${API_BASE_URL}/api/chat`,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Show user-friendly error message (never reveal technical details)
+        let errorMessage = `I apologize, but I'm experiencing connection issues at the moment. Please try again in a few moments. If the issue persists, there may be a server-side problem that needs attention.`;
+        
+        addMessage('maya', errorMessage);
+        // Ensure scroll after error message
+        setTimeout(() => scrollToBottom(true), 100);
+      } finally {
+        submitBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    // Add message to UI
+    function addMessage(role, content, messageId = null) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `maya-message ${role}`;
+      if (messageId) {
+        messageDiv.dataset.messageId = messageId;
+      }
+      
+      let avatar;
+      if (role === 'user') {
+        avatar = document.createElement('div');
+        avatar.className = 'maya-message-avatar';
+        avatar.textContent = 'You';
+      } else {
+        avatar = document.createElement('img');
+        avatar.src = 'static/images/hero/maya.jpg';
+        avatar.alt = 'Maya';
+        avatar.className = 'maya-message-avatar';
+      }
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'maya-message-content';
+      contentDiv.innerHTML = formatMessage(content);
+      
+      // Add copy button for all messages
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'maya-message-actions';
+      
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'maya-message-action-btn';
+      copyBtn.innerHTML = '📋';
+      copyBtn.title = 'Copy message';
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        copyMessage(content);
+      };
+      
+      actionsDiv.appendChild(copyBtn);
+      contentDiv.appendChild(actionsDiv);
+      
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(contentDiv);
+      
+      chatMessages.appendChild(messageDiv);
+      
+      // Scroll to absolute bottom immediately after adding message
+      // This ensures both the message and input bar are visible
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Ensure input bar is always visible by scrolling it into view
+      const chatInput = document.getElementById('chatInput');
+      const inputContainer = document.querySelector('.maya-input-container');
+      
+      if (chatInput && inputContainer) {
+        // Use requestAnimationFrame to ensure DOM is updated
+        requestAnimationFrame(() => {
+          // Scroll messages to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          
+          // Check if input bar is visible in viewport
+          const inputRect = inputContainer.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          
+          // If input bar is below viewport, scroll it into view
+          if (inputRect.bottom > viewportHeight) {
+            inputContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        });
+      }
+      
+      // Call scrollToBottom helper for delayed checks
+      scrollToBottom();
+    }
+
+    // Copy message to clipboard
+    function copyMessage(text) {
+      // Remove HTML tags and decode entities to get plain text
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = text;
+      const plainText = tempDiv.textContent || tempDiv.innerText || text;
+      
+      // Use Clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(plainText).then(() => {
+          showCopyToast();
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+          // Fallback for older browsers
+          fallbackCopyTextToClipboard(plainText);
+        });
+      } else {
+        // Fallback for browsers without Clipboard API
+        fallbackCopyTextToClipboard(plainText);
+      }
+    }
+
+    // Fallback copy method for older browsers
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showCopyToast();
+        } else {
+          console.error('Fallback copy failed');
+        }
+      } catch (err) {
+        console.error('Fallback copy error:', err);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    // Show copy notification toast
+    function showCopyToast() {
+      // Remove any existing toast
+      const existingToast = document.querySelector('.maya-copy-toast');
+      if (existingToast) {
+        existingToast.remove();
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = 'maya-copy-toast';
+      toast.textContent = 'Copied';
+      document.body.appendChild(toast);
+      
+      // Remove after animation completes
+      setTimeout(() => {
+        toast.remove();
+      }, 2000);
+    }
+
+    // Format message (simple markdown-like formatting)
+    function formatMessage(text) {
+      return text
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>');
+    }
+
+    // Show typing indicator
+    function showTypingIndicator() {
+      const typingId = 'typing-' + Date.now();
+      const typingDiv = document.createElement('div');
+      typingDiv.id = typingId;
+      typingDiv.className = 'maya-typing-indicator';
+      
+      const avatar = document.createElement('img');
+      avatar.src = 'static/images/hero/maya.jpg';
+      avatar.alt = 'Maya';
+      avatar.className = 'maya-message-avatar';
+      
+      const dotsDiv = document.createElement('div');
+      dotsDiv.className = 'maya-typing-dots';
+      dotsDiv.innerHTML = '<div class="maya-typing-dot"></div><div class="maya-typing-dot"></div><div class="maya-typing-dot"></div>';
+      
+      typingDiv.appendChild(avatar);
+      typingDiv.appendChild(dotsDiv);
+      
+      chatMessages.appendChild(typingDiv);
+      
+      // Scroll to bottom after DOM update
+      scrollToBottom();
+      
+      return typingId;
+    }
+
+    // Remove typing indicator
+    function removeTypingIndicator(id) {
+      const indicator = document.getElementById(id);
+      if (indicator) {
+        indicator.remove();
+      }
+    }
+
+    // Helper function to scroll chat to bottom
+    function scrollToBottom(force = false) {
+      const chatMessages = document.getElementById('chatMessages');
+      const inputContainer = document.querySelector('.maya-input-container');
+      
+      if (!chatMessages) {
+        console.warn('chatMessages element not found');
+        return;
+      }
+      
+      // Function to perform the actual scroll - scroll to absolute bottom
+      const doScroll = () => {
+        // Always scroll messages to absolute bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Ensure input bar is visible in viewport
+        if (inputContainer) {
+          const inputRect = inputContainer.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          
+          // If input bar is below viewport, scroll it into view
+          if (inputRect.bottom > viewportHeight || inputRect.top < 0) {
+            inputContainer.scrollIntoView({ behavior: 'auto', block: 'end' });
+          }
+        }
+      };
+      
+      // Immediate scroll
+      doScroll();
+      
+      // Use requestAnimationFrame for smooth scroll after DOM update
+      requestAnimationFrame(() => {
+        doScroll();
+        
+        // Multiple delayed checks to catch async content rendering
+        setTimeout(doScroll, 50);
+        setTimeout(doScroll, 100);
+        setTimeout(doScroll, 200);
+        setTimeout(doScroll, 400);
+        setTimeout(doScroll, 600);
+        setTimeout(doScroll, 1000);
+      });
+    }
+
+    // Render messages
+    function renderMessages() {
+      clearMessages();
+      messageHistory.forEach((msg, index) => {
+        const messageId = msg.id || `msg-${index}`;
+        addMessage(msg.role === 'user' ? 'user' : 'maya', msg.content, messageId);
+      });
+      // Scroll to bottom after rendering all messages
+      scrollToBottom();
+    }
+
+    // Clear messages
+    function clearMessages() {
+      chatMessages.innerHTML = '';
+      if (messageHistory.length === 0 && emptyState) {
+        emptyState.style.display = 'flex';
+      }
+    }
+
+    // Render chat history
+    function renderChatHistory() {
+      chatHistory.innerHTML = '';
+      
+      if (chats.length === 0) return;
+
+      // Group chats by date
+      const grouped = groupChatsByDate(chats);
+      
+      Object.keys(grouped).forEach(dateGroup => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'maya-history-group';
+        
+        const title = document.createElement('div');
+        title.className = 'maya-history-group-title';
+        title.textContent = dateGroup;
+        groupDiv.appendChild(title);
+        
+        grouped[dateGroup].forEach(chat => {
+          const item = document.createElement('div');
+          item.className = `maya-history-item ${chat.id === currentChatId ? 'active' : ''}`;
+          item.onclick = () => loadChat(chat.id);
+          
+          const icon = document.createElement('span');
+          icon.className = 'maya-history-icon';
+          icon.textContent = '💬';
+          
+          const text = document.createElement('span');
+          text.className = 'maya-history-text';
+          text.textContent = chat.title;
+          
+          item.appendChild(icon);
+          item.appendChild(text);
+          groupDiv.appendChild(item);
+        });
+        
+        chatHistory.appendChild(groupDiv);
+      });
+    }
+
+    // Group chats by date
+    function groupChatsByDate(chats) {
+      const groups = {};
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const thisWeek = new Date(today);
+      thisWeek.setDate(thisWeek.getDate() - 7);
+      const thisMonth = new Date(today);
+      thisMonth.setMonth(thisMonth.getMonth() - 1);
+
+      chats.forEach(chat => {
+        const chatDate = new Date(chat.createdAt);
+        let group;
+
+        if (chatDate >= today) {
+          group = 'Today';
+        } else if (chatDate >= yesterday) {
+          group = 'Yesterday';
+        } else if (chatDate >= thisWeek) {
+          group = 'Previous 7 Days';
+        } else if (chatDate >= thisMonth) {
+          group = 'Previous 30 Days';
+        } else {
+          group = chatDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        if (!groups[group]) {
+          groups[group] = [];
+        }
+        groups[group].push(chat);
+      });
+
+      return groups;
+    }
+
+    // Update chat title
+    function updateChatTitle(title) {
+      const chat = chats.find(c => c.id === currentChatId);
+      if (chat) {
+        chat.title = title;
+        saveChats();
+        renderChatHistory();
+      }
+    }
+
+    // Save chat
+    function saveChat() {
+      const chat = chats.find(c => c.id === currentChatId);
+      if (chat) {
+        chat.messages = messageHistory;
+        chat.updatedAt = Date.now();
+        saveChats();
+      }
+    }
+
+    // Save chats to localStorage
+    function saveChats() {
+      localStorage.setItem('mayaChats', JSON.stringify(chats));
+    }
+
+    // Initialize on load
+    init();
+  </script>
+
+  <!-- Social Media Icons -->
+  <section id="social" class="social-section" style="padding: var(--spacing-2xl) 0; background-color: var(--bg-primary); border-top: 1px solid var(--border-color);">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+      <div class="social-icons" style="display: flex; justify-content: center; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap;">
+        <a href="https://www.linkedin.com/in/janetxiushi/" target="_blank" rel="noopener noreferrer" class="social-icon"
+          aria-label="LinkedIn" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <path
+              d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+        </a>
+        <a href="https://github.com/xiu-shi" target="_blank" rel="noopener noreferrer" class="social-icon"
+          aria-label="GitHub" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <path
+              d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>
+        </a>
+        <a href="https://www.instagram.com/janetxiushi/" target="_blank" rel="noopener noreferrer" class="social-icon"
+          aria-label="Instagram" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <path
+              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+          </svg>
+        </a>
+        <a href="https://www.youtube.com/@XiuShi" target="_blank" rel="noopener noreferrer" class="social-icon"
+          aria-label="YouTube" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <path
+              d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+        </a>
+        <a href="https://x.com/janetxiushi" target="_blank" rel="noopener noreferrer" class="social-icon"
+          aria-label="X (Twitter)" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <line x1="4" y1="4" x2="20" y2="20"></line>
+            <line x1="20" y1="4" x2="4" y2="20"></line>
+          </svg>
+        </a>
+        <a href="https://ie.pinterest.com/janetxiushi/photography-by-janet-xiu-shi/" target="_blank"
+          rel="noopener noreferrer" class="social-icon" aria-label="Pinterest" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-secondary); border: 2px solid var(--border-color); color: var(--text-muted); text-decoration: none; transition: all var(--transition-normal); position: relative;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px; position: relative; z-index: 1;">
+            <path
+              d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.347-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" style="padding: var(--spacing-xl) 0; background-color: var(--bg-primary); border-top: 1px solid var(--border-color); text-align: center;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+      <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: 0;">&copy; 2026 All rights reserved janetxiushi.me ❤️</p>
+    </div>
+  </footer>
+
+  <style>
+    /* Social Icons Hover Effects */
+    .social-icon:hover {
+      opacity: 1;
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      background-color: var(--bg-primary);
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 25px var(--shadow-hover);
+    }
+    .social-icon[aria-label="LinkedIn"]:hover {
+      color: #0077b5;
+      border-color: #0077b5;
+    }
+    .social-icon[aria-label="GitHub"]:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    .social-icon[aria-label="Instagram"]:hover {
+      color: #e4405f;
+      border-color: #e4405f;
+    }
+    .social-icon[aria-label="YouTube"]:hover {
+      color: #ff0000;
+      border-color: #ff0000;
+    }
+    .social-icon[aria-label="X (Twitter)"]:hover {
+      color: var(--text-primary);
+      border-color: var(--text-primary);
+    }
+    .social-icon[aria-label="Pinterest"]:hover {
+      color: #bd081c;
+      border-color: #bd081c;
+    }
+  </style>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+# Ignore large files and processed data
+*.pdf
+*.docx
+*.xlsx
+
+# Ignore embeddings and processed files (can be regenerated)
+embeddings/*
+processed/*
+!embeddings/.gitkeep
+!processed/.gitkeep
+
+# Google API credentials (if added later)
+google-credentials.json
+google-oauth-token.json
+
+# Keep directory structure
+!.gitkeep
+

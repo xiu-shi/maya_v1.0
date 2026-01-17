@@ -1,0 +1,27 @@
+{
+  "high": [
+    "docs/bio/janet-bio.md",
+    "docs/expertise/ai-security.md",
+    "docs/expertise/digital-transformation.md",
+    "docs/cert_educ/certifications.md",
+    "docs/cert_educ/education.md",
+    "docs/honors_awards/lakera-genai-report-2025.md",
+    "docs/honors_awards/workday-vibe-award-2023.md",
+    "docs/experience/iadt.md",
+    "docs/experience/connectd.md",
+    "docs/experience/workday.md"
+  ],
+  "medium": [
+    "docs/experience/huawei.md",
+    "docs/experience/woodies.md",
+    "docs/cert_educ/personal-projects.md",
+    "docs/honors_awards/health-beauty-innovation-2024.md"
+  ],
+  "low": [
+    "docs/context/irish-market.md",
+    "docs/experience/catriona-hanly.md",
+    "docs/experience/dunnes.md",
+    "docs/experience/lidl.md"
+  ]
+}
+
