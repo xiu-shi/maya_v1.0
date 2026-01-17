@@ -806,9 +806,9 @@
     const emptyState = document.getElementById('emptyState');
     const chatHistory = document.getElementById('chatHistory');
 
-    // Chat state
+    // Chat state - Start fresh on each page load
     let currentChatId = null;
-    let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
+    let chats = []; // Always start with empty chats for fresh experience
     let messageHistory = [];
 
     // API Configuration
@@ -847,12 +847,42 @@
       fullUrl: window.location.href
     });
 
-    // Initialize
+    // Initialize - Start fresh, scroll to top
     function init() {
+      // Always start with fresh state (no chat history loaded)
+      currentChatId = null;
+      messageHistory = [];
+      chats = [];
+      
+      // Don't load from localStorage - start fresh each time
+      // localStorage.removeItem('mayaChats'); // Optional: uncomment to clear on each visit
+      
+      // Render empty chat history
       renderChatHistory();
-      if (chats.length > 0) {
-        loadChat(chats[0].id);
+      
+      // Show empty state (no messages)
+      clearMessages();
+      
+      // Scroll to top of page immediately
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
       }
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+      
+      // Also scroll chat messages container to top
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+      
+      // Focus on input after a brief delay to ensure page is ready
+      setTimeout(() => {
+        if (chatInput) {
+          chatInput.focus();
+        }
+      }, 100);
     }
 
     // Auto-resize textarea
@@ -901,6 +931,10 @@
       messageHistory = chat.messages || [];
       renderMessages();
       renderChatHistory();
+      // Scroll to bottom when loading an existing chat (user clicked on history)
+      if (messageHistory.length > 0) {
+        scrollToBottom();
+      }
       chatInput.focus();
     }
 
@@ -1337,8 +1371,10 @@
         const messageId = msg.id || `msg-${index}`;
         addMessage(msg.role === 'user' ? 'user' : 'maya', msg.content, messageId);
       });
-      // Scroll to bottom after rendering all messages
-      scrollToBottom();
+      // Only scroll to bottom if there are messages (not on initial load)
+      if (messageHistory.length > 0) {
+        scrollToBottom();
+      }
     }
 
     // Clear messages
@@ -1451,8 +1487,26 @@
       localStorage.setItem('mayaChats', JSON.stringify(chats));
     }
 
-    // Initialize on load
-    init();
+    // Initialize on load - ensure page scrolls to top
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to top before initializing
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        init();
+      });
+    } else {
+      // Already loaded, scroll to top immediately then init
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      init();
+    }
+    
+    // Also handle page visibility changes (when user returns to tab)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        // When page becomes visible, ensure we're at top
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    });
   </script>
 
   <!-- Social Media Icons -->
