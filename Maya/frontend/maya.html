@@ -876,12 +876,8 @@
         chatMessages.scrollTop = 0;
       }
       
-      // Focus on input after a brief delay to ensure page is ready
-      setTimeout(() => {
-        if (chatInput) {
-          chatInput.focus();
-        }
-      }, 100);
+      // Don't focus input on initial load - it causes page to scroll to bottom
+      // User can click/focus when ready
     }
 
     // Auto-resize textarea
@@ -1487,16 +1483,41 @@
     }
 
     // Initialize on load - ensure page scrolls to top
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        // Scroll to top before initializing
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        init();
-      });
-    } else {
-      // Already loaded, scroll to top immediately then init
+    function ensureTopAndInit() {
+      // Force scroll to top multiple times to ensure it sticks
       window.scrollTo({ top: 0, behavior: 'instant' });
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+      
+      // Initialize after ensuring we're at top
       init();
+      
+      // Re-enforce scroll to top after init (in case anything scrolled)
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        if (document.documentElement) {
+          document.documentElement.scrollTop = 0;
+        }
+        if (document.body) {
+          document.body.scrollTop = 0;
+        }
+      }, 50);
+      
+      // One more check after a longer delay
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 200);
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensureTopAndInit);
+    } else {
+      // Already loaded, ensure top and init immediately
+      ensureTopAndInit();
     }
     
     // Also handle page visibility changes (when user returns to tab)
@@ -1504,6 +1525,17 @@
       if (!document.hidden) {
         // When page becomes visible, ensure we're at top
         window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    });
+    
+    // Prevent any auto-scroll on page load
+    window.addEventListener('load', function() {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+      }
+      if (document.body) {
+        document.body.scrollTop = 0;
       }
     });
   </script>
