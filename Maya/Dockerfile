@@ -32,9 +32,10 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Health check - wait longer for startup, then check health endpoint
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+# Health check - check both /health and /api/health endpoints
+# Wait longer for startup (server needs time to initialize)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>/dev/null || exit 1
 
 # Start server
 CMD ["node", "server.js"]
