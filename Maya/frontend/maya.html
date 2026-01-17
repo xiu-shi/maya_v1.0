@@ -1013,28 +1013,42 @@
 
         console.log('📥 Response status:', response.status, response.statusText);
 
-        const data = await response.json();
-        console.log('📥 Response data:', data);
-        
-        // Remove typing indicator
+        // Remove typing indicator before processing response
         removeTypingIndicator(typingId);
 
+        // Check if response is OK first, before parsing JSON
         if (!response.ok) {
+          // Try to parse error response JSON, but handle cases where body might be empty/invalid
+          let errorData = {};
+          try {
+            const text = await response.text();
+            if (text) {
+              errorData = JSON.parse(text);
+            }
+          } catch (parseError) {
+            // If JSON parsing fails, use empty object (we'll use status code)
+            console.warn('⚠️ Could not parse error response as JSON:', parseError);
+          }
+          
           // Log more details for debugging (especially 503 errors)
           console.error('❌ API Error Response:', {
             status: response.status,
             statusText: response.statusText,
-            error: data.error,
-            message: data.message,
-            details: data.details
+            error: errorData.error,
+            message: errorData.message,
+            details: errorData.details
           });
           
           // Throw error with more context
-          const error = new Error(data.error || data.message || `API error: ${response.status} ${response.statusText}`);
+          const error = new Error(errorData.error || errorData.message || `API error: ${response.status} ${response.statusText}`);
           error.status = response.status;
-          error.data = data;
+          error.data = errorData;
           throw error;
         }
+
+        // Response is OK, parse JSON
+        const data = await response.json();
+        console.log('📥 Response data:', data);
 
         // Add Maya's response
         const mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
