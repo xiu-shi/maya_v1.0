@@ -849,40 +849,29 @@
 
     // Initialize
     function init() {
-      // Ensure elements exist
-      if (!chatInput || !submitBtn || !newChatBtn) {
-        console.error('❌ Required elements not found:', {
-          chatInput: !!chatInput,
-          submitBtn: !!submitBtn,
-          newChatBtn: !!newChatBtn
-        });
-        return;
-      }
-
-      // Attach event listeners
-      // Auto-resize textarea
-      chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-      });
-
-      // Send on Enter (Shift+Enter for new line)
-      chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
-
-      submitBtn.addEventListener('click', sendMessage);
-      newChatBtn.addEventListener('click', createNewChat);
-
-      // Initialize chat state
       renderChatHistory();
       if (chats.length > 0) {
         loadChat(chats[0].id);
       }
     }
+
+    // Attach event listeners (outside init to ensure they're attached once)
+    // Auto-resize textarea
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
+
+    // Send on Enter (Shift+Enter for new line)
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    submitBtn.addEventListener('click', sendMessage);
+    newChatBtn.addEventListener('click', createNewChat);
 
     // Create new chat
     function createNewChat() {
