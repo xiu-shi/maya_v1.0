@@ -111,7 +111,12 @@ async function getMCPClient() {
   }
 }
 
-logInfo('Setting up health check endpoint...');
+logInfo('Setting up routes...');
+
+// Root endpoint - redirect to frontend
+app.get('/', (req, res) => {
+  res.redirect('/maya.html');
+});
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
