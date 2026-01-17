@@ -1451,8 +1451,13 @@
       localStorage.setItem('mayaChats', JSON.stringify(chats));
     }
 
-    // Initialize on load
-    init();
+    // Initialize on load - ensure DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      // DOM already loaded
+      init();
+    }
   </script>
 
   <!-- Social Media Icons -->
