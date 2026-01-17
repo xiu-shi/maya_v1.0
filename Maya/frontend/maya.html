@@ -1148,6 +1148,18 @@
 
     // Add message to UI
     function addMessage(role, content, messageId = null) {
+      console.log('📝 addMessage called:', { role, contentLength: content?.length, messageId });
+      
+      if (!chatMessages) {
+        console.error('❌ chatMessages element not found!');
+        return;
+      }
+      
+      if (!content || content.trim() === '') {
+        console.warn('⚠️ Empty content, skipping message');
+        return;
+      }
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = `maya-message ${role}`;
       if (messageId) {
@@ -1164,6 +1176,14 @@
         avatar.src = 'static/images/hero/maya.jpg';
         avatar.alt = 'Maya';
         avatar.className = 'maya-message-avatar';
+        avatar.onerror = function() {
+          console.warn('⚠️ Avatar image failed to load, using fallback');
+          // Fallback to text avatar
+          const textAvatar = document.createElement('div');
+          textAvatar.className = 'maya-message-avatar';
+          textAvatar.textContent = 'M';
+          messageDiv.replaceChild(textAvatar, avatar);
+        };
       }
       
       const contentDiv = document.createElement('div');
@@ -1190,6 +1210,7 @@
       messageDiv.appendChild(contentDiv);
       
       chatMessages.appendChild(messageDiv);
+      console.log('✅ Message element added to chatMessages, total children:', chatMessages.children.length);
       
       // Scroll to absolute bottom immediately after adding message
       // This ensures both the message and input bar are visible
