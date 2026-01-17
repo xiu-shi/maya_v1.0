@@ -507,14 +507,16 @@ process.on('SIGINT', async () => {
 logInfo('About to start server...');
 const PORT = config.port;
 logInfo(`Calling app.listen on port ${PORT}...`);
-app.listen(PORT, () => {
+// Bind to 0.0.0.0 to accept connections from all interfaces (required for Docker/containers)
+app.listen(PORT, '0.0.0.0', () => {
   logInfo(`Maya backend server started`, {
     port: PORT,
+    host: '0.0.0.0',
     environment: config.nodeEnv,
     nodeVersion: process.version
   });
-  logInfo(`Frontend available at: http://localhost:${PORT}/maya.html`);
-  logInfo(`Health check: http://localhost:${PORT}/health`);
+  logInfo(`Frontend available at: http://0.0.0.0:${PORT}/maya.html`);
+  logInfo(`Health check: http://0.0.0.0:${PORT}/health`);
 });
 
 logInfo('app.listen() called, server should be starting...');
