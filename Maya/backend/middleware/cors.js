@@ -12,22 +12,48 @@ import config from '../config/env.js';
  */
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (file:// protocol, mobile apps, Postman, etc.) in development
-    if (!origin && config.isDevelopment) {
+    // Allow requests with no origin (same-origin requests don't send Origin header)
+    // This is the most common case for same-origin requests
+    if (!origin) {
       return callback(null, true);
     }
     
-    // Allow null origin (file:// protocol) in development
-    if (origin === 'null' && config.isDevelopment) {
+    // Allow null origin (file:// protocol, some mobile apps)
+    if (origin === 'null') {
       return callback(null, true);
     }
     
     // Check if origin is in allowed list
-    if (!origin || config.allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
+    if (config.allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    
+    // In production, if origin matches the deployment domain pattern, allow it
+    // This handles cases where browser sends Origin header for same-origin requests
+    if (config.isProduction) {
+      try {
+        const originUrl = new URL(origin);
+        // Check if any allowed origin has the same hostname
+        const hostnameMatch = config.allowedOrigins.some(allowed => {
+          try {
+            const allowedUrl = new URL(allowed);
+            return allowedUrl.hostname === originUrl.hostname;
+          } catch {
+            // If allowed origin is not a full URL, check if it matches hostname pattern
+            return allowed.includes(originUrl.hostname);
+          }
+        });
+        
+        if (hostnameMatch) {
+          return callback(null, true);
+        }
+      } catch (e) {
+        // Invalid origin URL, fall through to reject
+      }
+    }
+    
+    // Reject if not in allowed list
+    callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
   },
   credentials: false, // Don't allow cookies
   methods: ['GET', 'POST', 'OPTIONS'],
