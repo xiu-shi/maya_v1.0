@@ -1,20 +1,26 @@
 # Dependencies
-node_modules/
+**/node_modules/
 npm-debug.log*
+package-lock.json
 
 # Environment files
 .env
 .env.local
 .env.*.local
+**/.env
+**/.env.local
 
 # Logs
 *.log
 logs/
+**/*.log
 
 # Test files
 tests/
 coverage/
 *.test.js
+**/*.test.js
+jest.config.js
 
 # Git
 .git/
@@ -23,6 +29,7 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+**/.DS_Store
 
 # IDE
 .vscode/
@@ -34,5 +41,21 @@ Thumbs.db
 dist/
 build/
 
-# Documentation (optional - can include if needed)
-# *.md
+# Scripts (not needed in production)
+*.sh
+start.sh
+stop.sh
+test-*.sh
+test-*.js
+
+# Documentation
+*.md
+README.md
+DIAGNOSTIC.md
+QUICK_START.md
+TEST_*.md
+SECURITY_LOGGING.md
+
+# Test reports
+test-report.json
+jest-results.json
