@@ -743,16 +743,16 @@
               <div style="background: var(--bg-secondary); padding: var(--spacing-lg); border-radius: 12px; margin-top: var(--spacing-lg); text-align: left;">
                 <p style="font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-primary);">💡 Try asking:</p>
                 <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-sm);">
-                  <li class="maya-prompt-item" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?">
                     "I run a [your industry] business. How can AI help me reduce costs and improve efficiency?"
                   </li>
-                  <li class="maya-prompt-item" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?">
                     "What are the biggest risks I should consider before adopting AI in my organization?"
                   </li>
-                  <li class="maya-prompt-item" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="How do I create an AI strategy that aligns with my business goals?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="How do I create an AI strategy that aligns with my business goals?">
                     "How do I create an AI strategy that aligns with my business goals?"
                   </li>
-                  <li class="maya-prompt-item" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="Can you help me understand cloud migration costs and ROI?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="Can you help me understand cloud migration costs and ROI?">
                     "Can you help me understand cloud migration costs and ROI?"
                   </li>
                 </ul>
@@ -977,107 +977,72 @@
       }
     });
 
-    // Initialize prompt click handlers (Fixed: Add DOM-ready check and better event handling)
+    // Initialize prompt click handlers (Fixed: Add DOM-ready check)
     function initPromptHandlers() {
-      console.log('🔗 Initializing prompt handlers...');
       const promptItems = document.querySelectorAll('[data-prompt]');
-      console.log(`📋 Found ${promptItems.length} prompt items`);
+      console.log(`🔗 Initializing prompt handlers for ${promptItems.length} sample questions`);
       
       promptItems.forEach((item, index) => {
         // Add hover effect for better UX
-        item.style.cursor = 'pointer';
         item.addEventListener('mouseenter', function() {
-          this.style.opacity = '0.8';
-          this.style.transform = 'scale(1.02)';
-        });
-        item.addEventListener('mouseleave', function() {
-          this.style.opacity = '1';
-          this.style.transform = 'scale(1)';
+          this.style.backgroundColor = 'var(--bg-hover, rgba(0, 0, 0, 0.05))';
+          this.style.transform = 'translateX(4px)';
         });
         
-        // Add click handler
+        item.addEventListener('mouseleave', function() {
+          this.style.backgroundColor = 'var(--bg-tertiary)';
+          this.style.transform = 'translateX(0)';
+        });
+        
+        // Click handler to populate chat input
         item.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           
           const prompt = this.getAttribute('data-prompt');
-          console.log(`💬 Prompt clicked: "${prompt}"`);
-          
           const chatInput = document.getElementById('chatInput');
-          if (!chatInput) {
-            console.error('❌ Chat input element not found');
-            return;
-          }
           
-          if (prompt) {
+          console.log(`💬 Sample question ${index + 1} clicked:`, prompt);
+          
+          if (chatInput && prompt) {
             // Set the prompt text
             chatInput.value = prompt;
             
             // Focus the input
             chatInput.focus();
             
-            // Auto-resize textarea
+            // Auto-resize textarea to fit content
             chatInput.style.height = 'auto';
             chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
             
             // Scroll input into view if needed
-            chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            
-            console.log('✅ Prompt pasted into chat input');
+            setTimeout(() => {
+              chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
             
             // Visual feedback - briefly highlight the input
-            chatInput.style.transition = 'border-color 0.3s ease';
-            const originalBorder = chatInput.style.borderColor;
-            chatInput.style.borderColor = 'var(--accent-color, #007bff)';
+            chatInput.style.transition = 'box-shadow 0.3s ease';
+            chatInput.style.boxShadow = '0 0 0 2px var(--primary-color, #007bff)';
             setTimeout(() => {
-              chatInput.style.borderColor = originalBorder;
+              chatInput.style.boxShadow = '';
             }, 500);
+            
+            console.log('✅ Prompt populated in chat input');
           } else {
-            console.warn('⚠️ No prompt data found on clicked element');
+            console.error('❌ Failed to populate prompt:', { chatInput: !!chatInput, prompt: !!prompt });
           }
         });
-        
-        console.log(`✅ Prompt handler ${index + 1} attached`);
       });
       
-      console.log(`✅ All ${promptItems.length} prompt handlers initialized`);
+      console.log(`✅ Prompt handlers initialized for ${promptItems.length} sample questions`);
     }
     
     // Initialize prompt handlers when DOM is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOMContentLoaded - initializing prompt handlers');
-        initPromptHandlers();
-      });
+      document.addEventListener('DOMContentLoaded', initPromptHandlers);
     } else {
-      console.log('📄 DOM already ready - initializing prompt handlers immediately');
       initPromptHandlers();
     }
-    
-    // Fallback: Also try on window load
-    window.addEventListener('load', function() {
-      // Re-check if handlers were attached (in case DOM wasn't ready)
-      const promptItems = document.querySelectorAll('[data-prompt]');
-      promptItems.forEach(item => {
-        // Check if click handler exists by checking if it has our custom attribute
-        if (!item.hasAttribute('data-handler-attached')) {
-          console.log('🔄 Re-attaching prompt handlers on window.load');
-          item.setAttribute('data-handler-attached', 'true');
-          const prompt = item.getAttribute('data-prompt');
-          const chatInput = document.getElementById('chatInput');
-          if (chatInput && prompt) {
-            item.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              chatInput.value = prompt;
-              chatInput.focus();
-              chatInput.style.height = 'auto';
-              chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-            });
-          }
-        }
-      });
-    });
 
     // Create new chat
     function createNewChat() {
