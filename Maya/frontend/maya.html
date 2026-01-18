@@ -1900,9 +1900,16 @@
       const _0x=['log','warn','error','info','debug','trace'];
       _0x.forEach(function(m){const _=console[m];console[m]=function(){if(window.location.hostname!=='localhost'&&window.location.hostname!=='127.0.0.1'){console.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');return;}return _.apply(console,arguments);}});
       
-      // Disable right-click context menu
+      // Disable right-click context menu (but allow with Shift key for testing)
       document.addEventListener('contextmenu', function(e) {
         const target = e.target;
+        
+        // Allow inspect with Shift+Right-click (for testing/debugging)
+        if (e.shiftKey) {
+          return true;
+        }
+        
+        // Allow in input fields and interactive elements
         if (target.tagName === 'INPUT' || 
             target.tagName === 'TEXTAREA' || 
             target.tagName === 'A' ||
@@ -1914,12 +1921,20 @@
             target.closest('.maya-chat-messages')) {
           return true;
         }
+        
+        // Block right-click on other elements
         e.preventDefault();
         return false;
       }, false);
       
-      // Disable text selection
+      // Disable text selection (but allow with Shift key for testing)
       document.addEventListener('selectstart', function(e) {
+        // Allow selection with Shift key (for testing/debugging)
+        if (e.shiftKey) {
+          return true;
+        }
+        
+        // Allow in input fields and interactive elements
         if (e.target.tagName === 'INPUT' || 
             e.target.tagName === 'TEXTAREA' || 
             e.target.isContentEditable ||
@@ -1927,6 +1942,8 @@
             e.target.closest('.maya-chat-messages')) {
           return true;
         }
+        
+        // Block selection on other elements
         e.preventDefault();
         return false;
       }, false);
@@ -1951,11 +1968,16 @@
         }
         
         // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S (save page)
+        // BUT allow with Alt key for testing/debugging (Alt+F12, Alt+Ctrl+Shift+I, etc.)
         if (
           e.key === 'F12' ||
           (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'K')) ||
           (e.ctrlKey && (e.key === 'U' || e.key === 'S'))
         ) {
+          // Allow if Alt key is pressed (for testing/debugging)
+          if (e.altKey) {
+            return true;
+          }
           e.preventDefault();
           return false;
         }
