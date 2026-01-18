@@ -1,6 +1,45 @@
-# Security Implementation Guide - Maya MCP Chat Interface
+# Security Policy & Best Practices
+**Last Updated**: January 18, 2026
 
-## Overview
+---
+
+## 🔒 CRITICAL: Secret Protection
+
+### Never Commit:
+- ❌ API keys or tokens (e.g., AI_BUILDER_TOKEN)
+- ❌ Passwords or secrets
+- ❌ `.env` files (any variant)
+- ❌ `mcp_config.json` (contains tokens)
+- ❌ Any file with credentials
+
+### Always Use:
+- ✅ `.env` files (must be in `.gitignore`)
+- ✅ `.example` files for templates
+- ✅ Environment variables
+- ✅ GitHub Secrets (for CI/CD)
+
+### Pre-Commit Checklist:
+- [ ] No `.env` files in commit
+- [ ] No `mcp_config.json` in commit
+- [ ] No tokens/keys in code
+- [ ] `.gitignore` includes sensitive files
+- [ ] No secrets visible in `git diff`
+
+---
+
+## 🚨 If Secret Exposed
+
+1. **IMMEDIATELY** revoke/regenerate the exposed secret
+2. Remove file from git: `git rm --cached filename`
+3. Add to `.gitignore`
+4. Commit removal
+5. Document incident
+
+---
+
+## Security Implementation Guide
+
+### Overview
 
 This document outlines all security measures implemented for the Maya Digital Twin chat interface using the AI Builders MCP server. Each security measure is explained with its rationale and implementation details.
 
