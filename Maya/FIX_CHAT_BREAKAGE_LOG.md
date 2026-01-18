@@ -122,3 +122,131 @@ if (document.readyState === 'loading') {
 4. ⏳ Regression test - ensure nothing else broke
 
 **Status**: Fix implemented, ready for testing...
+
+---
+
+## Step 3: Code Review & Additional Checks
+
+### Potential Issue Found: Role Mismatch
+
+**Issue**: `addMessage()` is called with role `'maya'` but function checks for `'user'` or `'assistant'`
+
+**Location**: Line 1110 calls `addMessage('maya', mayaResponse, ...)` but function at line 1245 checks:
+```javascript
+if (role === 'user') {
+  // user avatar
+} else {
+  // Maya avatar (img)
+}
+```
+
+**Analysis**: This should be fine - the `else` clause handles 'maya' role. But let's verify consistency.
+
+**Check**: All calls to `addMessage`:
+- Line 1007: `addMessage('assistant', ...)` ✅
+- Line 1110: `addMessage('maya', ...)` ⚠️ (should this be 'assistant'?)
+- Line 1171: `addMessage('assistant', ...)` ✅
+- Line 1213: `addMessage('maya', ...)` ⚠️
+- Line 1478: `addMessage(msg.role === 'user' ? 'user' : 'maya', ...)` ⚠️
+
+**Decision**: The function handles both 'maya' and 'assistant' in the else clause, so this is fine. But for consistency, we should standardize.
+
+**Action**: Keep as-is for now, but note for future refactoring.
+
+---
+
+## Step 4: Testing Status
+
+### Test File Created
+✅ `frontend-chat-event-listeners.test.js` - Comprehensive test suite
+
+### Tests Cover:
+1. ✅ DOM element availability
+2. ✅ Event listener attachment with checks
+3. ✅ DOM ready state detection
+4. ✅ Event listener functionality (Enter key, button clicks)
+5. ✅ Error handling
+6. ✅ Initialization order
+
+### Test Execution
+⚠️ Tests created but need Jest configuration - tests are in place for future validation
+
+---
+
+## Step 5: Verification Checklist
+
+### Code Review Complete ✅
+- ✅ Event listeners wrapped in DOM-ready check
+- ✅ Element existence verified before attaching
+- ✅ Error handling added
+- ✅ Logging added for debugging
+- ✅ Fallback retry mechanism
+- ✅ Initialization order corrected
+
+### Potential Issues Checked ✅
+- ✅ Role handling: 'maya' vs 'assistant' - both handled correctly
+- ✅ messageHistory updates correctly
+- ✅ addMessage function handles all roles
+- ✅ Response parsing improved
+- ✅ Error handling comprehensive
+
+---
+
+## Step 6: Root Cause Analysis (Preliminary)
+
+### Root Cause
+**Event listeners were attaching before DOM elements existed**
+
+### Why It Happened
+1. Script runs when `<script>` tag is encountered (line 783)
+2. Elements queried immediately (lines 802-807)
+3. If DOM not ready, `getElementById()` returns `null`
+4. Event listeners attached to `null` elements (lines 858-874)
+5. `null.addEventListener()` throws error silently or fails
+6. No listeners attached = chat doesn't work
+
+### Why It Wasn't Caught Earlier
+- Original code (commit `35d4526`) worked because script placement or timing was different
+- Commit `49cf4b4` changed initialization timing, exposing the issue
+- No tests existed for event listener attachment timing
+- Browser behavior varies - might work in some cases, fail in others
+
+### The Fix
+1. Wrapped listener attachment in `attachEventListeners()` function
+2. Added element existence checks before attaching
+3. Added DOM readiness detection (`document.readyState`)
+4. Added fallback retry mechanism
+5. Added comprehensive logging
+
+---
+
+## Step 7: Future-Proofing
+
+### Tests Added ✅
+- `frontend-chat-event-listeners.test.js` - Comprehensive test suite covering:
+  - DOM element availability
+  - Event listener attachment
+  - DOM ready state detection
+  - Event functionality
+  - Error handling
+  - Initialization order
+
+### Best Practices Documented
+- Always check element existence before attaching listeners
+- Use DOM-ready events when script runs before DOM
+- Add defensive checks and error handling
+- Log critical operations for debugging
+
+---
+
+## Step 8: Deployment & Verification
+
+### Next Steps
+1. ⏳ Deploy fix to production
+2. ⏳ Test in browser with console open
+3. ⏳ Verify event listeners attach
+4. ⏳ Test full chat flow
+5. ⏳ Confirm fix resolves issue
+6. ⏳ Finalize root cause analysis
+
+**Status**: Fix ready for deployment and testing...
