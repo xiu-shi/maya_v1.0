@@ -426,7 +426,14 @@ export class MayaMCPClient {
       this.reconnectAttempts = 0;
       logInfo('MCP client connected successfully');
     } catch (error) {
-      logError('MCP connection failed', error);
+      logError('MCP connection failed', error, {
+        errorMessage: error.message,
+        errorName: error.name,
+        hasToken: !!config.aiBuilderToken,
+        tokenLength: config.aiBuilderToken ? config.aiBuilderToken.length : 0,
+        nodeVersion: process.version,
+        platform: process.platform
+      });
       this.connected = false;
       // Clean up transport and client on failure
       if (this.transport) {

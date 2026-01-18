@@ -610,12 +610,41 @@ app.post('/api/chat',
     }
     
     if (!client.connected) {
-      try {
-        await client.connect();
-      } catch (error) {
-        logError('Failed to connect to MCP server', error, {
+      // Retry connection with exponential backoff
+      let lastError = null;
+      const maxRetries = 3;
+      const baseDelay = 1000; // 1 second
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          logInfo(`Attempting MCP connection (attempt ${attempt}/${maxRetries})...`);
+          await client.connect();
+          logInfo('MCP client connected successfully');
+          break; // Success, exit retry loop
+        } catch (error) {
+          lastError = error;
+          logError(`MCP connection attempt ${attempt} failed`, error, {
+            hasToken: !!config.aiBuilderToken,
+            tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none',
+            attempt: attempt,
+            maxRetries: maxRetries
+          });
+          
+          // If not the last attempt, wait before retrying
+          if (attempt < maxRetries) {
+            const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
+            logInfo(`Retrying MCP connection in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      }
+      
+      // If still not connected after all retries
+      if (!client.connected) {
+        logError('MCP client failed to connect after all retries', lastError, {
           hasToken: !!config.aiBuilderToken,
-          tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none'
+          tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none',
+          retries: maxRetries
         });
         return res.status(503).json({
           error: 'Service temporarily unavailable',
