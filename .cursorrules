@@ -42,12 +42,16 @@ When working on Maya's system prompt, response handling, or KB integration:
 - Add JSDoc comments for functions
 
 ## Security
-- Never expose AI_BUILDER_TOKEN in code or logs
+- **CRITICAL**: Never expose AI_BUILDER_TOKEN in code, logs, or config files committed to git
+- **CRITICAL**: Never commit `mcp_config.json` or any file containing tokens/secrets
+- **CRITICAL**: Always use `.env` files for secrets (gitignored)
+- **CRITICAL**: Always check `.gitignore` before committing config files
 - Validate all user inputs using sanitize.js
 - Sanitize responses before sending to frontend
 - Rate limit API endpoints (20 requests per 15 minutes)
 - Use security headers (Helmet.js)
 - Validate message length (max 2000 characters)
+- Before committing: Check for secrets, tokens, API keys in files
 
 ## Testing
 - All tests in `Maya/tests/` directory
