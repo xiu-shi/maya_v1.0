@@ -41,17 +41,45 @@ When working on Maya's system prompt, response handling, or KB integration:
 - Use descriptive variable names
 - Add JSDoc comments for functions
 
-## Security
-- **CRITICAL**: Never expose AI_BUILDER_TOKEN in code, logs, or config files committed to git
-- **CRITICAL**: Never commit `mcp_config.json` or any file containing tokens/secrets
-- **CRITICAL**: Always use `.env` files for secrets (gitignored)
-- **CRITICAL**: Always check `.gitignore` before committing config files
+## Security - CRITICAL RULES
+**MANDATORY**: These rules MUST be followed before every commit.
+
+### Secret Protection (MANDATORY):
+- **NEVER** commit files containing:
+  - API keys, tokens, passwords, secrets
+  - `.env` files (any variant)
+  - `mcp_config.json` (contains tokens)
+  - Any config file with credentials
+  - `*.secret`, `*.key`, `*.token` files
+- **ALWAYS** use `.env` files for secrets (must be in `.gitignore`)
+- **ALWAYS** create `.example` templates for config files
+- **ALWAYS** check `.gitignore` before committing
+- **ALWAYS** verify no secrets in `git diff` before committing
+
+### Pre-Commit Security Checklist (MANDATORY):
+Before EVERY commit, verify:
+- [ ] No `.env` files in commit (`git status` should not show .env)
+- [ ] No `mcp_config.json` in commit (use `.example` instead)
+- [ ] No tokens/keys in code or config files
+- [ ] `.gitignore` includes all sensitive files
+- [ ] No secrets visible in `git diff`
+- [ ] Example/template files don't contain real values
+
+### Code Security:
 - Validate all user inputs using sanitize.js
 - Sanitize responses before sending to frontend
 - Rate limit API endpoints (20 requests per 15 minutes)
 - Use security headers (Helmet.js)
 - Validate message length (max 2000 characters)
-- Before committing: Check for secrets, tokens, API keys in files
+- Never log sensitive data (tokens, passwords, API keys)
+
+### If Secret Exposed:
+1. **IMMEDIATELY** revoke/regenerate the exposed secret
+2. Remove file from git: `git rm --cached filename`
+3. Add to `.gitignore`
+4. Commit removal
+5. Document incident
+6. Update security guidelines
 
 ## Testing
 - All tests in `Maya/tests/` directory
