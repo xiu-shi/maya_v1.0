@@ -451,7 +451,12 @@ describe('Markdown Reference Integrity', () => {
       'Maya/DEPLOYMENT_COMPLETE_SUMMARY.md', // Deployment completion summary - consolidated into Maya/DEPLOYMENT.md
       'Maya/DEPLOYMENT_EXECUTION_LOG.md', // Execution log - consolidated into Maya/DEPLOYMENT.md
       'Maya/DEPLOYMENT_STATUS_SUMMARY.md', // Status summary - consolidated into Maya/DEPLOYMENT.md
-      'Maya/FINAL_REVIEW_AND_DEPLOYMENT_READY.md' // Final review - consolidated into Maya/DEPLOYMENT.md
+      'Maya/FINAL_REVIEW_AND_DEPLOYMENT_READY.md', // Final review - consolidated into Maya/DEPLOYMENT.md
+      // Frontend API documentation consolidation - January 18, 2026
+      'Maya/FRONTEND_API_ENDPOINT_TESTS.md', // Endpoint tests - consolidated into Maya/FRONTEND_API.md
+      'Maya/FRONTEND_API_URL_FIX_VERIFICATION.md', // Fix verification - consolidated into Maya/FRONTEND_API.md
+      'Maya/FRONTEND_API_URL_FIX.md', // URL fix - consolidated into Maya/FRONTEND_API.md
+      'Maya/FRONTEND_API_URL_VERIFICATION.md' // URL verification - consolidated into Maya/FRONTEND_API.md
     ];
     
     const existingOldFiles = [];
@@ -552,7 +557,12 @@ describe('Markdown Reference Integrity', () => {
       'DEPLOYMENT_COMPLETE_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Deployment completion summary consolidated into DEPLOYMENT.md
       'DEPLOYMENT_EXECUTION_LOG.md': 'Maya/DEPLOYMENT.md', // Execution log consolidated into DEPLOYMENT.md
       'DEPLOYMENT_STATUS_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Status summary consolidated into DEPLOYMENT.md
-      'FINAL_REVIEW_AND_DEPLOYMENT_READY.md': 'Maya/DEPLOYMENT.md' // Final review consolidated into DEPLOYMENT.md
+      'FINAL_REVIEW_AND_DEPLOYMENT_READY.md': 'Maya/DEPLOYMENT.md', // Final review consolidated into DEPLOYMENT.md
+      // Frontend API documentation consolidation - January 18, 2026
+      'FRONTEND_API_ENDPOINT_TESTS.md': 'Maya/FRONTEND_API.md', // Endpoint tests consolidated into FRONTEND_API.md
+      'FRONTEND_API_URL_FIX_VERIFICATION.md': 'Maya/FRONTEND_API.md', // Fix verification consolidated into FRONTEND_API.md
+      'FRONTEND_API_URL_FIX.md': 'Maya/FRONTEND_API.md', // URL fix consolidated into FRONTEND_API.md
+      'FRONTEND_API_URL_VERIFICATION.md': 'Maya/FRONTEND_API.md' // URL verification consolidated into FRONTEND_API.md
     };
     
     const incorrectRefs = [];
