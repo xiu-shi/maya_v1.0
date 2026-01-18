@@ -50,6 +50,10 @@ secrets.json
 .env.local
 .env.*.local
 
+# MCP Configuration (contains sensitive tokens)
+mcp_config.json
+!mcp_config.json.example
+
 # Logs
 *.log
 logs/
