@@ -35,7 +35,7 @@
 2. **`TEST_STRATEGY_SUMMARY.md`** - Test strategy overview (needs test count update)
 3. **`TEST_ISOLATION_GUIDELINES.md`** - Critical guidelines (current)
 4. **`API_ENDPOINT_TESTS.md`** - API endpoint test documentation (current)
-5. **`FRONTEND_API_ENDPOINT_TESTS.md`** - Frontend API tests (current)
+5. **`FRONTEND_API.md`** - Frontend API configuration guide (consolidated from FRONTEND_API_ENDPOINT_TESTS.md and related files)
 6. **`ROOT_ROUTE_TEST_SUITE.md`** - Root route tests (current)
 7. **`TEST_EXECUTION_EVIDENCE.md`** - Test execution evidence (needs date update)
 8. **`E2E_TEST_EVIDENCE.md`** - E2E test evidence (historical, but still relevant)
@@ -130,7 +130,7 @@ npm test -- --json | jq '.numTotalTests'  # Count actual tests
 
 **No major consolidation needed** - documentation is well-organized:
 - Main guides: `TESTING_GUIDE.md`, `TEST_STRATEGY_SUMMARY.md`
-- Specific test docs: `API_ENDPOINT_TESTS.md`, `FRONTEND_API_ENDPOINT_TESTS.md`, `ROOT_ROUTE_TEST_SUITE.md`
+- Specific test docs: `API_ENDPOINT_TESTS.md`, `FRONTEND_API.md` (consolidated frontend API guide), `ROOT_ROUTE_TEST_SUITE.md`
 - Evidence: `TEST_EXECUTION_EVIDENCE.md`, `E2E_TEST_EVIDENCE.md`
 - Guidelines: `TEST_ISOLATION_GUIDELINES.md`
 
