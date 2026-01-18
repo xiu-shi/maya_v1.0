@@ -445,7 +445,13 @@ describe('Markdown Reference Integrity', () => {
       'Maya/DEPLOY_MAYA_HTML.md', // Frontend deployment - consolidated into Maya/DEPLOYMENT.md
       'Maya/frontend/DEPLOYMENT_SUMMARY.md', // Frontend summary - consolidated into Maya/DEPLOYMENT.md
       'Maya/frontend/MAYA_DEPLOYMENT_READY.md', // Frontend ready status - consolidated into Maya/DEPLOYMENT.md
-      'Maya/tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md' // Security checklist - consolidated into Maya/DEPLOYMENT.md
+      'Maya/tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md', // Security checklist - consolidated into Maya/DEPLOYMENT.md
+      // Additional deployment documentation consolidation - January 18, 2026
+      'Maya/DEPLOYMENT_CHECKLIST.md', // Pre-deployment checklist - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_COMPLETE_SUMMARY.md', // Deployment completion summary - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_EXECUTION_LOG.md', // Execution log - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_STATUS_SUMMARY.md', // Status summary - consolidated into Maya/DEPLOYMENT.md
+      'Maya/FINAL_REVIEW_AND_DEPLOYMENT_READY.md' // Final review - consolidated into Maya/DEPLOYMENT.md
     ];
     
     const existingOldFiles = [];
@@ -540,7 +546,13 @@ describe('Markdown Reference Integrity', () => {
       'DEPLOY_MAYA_HTML.md': 'Maya/DEPLOYMENT.md', // Frontend deployment consolidated into DEPLOYMENT.md
       'frontend/DEPLOYMENT_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Frontend summary consolidated into DEPLOYMENT.md
       'frontend/MAYA_DEPLOYMENT_READY.md': 'Maya/DEPLOYMENT.md', // Frontend ready status consolidated into DEPLOYMENT.md
-      'tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md': 'Maya/DEPLOYMENT.md' // Security checklist consolidated into DEPLOYMENT.md
+      'tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md': 'Maya/DEPLOYMENT.md', // Security checklist consolidated into DEPLOYMENT.md
+      // Additional deployment documentation consolidation - January 18, 2026
+      'DEPLOYMENT_CHECKLIST.md': 'Maya/DEPLOYMENT.md', // Pre-deployment checklist consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_COMPLETE_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Deployment completion summary consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_EXECUTION_LOG.md': 'Maya/DEPLOYMENT.md', // Execution log consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_STATUS_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Status summary consolidated into DEPLOYMENT.md
+      'FINAL_REVIEW_AND_DEPLOYMENT_READY.md': 'Maya/DEPLOYMENT.md' // Final review consolidated into DEPLOYMENT.md
     };
     
     const incorrectRefs = [];

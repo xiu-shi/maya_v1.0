@@ -197,6 +197,126 @@ The Space platform automatically:
 
 ---
 
+## Pre-Deployment Checklist
+
+### Automated Checks
+
+Run pre-deployment tests before deploying:
+
+```bash
+cd Maya
+./scripts/pre-deployment-test.sh
+```
+
+**Expected Output**:
+```
+✅ All tests passed!
+✅ Security tests passed!
+✅ Integration tests passed!
+✅ Event listener tests passed!
+🚀 You are cleared for deployment!
+```
+
+### Test Commands
+
+```bash
+# All tests
+cd Maya/backend && npm test
+
+# Security tests only
+npm run test:security
+
+# Event listener tests only
+npm test -- tests/integration_tests/frontend-chat-event-listeners.test.js
+
+# Pre-deployment check
+cd Maya && ./scripts/pre-deployment-test.sh
+```
+
+### Manual Checks
+
+1. **Code Review**
+   - [ ] All DOM element access has null checks
+   - [ ] All event listeners attached after DOM ready
+   - [ ] No inline event handlers accessing DOM
+   - [ ] Error handling present for DOM operations
+
+2. **Browser Testing** (Local)
+   - [ ] Open `maya.html` in browser
+   - [ ] Open browser console (F12)
+   - [ ] Check for: `✅ All event listeners attached successfully`
+   - [ ] Test: Type message → Click Send → Verify response
+   - [ ] Test: Type message → Press Enter → Verify response
+   - [ ] Test: Click prompt suggestions → Verify input populated
+   - [ ] Test: Theme toggle works
+
+3. **Console Verification**
+   - [ ] No red errors in console
+   - [ ] Event listener logs appear
+   - [ ] API calls logged correctly
+   - [ ] Responses logged correctly
+
+### Review Changes Before Deploying
+
+```bash
+git log --oneline -10
+git diff HEAD~5 HEAD --stat
+```
+
+---
+
+## Deployment Execution Process
+
+### Step 1: Run Pre-Deployment Tests
+
+```bash
+cd Maya
+./scripts/pre-deployment-test.sh
+```
+
+**Critical Tests Status**:
+- ✅ Event listener attachment logic: Tests exist and cover scenarios
+- ✅ DOM readiness checks: Tests cover scenarios
+- ✅ Security tests: All passing
+- ✅ Backend API tests: All passing
+
+### Step 2: Commit and Push
+
+```bash
+git add .
+git commit -m "Your descriptive commit message"
+git push origin main
+```
+
+### Step 3: Monitor Auto-Deployment
+
+**Platform**: AI Builders Space  
+**Trigger**: GitHub push to main branch  
+**Expected Duration**: 2-5 minutes  
+**Monitoring**:
+- GitHub Actions: https://github.com/xiu-shi/maya_v1.0/actions
+- Deployment Dashboard: https://space.ai-builders.com/deployments
+
+**Status Progression**:
+- 🟡 **"Deploying"** or **"Building"** - Initial phase (2-5 min)
+- 🟡 **"Starting"** - Container starting (1-2 min)
+- 🟢 **"Healthy"** - Service ready! (total 5-10 min)
+
+### Step 4: Post-Deployment Verification
+
+After deployment completes (wait 5-10 minutes), verify:
+
+**Production Site Status**:
+- **URL**: https://maya-agent.ai-builders.space/maya.html
+- **HTTP Status**: Should be 200 OK
+- **Accessibility**: Site should be accessible
+
+**Health Endpoint**:
+- **URL**: https://maya-agent.ai-builders.space/health
+- **Expected**: `{"status":"ok","timestamp":"...","environment":"production"}`
+
+---
+
 ## Verification
 
 ### Health Check
@@ -249,15 +369,49 @@ Location: /maya.html
 
 ### Post-Deployment Checklist
 
+**Deployment Status**:
 - [ ] Deployment status is "Healthy"
 - [ ] Health endpoint returns `{"status": "ok"}`
 - [ ] Root URL (`/`) redirects to `/maya.html` (301 redirect)
 - [ ] Frontend loads at `/maya.html`
+
+**Functionality**:
 - [ ] Chat API responds successfully
 - [ ] LLM backend connected (`tokenConfigured: true`)
-- [ ] No console errors
-- [ ] No CORS errors
+- [ ] Send button works
+- [ ] Enter key works
+- [ ] Typing indicator shows
+- [ ] API response received
+- [ ] Message displayed correctly
+- [ ] Theme toggle works
+- [ ] Prompt suggestions work
+
+**Console Verification**:
+- [ ] No red errors in console
+- [ ] Console shows: `✅ All event listeners attached successfully`
+- [ ] Event listener logs appear
+- [ ] API calls logged correctly
+- [ ] Responses logged correctly
 - [ ] Browser cache cleared (use `Cmd+Shift+R` or private window)
+
+**Expected Console Logs (Success)**:
+```
+🔗 Attaching event listeners...
+✅ Auto-resize listener attached
+✅ Enter key listener attached
+✅ Submit button listener attached
+✅ New chat button listener attached
+✅ All event listeners attached successfully
+```
+
+**When Sending Message**:
+```
+🖱️ Submit button clicked, calling sendMessage
+📤 Sending request to: [API URL]
+📥 Response status: 200
+💬 Adding message to UI
+✅ Message added to UI
+```
 
 ---
 
@@ -674,7 +828,137 @@ If AI Builder Space supports custom domains:
 
 ---
 
+## Deployment Readiness Review
+
+### Code Quality Checklist
+
+Before deploying, ensure:
+
+- [x] All fixes implemented
+- [x] Similar patterns fixed
+- [x] Code reviewed
+- [x] No console errors
+- [x] All DOM access has null checks
+- [x] Event listeners attached after DOM ready
+- [x] No inline handlers accessing DOM
+- [x] Error handling present
+
+### Testing Checklist
+
+- [x] Tests created
+- [x] Tests passing locally
+- [x] Event listener tests passing
+- [x] Security tests passing
+- [x] DOM readiness tests passing
+- [x] E2E chat flow tests passing
+
+### Documentation Checklist
+
+- [x] Root cause documented
+- [x] Fix documented
+- [x] Prevention guide created
+- [x] Deployment checklist created
+- [x] Process documented
+
+### Automation Checklist
+
+- [x] Pre-deployment script created
+- [x] Test scripts executable
+- [x] Process automated
+
+### Risk Assessment
+
+**Low Risk** ✅:
+- Fixes are defensive (add checks, don't remove functionality)
+- Tests verify behavior
+- Rollback available via git revert
+
+**Mitigation**:
+- ✅ Comprehensive testing
+- ✅ Defensive programming
+- ✅ Error handling
+- ✅ Logging for debugging
+
+### If Issues Found After Deployment
+
+1. **Document Issue**
+   - Capture console logs
+   - Capture network requests
+   - Take screenshots if needed
+   - Document steps to reproduce
+
+2. **Diagnose**
+   - Check console for errors
+   - Check network tab for failed requests
+   - Review deployment logs
+   - Compare with expected behavior
+
+3. **Fix**
+   - Identify root cause
+   - Implement fix
+   - Test locally
+   - Re-deploy
+
+4. **Rollback if Critical**
+   ```bash
+   git revert HEAD
+   git push origin main
+   ```
+
+5. **Re-Verify**
+   - Run verification checklist again
+   - Confirm fix works
+   - Update documentation
+
+---
+
 ## Deployment History
+
+### January 18, 2026 - Chat Functionality Fix Deployment
+
+**Status**: ✅ **DEPLOYMENT COMPLETE** - Ready for Verification
+
+**Deployment Timeline**:
+- **13:17 GMT**: Pre-deployment tests run
+- **13:17 GMT**: Test path issues identified and fixed
+- **13:20 GMT**: Code fixes pushed
+- **13:20 GMT**: Deployment triggered
+- **13:20 GMT**: Production site verified accessible
+- **13:20 GMT**: Health endpoint verified responding
+- **13:25 GMT**: Expected deployment completion
+
+**Fixes Deployed**:
+1. **Event Listener Attachment** (PRIMARY FIX)
+   - Issue: Listeners attaching before DOM ready
+   - Fix: Added DOM-ready checks and defensive programming
+   - Status: ✅ Deployed
+
+2. **Theme Toggle** (SECONDARY FIX)
+   - Issue: Accessing elements without checks
+   - Fix: Wrapped in function with existence checks
+   - Status: ✅ Deployed
+
+3. **Inline onclick Handlers** (SECONDARY FIX)
+   - Issue: Inline handlers accessing DOM without checks
+   - Fix: Converted to event delegation with data attributes
+   - Status: ✅ Deployed
+
+**Commits Deployed**:
+- `40e290b` - Fix: Additional DOM timing issues and add pre-deployment automation
+- `40ed9f6` - Fix: Correct path to maya.html in frontend-api-url test
+- `a82abd9` - Add deployment execution log and production verification guide
+- `0a39c95` - Add deployment status summary
+
+**Prevention Measures Implemented**:
+- ✅ Pre-deployment test script (`scripts/pre-deployment-test.sh`)
+- ✅ Event listener attachment tests
+- ✅ DOM readiness tests
+- ✅ DOM timing patterns guide
+- ✅ Code review checklist
+
+**Next Steps**: Production verification (see Post-Deployment Checklist above)
+
+---
 
 ### January 17, 2026 - First Production Deployment
 
@@ -880,6 +1164,25 @@ curl -X POST "https://space.ai-builders.com/backend/v1/deployments" \
 
 ---
 
+---
+
+## Related Documentation
+
+### Prevention Guides
+- `DOM_TIMING_PATTERNS.md` - Prevention guide for DOM timing issues
+- `ROOT_CAUSE_ANALYSIS_CHAT_BREAKAGE.md` - Comprehensive root cause analysis
+- `CHAT_FIX_SUMMARY.md` - Quick reference for chat fixes
+
+### Scripts
+- `scripts/pre-deployment-test.sh` - Automated pre-deployment checks
+- `scripts/run-tests-locally.sh` - Local test runner
+
+### Test Files
+- `tests/integration_tests/frontend-chat-event-listeners.test.js` - Event listener tests
+- `tests/integration_tests/frontend-chat-e2e-flow.test.js` - E2E chat flow tests
+
+---
+
 **Last Updated**: January 18, 2026  
 **Status**: Complete Deployment Reference Guide  
-**Version**: 1.0
+**Version**: 2.0 (Consolidated from all deployment documentation)
