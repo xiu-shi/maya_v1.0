@@ -164,7 +164,7 @@ Tests:       8 passed, 8 total
 ### Main Documentation
 - `Implementation.md` - Complete implementation documentation (2045+ lines)
 - `README.md` - Project overview and quick start
-- `DEPLOYMENT.md` - Deployment guide
+- `DEPLOYMENT.md` - Complete deployment guide (consolidated from all deployment documentation)
 
 ### Backend Documentation
 - `backend/TEST_COMMANDS.md` - Test commands reference

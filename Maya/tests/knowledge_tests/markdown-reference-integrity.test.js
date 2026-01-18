@@ -285,7 +285,12 @@ describe('Markdown Reference Integrity', () => {
     for (const ref of allReferences) {
       // Skip excluded files - they are expected to mention old files
       const relativePath = relative(MAYA_ROOT, ref.file);
-      if (excludedFiles.some(excluded => relativePath.includes(excluded))) {
+      // Check both with and without "Maya/" prefix for excluded files
+      const normalizedRelativePath = relativePath.replace(/^Maya\//, '');
+      if (excludedFiles.some(excluded => {
+        const normalizedExcluded = excluded.replace(/^Maya\//, '');
+        return relativePath.includes(excluded) || normalizedRelativePath.includes(normalizedExcluded);
+      })) {
         continue;
       }
       
@@ -415,7 +420,32 @@ describe('Markdown Reference Integrity', () => {
       'tests/documentation/README.md',
       'tests/integration_tests/mock-failures-toggle.test.js', // Removed January 11, 2026 - mock toggle functionality removed
       'backend/run-tests-with-preference.js', // Removed January 11, 2026 - mock toggle functionality removed
-      'tests/integration_tests/e2e-test-execution.test.js' // Removed January 11, 2026 - recursive test execution causing CPU freeze
+      'tests/integration_tests/e2e-test-execution.test.js', // Removed January 11, 2026 - recursive test execution causing CPU freeze
+      'tests/integration/root-route.test.js', // Removed January 17, 2026 - duplicate of integration_tests/root-route.test.js
+      'tests/integration/root-route-server.test.js', // Removed January 17, 2026 - duplicate functionality covered by integration_tests/root-route-comprehensive.test.js
+      // Deployment documentation consolidation - January 18, 2026
+      'DEPLOYMENT_IN_PROGRESS.md', // Historical snapshot - consolidated into Maya/DEPLOYMENT.md
+      'DEPLOYMENT_SUCCESS.md', // Historical snapshot - consolidated into Maya/DEPLOYMENT.md
+      'DEPLOYMENT_TIMING.md', // Timing info - consolidated into Maya/DEPLOYMENT.md
+      'DEPLOYMENT_TRIGGER.md', // Trigger info - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_FIX_SUMMARY.md', // Fix summary - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_IN_PROGRESS_CHECKLIST.md', // Checklist - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_LLM_CONNECTION_FIX.md', // LLM fix - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_NEXT_STEPS.md', // Next steps - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_STATUS.md', // Status snapshot - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_SUCCESS_FINAL.md', // Success summary - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_WAIT_TIME.md', // Wait time info - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_API.md', // API deployment guide - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_SPACE.md', // Main deployment guide - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOYMENT_TROUBLESHOOTING.md', // Troubleshooting guide - consolidated into Maya/DEPLOYMENT.md
+      'Maya/FIRST_DEPLOYMENT_GUIDE.md', // First deployment guide - consolidated into Maya/DEPLOYMENT.md
+      'Maya/PRODUCTION_LOGS_DEPLOYMENT_STATUS.md', // Production logs status - consolidated into Maya/DEPLOYMENT.md
+      'Maya/ROOT_ROUTE_DEPLOYMENT_STATUS.md', // Root route status - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOY_PRODUCTION_LOGS.md', // Production logs deployment - consolidated into Maya/DEPLOYMENT.md
+      'Maya/DEPLOY_MAYA_HTML.md', // Frontend deployment - consolidated into Maya/DEPLOYMENT.md
+      'Maya/frontend/DEPLOYMENT_SUMMARY.md', // Frontend summary - consolidated into Maya/DEPLOYMENT.md
+      'Maya/frontend/MAYA_DEPLOYMENT_READY.md', // Frontend ready status - consolidated into Maya/DEPLOYMENT.md
+      'Maya/tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md' // Security checklist - consolidated into Maya/DEPLOYMENT.md
     ];
     
     const existingOldFiles = [];
@@ -442,7 +472,8 @@ describe('Markdown Reference Integrity', () => {
       'knowledge/CONSOLIDATION_REPORT.md',
       'knowledge/CONSOLIDATION_ANALYSIS_QUICK_START_REORG.md',
       'knowledge/FILE_REVIEW_ANALYSIS_2.md',
-      'knowledge/DOCS_REVIEW_ANALYSIS_3.md'
+      'knowledge/DOCS_REVIEW_ANALYSIS_3.md',
+      'tests/TEST_SUITE_REVIEW_JAN_17_2026.md' // Historical test review document
     ];
     
     const mergedFileMappings = {
@@ -480,9 +511,36 @@ describe('Markdown Reference Integrity', () => {
       'mock-failures-toggle.test.js': 'REMOVED', // Mock toggle functionality removed January 11, 2026
       'run-tests-with-preference.js': 'REMOVED', // Mock toggle functionality removed January 11, 2026
       'e2e-test-execution.test.js': 'REMOVED', // Recursive test execution causing CPU freeze - removed January 11, 2026
+      'root-route.test.js': 'tests/integration_tests/root-route.test.js', // Moved from integration/ to integration_tests/ for consistency - January 17, 2026
+      'root-route-server.test.js': 'tests/integration_tests/root-route-comprehensive.test.js', // Functionality consolidated into comprehensive test - January 17, 2026
       'FILE_REVIEW_ANALYSIS.md': 'tests/knowledge_tests/KB_MANAGEMENT_STRATEGY.md',
       'FILE_REVIEW_ANALYSIS_2.md': 'tests/knowledge_tests/KB_MANAGEMENT_STRATEGY.md',
-      'DOCS_REVIEW_ANALYSIS_3.md': 'tests/knowledge_tests/KB_MANAGEMENT_STRATEGY.md'
+      'DOCS_REVIEW_ANALYSIS_3.md': 'tests/knowledge_tests/KB_MANAGEMENT_STRATEGY.md',
+      // Deployment documentation consolidation - January 18, 2026
+      // Deployment documentation consolidation - January 18, 2026
+      'DEPLOYMENT_IN_PROGRESS.md': 'Maya/DEPLOYMENT.md', // Historical snapshot consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_SUCCESS.md': 'Maya/DEPLOYMENT.md', // Historical snapshot consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_TIMING.md': 'Maya/DEPLOYMENT.md', // Timing info consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_TRIGGER.md': 'Maya/DEPLOYMENT.md', // Trigger info consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_FIX_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Fix summary consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_IN_PROGRESS_CHECKLIST.md': 'Maya/DEPLOYMENT.md', // Checklist consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_LLM_CONNECTION_FIX.md': 'Maya/DEPLOYMENT.md', // LLM fix consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_NEXT_STEPS.md': 'Maya/DEPLOYMENT.md', // Next steps consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_STATUS.md': 'Maya/DEPLOYMENT.md', // Status snapshot consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_SUCCESS_FINAL.md': 'Maya/DEPLOYMENT.md', // Success summary consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_WAIT_TIME.md': 'Maya/DEPLOYMENT.md', // Wait time info consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_CONSOLIDATION_ANALYSIS.md': 'REMOVED', // Temporary analysis document removed after consolidation
+      'DEPLOYMENT_API.md': 'Maya/DEPLOYMENT.md', // API deployment guide consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_SPACE.md': 'Maya/DEPLOYMENT.md', // Main deployment guide consolidated into DEPLOYMENT.md
+      'DEPLOYMENT_TROUBLESHOOTING.md': 'Maya/DEPLOYMENT.md', // Troubleshooting guide consolidated into DEPLOYMENT.md
+      'FIRST_DEPLOYMENT_GUIDE.md': 'Maya/DEPLOYMENT.md', // First deployment guide consolidated into DEPLOYMENT.md
+      'PRODUCTION_LOGS_DEPLOYMENT_STATUS.md': 'Maya/DEPLOYMENT.md', // Production logs status consolidated into DEPLOYMENT.md
+      'ROOT_ROUTE_DEPLOYMENT_STATUS.md': 'Maya/DEPLOYMENT.md', // Root route status consolidated into DEPLOYMENT.md
+      'DEPLOY_PRODUCTION_LOGS.md': 'Maya/DEPLOYMENT.md', // Production logs deployment consolidated into DEPLOYMENT.md
+      'DEPLOY_MAYA_HTML.md': 'Maya/DEPLOYMENT.md', // Frontend deployment consolidated into DEPLOYMENT.md
+      'frontend/DEPLOYMENT_SUMMARY.md': 'Maya/DEPLOYMENT.md', // Frontend summary consolidated into DEPLOYMENT.md
+      'frontend/MAYA_DEPLOYMENT_READY.md': 'Maya/DEPLOYMENT.md', // Frontend ready status consolidated into DEPLOYMENT.md
+      'tests/security_tests/GITHUB_DEPLOYMENT_SECURITY_CHECKLIST.md': 'Maya/DEPLOYMENT.md' // Security checklist consolidated into DEPLOYMENT.md
     };
     
     const incorrectRefs = [];
@@ -490,7 +548,12 @@ describe('Markdown Reference Integrity', () => {
     for (const ref of allReferences) {
       // Skip consolidation reports - they are expected to mention old files
       const relativePath = relative(MAYA_ROOT, ref.file);
-      if (excludedFiles.some(excluded => relativePath.includes(excluded))) {
+      // Check both with and without "Maya/" prefix for excluded files
+      const normalizedRelativePath = relativePath.replace(/^Maya\//, '');
+      if (excludedFiles.some(excluded => {
+        const normalizedExcluded = excluded.replace(/^Maya\//, '');
+        return relativePath.includes(excluded) || normalizedRelativePath.includes(normalizedExcluded);
+      })) {
         continue;
       }
       
@@ -736,7 +799,8 @@ describe('Markdown Reference Integrity', () => {
     // Exclude timeline and review documents that document deleted files
     const excludedHistoricalDocs = [
       'tests/JAN_11_2026_TIMELINE.md', // Timeline document that references deleted files
-      'tests/CPU_USAGE_REVIEW_SUMMARY.md' // Review document that references deleted files
+      'tests/CPU_USAGE_REVIEW_SUMMARY.md', // Review document that references deleted files
+      'tests/TEST_SUITE_REVIEW_JAN_17_2026.md' // Historical test review document
     ];
     
     const invalidTestRefs = [];
