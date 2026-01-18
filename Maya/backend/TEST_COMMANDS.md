@@ -31,27 +31,36 @@ npm test
 npm run test:security
 ```
 
-**What it does**: Tests rate limiting and security measures  
-**Tests**: 6 tests  
-**Files**: `tests/security_tests/rateLimit.test.js`
+**What it does**: Tests rate limiting, input validation, and frontend security protections  
+**Tests**: 60 tests  
+**Files**: 
+- `tests/security_tests/rateLimit.test.js` (6 tests)
+- `tests/security_tests/input-validation.test.js` (37 tests)
+- `tests/security_tests/frontend-protection.test.js` (23 tests) ⭐ NEW
 
 **Example Output**:
 ```
-PASS ../tests/security_tests/rateLimit.test.js
-  Rate Limiting Security
-    General API Rate Limiter
-      ✓ allows requests within limit
-      ✓ rate limiter is configured
-      ✓ rate limiter middleware is functional
-    Chat Endpoint Rate Limiter
-      ✓ chat limiter is configured
-      ✓ both limiters are functional
-    Rate Limit Configuration
-      ✓ rate limiters are middleware functions
+PASS ../tests/security_tests/frontend-protection.test.js    (23 tests) ⭐ NEW
+PASS ../tests/security_tests/input-validation.test.js       (37 tests)
+PASS ../tests/security_tests/rateLimit.test.js              (6 tests)
 
-Test Suites: 1 passed, 1 total
-Tests:       6 passed, 6 total
+Test Suites: 3 passed, 3 total
+Tests:       60 passed, 60 total
 ```
+
+**Frontend Protection Tests** (⭐ NEW):
+- Right-click prevention (3 tests)
+- Text selection prevention (2 tests)
+- Keyboard shortcut blocking (3 tests)
+- Copy protection (2 tests)
+- Image drag prevention (2 tests)
+- Iframe embedding prevention (1 test)
+- Console restrictions (2 tests)
+- eval() restriction (1 test)
+- Developer tools detection (2 tests)
+- Print screen detection (1 test)
+- Accessibility compliance (2 tests)
+- Production vs development (2 tests)
 
 ---
 

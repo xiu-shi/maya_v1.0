@@ -10,7 +10,8 @@ import request from 'supertest';
 
 let app;
 let server;
-const TEST_PORT = 3005;
+// Use dynamic port to avoid conflicts
+const TEST_PORT = process.env.TEST_PORT || 0; // 0 = let OS assign available port
 
 describe('Frontend Chat E2E Flow', () => {
   beforeAll(async () => {
@@ -28,14 +29,12 @@ describe('Frontend Chat E2E Flow', () => {
     return new Promise((resolve, reject) => {
       server = app.listen(TEST_PORT, '127.0.0.1', (err) => {
         if (err) {
-          if (err.code === 'EADDRINUSE') {
-            console.log(`⚠️  Port ${TEST_PORT} in use, using existing server`);
-            resolve();
-          } else {
-            reject(err);
-          }
+          reject(err);
         } else {
-          console.log(`✅ Test server started on port ${TEST_PORT}`);
+          const actualPort = server.address().port;
+          console.log(`✅ Test server started on port ${actualPort}`);
+          // Update API_BASE_URL if needed
+          process.env.TEST_API_PORT = actualPort.toString();
           setTimeout(resolve, 1000);
         }
       });

@@ -7,8 +7,6 @@
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { JSDOM } from 'jsdom';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 describe('Frontend Chat Event Listeners', () => {
   let dom;

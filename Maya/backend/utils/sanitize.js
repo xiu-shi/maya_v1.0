@@ -144,12 +144,20 @@ export function sanitizeChatInput(input) {
     result.warnings.push(lengthCheck.warning);
   }
   
-  // Validate history
-  if (input.history) {
-    result.history = validateHistory(input.history, 50);
-    if (input.history.length > result.history.length) {
-      result.warnings.push(`History truncated from ${input.history.length} to ${result.history.length} messages`);
-    }
+  // Validate history (required)
+  if (input.history === undefined || input.history === null) {
+    result.errors.push('History is required and must be an array');
+    return result;
+  }
+  
+  if (!Array.isArray(input.history)) {
+    result.errors.push('History must be an array');
+    return result;
+  }
+  
+  result.history = validateHistory(input.history, 50);
+  if (input.history.length > result.history.length) {
+    result.warnings.push(`History truncated from ${input.history.length} to ${result.history.length} messages`);
   }
   
   return result;

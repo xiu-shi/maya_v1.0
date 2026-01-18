@@ -128,27 +128,28 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo -e "Server PID: ${SERVER_PID}"
 echo -e "Port: ${PORT}"
 echo -e "Health Check: http://localhost:${PORT}/health"
-echo -e "Frontend: http://localhost:${PORT}/maya.html"
+echo -e "Chat Interface: http://localhost:${PORT}/maya.html"
+echo -e "Chat Logs Dashboard: http://localhost:${PORT}/chat_logs.html"
 echo -e "Logs: tail -f $SCRIPT_DIR/server.log"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 
 # Step 6: Open browser
-echo -e "${YELLOW}🌐 Opening browser...${NC}"
+echo -e "${YELLOW}🌐 Opening Chat Logs Dashboard...${NC}"
 sleep 2  # Give server a moment to fully initialize
 
 # Detect OS and open browser accordingly
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
-    open http://localhost:${PORT}/maya.html
+    open http://localhost:${PORT}/chat_logs.html
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
-    xdg-open http://localhost:${PORT}/maya.html 2>/dev/null || sensible-browser http://localhost:${PORT}/maya.html 2>/dev/null || true
+    xdg-open http://localhost:${PORT}/chat_logs.html 2>/dev/null || sensible-browser http://localhost:${PORT}/chat_logs.html 2>/dev/null || true
 elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
     # Windows (Git Bash/Cygwin)
-    start http://localhost:${PORT}/maya.html
+    start http://localhost:${PORT}/chat_logs.html
 else
     echo -e "${YELLOW}⚠️  Could not auto-open browser. Please manually open:${NC}"
-    echo -e "   http://localhost:${PORT}/maya.html"
+    echo -e "   http://localhost:${PORT}/chat_logs.html"
 fi
 
 # Step 7: Show how to stop the server

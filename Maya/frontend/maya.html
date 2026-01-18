@@ -743,16 +743,16 @@
               <div style="background: var(--bg-secondary); padding: var(--spacing-lg); border-radius: 12px; margin-top: var(--spacing-lg); text-align: left;">
                 <p style="font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-primary);">💡 Try asking:</p>
                 <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-sm);">
-                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='I run a [your industry] business. How can AI help me reduce costs and improve efficiency?'; document.getElementById('chatInput').focus();">
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?">
                     "I run a [your industry] business. How can AI help me reduce costs and improve efficiency?"
                   </li>
-                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='What are the biggest risks I should consider before adopting AI in my organization?'; document.getElementById('chatInput').focus();">
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?">
                     "What are the biggest risks I should consider before adopting AI in my organization?"
                   </li>
-                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='How do I create an AI strategy that aligns with my business goals?'; document.getElementById('chatInput').focus();">
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="How do I create an AI strategy that aligns with my business goals?">
                     "How do I create an AI strategy that aligns with my business goals?"
                   </li>
-                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" onclick="document.getElementById('chatInput').value='Can you help me understand cloud migration costs and ROI?'; document.getElementById('chatInput').focus();">
+                  <li style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer; transition: all var(--transition-fast);" data-prompt="Can you help me understand cloud migration costs and ROI?">
                     "Can you help me understand cloud migration costs and ROI?"
                   </li>
                 </ul>
@@ -781,22 +781,40 @@
   </div>
 
   <script>
-    // Theme toggle (reuse from main site)
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = themeToggle.querySelector('.theme-icon');
+    // Theme toggle (reuse from main site) - Fixed: Add DOM-ready check
+    function initThemeToggle() {
+      const themeToggle = document.getElementById('themeToggle');
+      if (!themeToggle) {
+        console.warn('⚠️ Theme toggle element not found');
+        return;
+      }
+      
+      const themeIcon = themeToggle.querySelector('.theme-icon');
+      if (!themeIcon) {
+        console.warn('⚠️ Theme icon element not found');
+        return;
+      }
+      
+      // Load theme preference
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+      
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      });
+    }
     
-    // Load theme preference
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-    
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    });
+    // Initialize theme toggle when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+      initThemeToggle();
+    }
 
     // Chat functionality
     const chatMessages = document.getElementById('chatMessages');
@@ -958,6 +976,31 @@
         listenersAttached = attachEventListeners();
       }
     });
+
+    // Initialize prompt click handlers (Fixed: Add DOM-ready check)
+    function initPromptHandlers() {
+      const promptItems = document.querySelectorAll('[data-prompt]');
+      promptItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const prompt = this.getAttribute('data-prompt');
+          const chatInput = document.getElementById('chatInput');
+          if (chatInput && prompt) {
+            chatInput.value = prompt;
+            chatInput.focus();
+            // Auto-resize textarea
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+          }
+        });
+      });
+    }
+    
+    // Initialize prompt handlers when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPromptHandlers);
+    } else {
+      initPromptHandlers();
+    }
 
     // Create new chat
     function createNewChat() {

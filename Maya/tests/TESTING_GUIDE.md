@@ -33,6 +33,9 @@ Maya/tests/
 │   └── backend/             # Backend unit tests
 ├── integration_tests/        # Integration tests
 ├── security_tests/          # Security tests
+│   ├── frontend-protection.test.js  # Frontend security protections (23 tests) ⭐ NEW
+│   ├── input-validation.test.js     # Input validation & injection prevention
+│   └── rateLimit.test.js            # Rate limiting security
 ├── performance_tests/       # Performance tests
 ├── knowledge_tests/         # Knowledge Base tests
 ├── model_test/              # Model optimization & security tests
@@ -74,6 +77,7 @@ npm test
 
 # Run specific test suite
 npm test -- security_tests
+npm test -- tests/security_tests/frontend-protection.test.js  # Frontend protections ⭐ NEW
 npm test -- performance_tests
 npm test -- knowledge_tests
 npm test -- model_test

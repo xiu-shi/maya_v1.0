@@ -2,3 +2,66 @@
 /private/
 /api/vendor/
 api/config.php          # if you ever put real values here locally
+private.sample/contact.secrets.php
+
+# Backend environment variables and secrets
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/.env.development
+backend/.env.production
+backend/node_modules/
+backend/.DS_Store
+
+# Maya backend - environment variables and secrets
+Maya/backend/.env
+Maya/backend/.env.local
+Maya/backend/.env.*.local
+Maya/backend/.env.development
+Maya/backend/.env.production
+Maya/backend/server.log
+Maya/backend/*.log
+Maya/backend/node_modules/
+Maya/backend/.DS_Store
+
+# Discovery results (may contain sensitive info)
+mcp-discovery-results.json
+**/mcp-discovery-results.json
+
+# Maya knowledge base - large files and processed data
+Maya/knowledge/*.pdf
+Maya/knowledge/*.docx
+Maya/knowledge/*.xlsx
+Maya/knowledge/embeddings/*
+Maya/knowledge/processed/*
+
+# General secrets and sensitive files
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+*credentials*
+*secrets*
+*password*
+*.token
+config.local.*
+secrets.json
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
