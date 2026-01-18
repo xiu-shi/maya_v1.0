@@ -855,23 +855,109 @@
       }
     }
 
-    // Attach event listeners (outside init to ensure they're attached once)
-    // Auto-resize textarea
-    chatInput.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-    });
+    // Attach event listeners - ensure DOM is ready and elements exist
+    function attachEventListeners() {
+      console.log('🔗 Attaching event listeners...');
+      
+      // Verify all required elements exist
+      if (!chatInput) {
+        console.error('❌ chatInput element not found');
+        return false;
+      }
+      if (!submitBtn) {
+        console.error('❌ submitBtn element not found');
+        return false;
+      }
+      if (!newChatBtn) {
+        console.error('❌ newChatBtn element not found');
+        return false;
+      }
+      if (!chatMessages) {
+        console.error('❌ chatMessages element not found');
+        return false;
+      }
 
-    // Send on Enter (Shift+Enter for new line)
-    chatInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+      try {
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+        console.log('✅ Auto-resize listener attached');
+
+        // Send on Enter (Shift+Enter for new line)
+        chatInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            console.log('⌨️ Enter key pressed, calling sendMessage');
+            sendMessage();
+          }
+        });
+        console.log('✅ Enter key listener attached');
+
+        // Submit button click
+        submitBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          console.log('🖱️ Submit button clicked, calling sendMessage');
+          sendMessage();
+        });
+        console.log('✅ Submit button listener attached');
+
+        // New chat button click
+        newChatBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          console.log('➕ New chat button clicked');
+          createNewChat();
+        });
+        console.log('✅ New chat button listener attached');
+
+        console.log('✅ All event listeners attached successfully');
+        return true;
+      } catch (error) {
+        console.error('❌ Error attaching event listeners:', error);
+        return false;
+      }
+    }
+
+    // Try to attach listeners immediately (if DOM is ready)
+    let listenersAttached = false;
+    if (document.readyState === 'loading') {
+      // DOM not ready yet, wait for it
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 DOMContentLoaded fired, attaching listeners');
+        listenersAttached = attachEventListeners();
+        if (!listenersAttached) {
+          console.error('❌ Failed to attach listeners on DOMContentLoaded');
+        }
+        // Initialize after listeners are attached
+        init();
+      });
+    } else {
+      // DOM already ready, attach immediately
+      console.log('📄 DOM already ready, attaching listeners immediately');
+      listenersAttached = attachEventListeners();
+      if (!listenersAttached) {
+        console.error('❌ Failed to attach listeners immediately');
+        // Retry after a short delay
+        setTimeout(() => {
+          console.log('🔄 Retrying listener attachment...');
+          listenersAttached = attachEventListeners();
+          if (listenersAttached) {
+            init();
+          }
+        }, 100);
+      } else {
+        init();
+      }
+    }
+
+    // Fallback: Ensure listeners are attached even if above fails
+    window.addEventListener('load', function() {
+      if (!listenersAttached) {
+        console.warn('⚠️ Listeners not attached yet, retrying on window.load');
+        listenersAttached = attachEventListeners();
       }
     });
-
-    submitBtn.addEventListener('click', sendMessage);
-    newChatBtn.addEventListener('click', createNewChat);
 
     // Create new chat
     function createNewChat() {
@@ -1506,11 +1592,27 @@
     }
 
     // Initialize on load - ensure DOM is ready
+    // Note: init() is now called from attachEventListeners() flow above
+    // This ensures proper order: DOM ready → Listeners attached → Init
+    // But keep this as fallback in case listeners attach fails
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+      // init() will be called from DOMContentLoaded handler above
+      // But add fallback in case listener attachment fails
+      document.addEventListener('DOMContentLoaded', function() {
+        // Only init if listeners weren't attached (fallback)
+        if (!listenersAttached) {
+          console.warn('⚠️ Listeners not attached, initializing without them');
+          init();
+        }
+      });
     } else {
       // DOM already loaded
-      init();
+      // init() should already be called from attachEventListeners() above
+      // But call as fallback if listeners failed
+      if (!listenersAttached) {
+        console.warn('⚠️ Listeners not attached, initializing without them');
+        init();
+      }
     }
   </script>
 
