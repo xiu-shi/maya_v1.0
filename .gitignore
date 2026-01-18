@@ -69,9 +69,24 @@ mcp_config.json
 # - Maya/knowledge/docs/**/*.md (KB documentation)
 
 # Block all other .md files by default
+# Essential files (allowed):
+# - README.md (root)
+# - SECURITY.md (root)
+# - GITHUB.md (root) - GitHub repository management guide
+# - Maya/README.md
+# - Maya/DEPLOYMENT.md
+# - Maya/Implementation.md
+# - Maya/knowledge/system_instruction.md
+# - Maya/knowledge/JANET_DOCS_REVIEW_SOP.md
+# - Maya/knowledge/CURSOR_RULES_TO_PRODUCTION.md
+# - Maya/knowledge/LOCAL_DEVELOPMENT_GUIDE.md
+# - Maya/tests/**/*.md (test documentation)
+# - Maya/knowledge/docs/**/*.md (KB documentation)
+
 *.md
 !README.md
 !SECURITY.md
+!GITHUB.md
 !Maya/README.md
 !Maya/DEPLOYMENT.md
 !Maya/Implementation.md
