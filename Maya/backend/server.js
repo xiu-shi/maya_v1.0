@@ -153,12 +153,15 @@ app.get('/health', async (req, res) => {
     }
   }
   
+  // Note: MCP client is lazy-loaded (connects on first chat request)
+  // mcpConnected may be false at startup - this is normal and expected
+  // Service is healthy if token is configured (MCP will connect when needed)
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
     mcpConnected: client?.connected || false,
-    tokenConfigured: !!config.aiBuilderToken, // Added: helps diagnose connection issues
+    tokenConfigured: !!config.aiBuilderToken,
     kb: kbStatus || { status: 'not_available' }
   });
 });
