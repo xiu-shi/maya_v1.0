@@ -28,7 +28,7 @@ function loadMCPConfig() {
     return serverConfig.env.AI_BUILDER_TOKEN;
   } catch (error) {
     console.error('⚠️  Could not load mcp_config.json, using environment variable');
-    return process.env.AI_BUILDER_TOKEN || 'sk_937d9f12_5e4fc7f11ca47cf77cefec16b8611132466d';
+    return process.env.AI_BUILDER_TOKEN || null;
   }
 }
 
