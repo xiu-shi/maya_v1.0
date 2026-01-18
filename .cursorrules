@@ -220,4 +220,11 @@ Would you like to remove this analysis report?
 - **NEVER** skip security checks
 - **ALWAYS** verify DOM timing for frontend changes
 - **ALWAYS** add defensive checks for DOM element access
+- **NEVER** force push to main branch (use `git push` only)
+- **ALWAYS** ensure tests pass before pushing to main
+
+## Branch Protection
+- Main branch should be protected (prevent force pushes and deletion)
+- Status checks should be required before merging
+- See `BRANCH_PROTECTION_SETUP.md` for setup instructions
 
