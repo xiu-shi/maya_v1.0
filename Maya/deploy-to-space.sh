@@ -88,8 +88,8 @@ HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 # Extract response body (all but last line)
 RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
 
-# Check response
-if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ]; then
+# Check response (202 Accepted is also success for async deployments)
+if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ] || [ "$HTTP_CODE" -eq 202 ]; then
     echo -e "${GREEN}✅ Deployment queued successfully!${NC}"
     echo ""
     echo -e "${GREEN}Response:${NC}"
@@ -99,7 +99,8 @@ if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ]; then
     echo "  https://space.ai-builders.com/deployments"
     echo ""
     echo -e "${BLUE}📝 Note:${NC}"
-    echo "  - Deployment may take a few minutes to complete"
+    echo "  - Deployment may take 5-10 minutes to complete"
+    echo "  - Status will update from 'deploying' to 'healthy' when ready"
     echo "  - After first successful deployment, git pushes will auto-deploy"
     echo "  - Free hosting for 12 months from first deployment"
     echo ""

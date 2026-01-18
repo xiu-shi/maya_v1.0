@@ -670,8 +670,7 @@
           <img src="static/images/hero/maya_tall_portrait.jpg" alt="Maya - Janet's Digital Twin" class="maya-hero-image" />
         </div>
         <div class="maya-hero-bio">
-          <h1 class="maya-hero-title">Maya</h1>
-          <p class="maya-hero-subtitle">Janet's Digital Twin</p>
+          <h1 class="maya-hero-title">Maya <span style="font-weight: 500; font-size: 0.7em; color: var(--text-secondary);">Janet's Digital Twin</span></h1>
           <div class="maya-hero-description">
             <p>
               <strong>Turning Complexity into Your Lasting Advantage.</strong>
@@ -686,10 +685,6 @@
               <li><strong>For Founders & Senior Leaders:</strong> I align your AI and cloud strategy with business goals, turning technical complexity into competitive advantage. I help you move fast without compromising security or compliance, from early cloud decisions to scaling AI adoption.</li>
               <li><strong>For Educators & Institutions:</strong> I design future-ready AI learning by integrating AI into curriculum and assessment, making complex concepts accessible. My approach combines enterprise experience with pedagogical rigor, preparing students and emerging leaders to lead responsibly.</li>
             </ul>
-            <p style="margin-top: var(--spacing-lg); padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: 12px; border-left: 4px solid var(--accent-color);">
-              <strong style="font-size: var(--font-size-lg); display: block; margin-bottom: var(--spacing-sm);">Ready to turn complexity into your competitive advantage?</strong>
-              Let's explore how AI and cloud strategy can drive measurable business outcomes for your organization. Book a free strategy session to discuss your specific challenges and opportunities.
-            </p>
             <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg); flex-wrap: wrap;">
               <a href="https://janetxiushi.me/#contact" style="display: inline-block; padding: var(--spacing-md) var(--spacing-xl); background: var(--accent-color); color: var(--bg-primary); text-decoration: none; border-radius: 8px; font-weight: 600; transition: all var(--transition-normal); text-align: center; min-width: 200px;">
                 📅 Book a Free Strategy Call
@@ -994,7 +989,7 @@
           this.style.transform = 'translateX(0)';
         });
         
-        // Click handler to populate chat input
+        // Click handler to populate chat input and auto-submit for guided experience
         item.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -1005,6 +1000,16 @@
           console.log(`💬 Sample question ${index + 1} clicked:`, prompt);
           
           if (chatInput && prompt) {
+            // Hide empty state immediately for better UX
+            if (emptyState) {
+              emptyState.style.display = 'none';
+            }
+            
+            // Create new chat if none exists (for first-time users)
+            if (!currentChatId) {
+              createNewChat();
+            }
+            
             // Set the prompt text
             chatInput.value = prompt;
             
@@ -1015,19 +1020,21 @@
             chatInput.style.height = 'auto';
             chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
             
-            // Scroll input into view if needed
-            setTimeout(() => {
-              chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-            
             // Visual feedback - briefly highlight the input
             chatInput.style.transition = 'box-shadow 0.3s ease';
-            chatInput.style.boxShadow = '0 0 0 2px var(--primary-color, #007bff)';
+            chatInput.style.boxShadow = '0 0 0 2px var(--accent-color)';
             setTimeout(() => {
               chatInput.style.boxShadow = '';
             }, 500);
             
             console.log('✅ Prompt populated in chat input');
+            
+            // Auto-submit for guided experience (first-time users)
+            // Small delay to ensure UI updates are complete
+            setTimeout(() => {
+              console.log('🚀 Auto-submitting sample question for guided experience');
+              sendMessage();
+            }, 150);
           } else {
             console.error('❌ Failed to populate prompt:', { chatInput: !!chatInput, prompt: !!prompt });
           }
