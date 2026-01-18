@@ -1,4 +1,6 @@
 # Maya Digital Twin - Cursor Development Rules
+**Last Updated**: January 18, 2026  
+**Version**: 1.0
 
 ## Project Context
 This is Maya, Janet Xiu Shi's digital twin - a ChatGPT-like interface powered by AI Builders API. The project includes a Node.js/Express backend and a vanilla HTML/CSS/JS frontend.
@@ -201,4 +203,21 @@ Would you like to remove this analysis report?
 - Test locally before deploying
 - Consider security implications
 
+## Pre-Deployment Checklist
+- ✅ Run all tests: `cd Maya/backend && npm test`
+- ✅ Run security tests: `npm run test:security`
+- ✅ Verify `.cursorrules` are followed
+- ✅ Check timezone/timestamps are correct
+- ✅ Verify no sensitive data exposed
+- ✅ Test locally before pushing
+- ✅ Document changes in relevant `.md` files
+
+## Important Reminders
+- **ALWAYS** check system time before updating timestamps
+- **ALWAYS** follow the 9-step Documentation Review SOP
+- **ALWAYS** run tests before committing
+- **NEVER** expose AI_BUILDER_TOKEN or sensitive data
+- **NEVER** skip security checks
+- **ALWAYS** verify DOM timing for frontend changes
+- **ALWAYS** add defensive checks for DOM element access
 
