@@ -12,7 +12,7 @@ describe('Frontend API URL Configuration - Integration Test', () => {
   
   beforeAll(() => {
     // Read the actual maya.html file
-    const mayaHtmlPath = join(process.cwd(), '../../frontend/maya.html');
+    const mayaHtmlPath = join(process.cwd(), '../frontend/maya.html');
     mayaHtmlContent = readFileSync(mayaHtmlPath, 'utf-8');
   });
 
