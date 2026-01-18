@@ -54,6 +54,20 @@ secrets.json
 mcp_config.json
 !mcp_config.json.example
 
+# Temporary documentation files (remove after purpose fulfilled)
+*.md
+!README.md
+!SECURITY.md
+!Maya/README.md
+!Maya/DEPLOYMENT.md
+!Maya/Implementation.md
+!Maya/knowledge/system_instruction.md
+!Maya/knowledge/JANET_DOCS_REVIEW_SOP.md
+!Maya/knowledge/CURSOR_RULES_TO_PRODUCTION.md
+!Maya/knowledge/LOCAL_DEVELOPMENT_GUIDE.md
+!Maya/tests/**/*.md
+!Maya/knowledge/docs/**/*.md
+
 # Logs
 *.log
 logs/
