@@ -60,7 +60,7 @@ run_check "Check API key is not placeholder" \
 
 # 4. Check .env is in .gitignore
 run_check "Check .env is in .gitignore" \
-    "grep -q '\.env' ../.gitignore && echo '  .env is gitignored'"
+    "grep -q '\.env' ../../.gitignore && echo '  .env is gitignored'"
 
 # 5. Check no API keys in committed code
 run_check "Check no API keys in committed code" \
