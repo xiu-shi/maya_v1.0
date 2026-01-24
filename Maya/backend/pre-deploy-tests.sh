@@ -107,6 +107,10 @@ run_check "Run sample integration tests" \
 run_check "Run Jan 18, 2026 test improvements" \
     "npm test -- tests/integration_tests/sample-questions-interactions.test.js tests/integration_tests/deployment-script.test.js 2>&1 | grep -q 'Tests.*passed' && echo '  New tests passed'"
 
+# 15. CRITICAL: Validate API key works with production API
+run_check "CRITICAL: Validate API key with production endpoint" \
+    "node verify-api-key-production.js && echo '  Production API validation passed'"
+
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════════════════════════════════${NC}"
 
