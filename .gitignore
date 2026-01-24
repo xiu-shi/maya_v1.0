@@ -1,0 +1,50 @@
+# Environment variables and secrets
+.env
+.env.*
+mcp_config.json
+*.secret
+*.key
+*.token
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Discovery results (may contain sensitive info)
+mcp-discovery-results.json
+**/mcp-discovery-results.json
+
+# Maya knowledge base - large files
+Maya/knowledge/*.pdf
+Maya/knowledge/*.docx
+Maya/knowledge/*.xlsx
+Maya/knowledge/embeddings/*
+Maya/knowledge/processed/*
+
+# Backend data
+Maya/backend/data/
+backend/data/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
+API_KEY_MANAGEMENT.md
