@@ -99,8 +99,8 @@ Service Status (Jan 18):
 ### ✅ Phase 6: Resolution (January 24, 2026, 21:15 GMT)
 
 **Actions Taken**:
-1. New API key obtained: `sk_9a342713_136e696672a6d8ae4701a0edcc8babbaefdc`
-2. Updated in `.env` file
+1. New API key obtained from AI Builders platform
+2. Updated in `.env` file (gitignored - not in git)
 3. Deployed to AI Builders Space
 4. Service redeployed with valid API key
 
@@ -154,7 +154,7 @@ Service Status (Jan 18):
 6. Status = Degraded
 
 **The Solution**:
-- Deploy with new valid key `sk_9a342713_...`
+- Deploy with new valid key (stored in .env file)
 - Platform will inject the new valid key
 - Service will connect to MCP successfully
 - Status = Healthy
@@ -187,7 +187,7 @@ Service Status (Jan 18):
 ## ✅ Current Status
 
 - **Old Key**: `sk_937d9f12_...` - Revoked by you (correct!)
-- **New Key**: `sk_9a342713_...` - Deployed January 24, 2026
+- **New Key**: Stored in .env file (gitignored) - Deployed January 24, 2026
 - **Service**: Deploying (will be healthy in ~10 minutes)
 - **Local Server**: Working perfectly with new key
 - **Tests**: All passing (167+ tests)
