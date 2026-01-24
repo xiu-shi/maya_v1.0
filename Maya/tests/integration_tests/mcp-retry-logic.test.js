@@ -112,7 +112,7 @@ describe('MCP Connection Retry Logic (Jan 18, 2026)', () => {
 
     it('should log token prefix for diagnostics', () => {
       const logError = jest.fn();
-      const token = 'sk_937d9f12_5e4fc7f11ca47cf77cefec16b8611132466d';
+      const token = 'sk_test_example_token_for_testing_purposes_only';
       const tokenPrefix = token.substring(0, 5);
       
       logError('MCP connection failed', new Error('test'), {
