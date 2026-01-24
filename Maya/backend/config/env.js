@@ -30,9 +30,14 @@ function getEnv(key, defaultValue = null, required = false) {
 
 /**
  * Validate AI_BUILDER_TOKEN format
- * Allows null during build/startup - will be validated when actually used
+ * Enhanced validation to prevent deployment with invalid/revoked keys
  */
 function validateToken(token) {
+  // Allow test tokens in test environment
+  if (process.env.NODE_ENV === 'test' && (token === 'test-token' || token === 'test-token-for-testing')) {
+    return token;
+  }
+  
   // During Docker build or initial startup, token might not be set yet
   // Allow null/undefined - will be validated when MCP client is actually used
   if (!token) {
@@ -42,16 +47,58 @@ function validateToken(token) {
       console.warn('⚠️  Warning: AI_BUILDER_TOKEN is not set. Service may not function correctly.');
       return null; // Return null instead of throwing
     }
-    throw new Error('AI_BUILDER_TOKEN is required');
+    // In development, require token
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Error: AI_BUILDER_TOKEN is required in development');
+      console.error('   Please set AI_BUILDER_TOKEN in your .env file');
+      throw new Error('AI_BUILDER_TOKEN is required');
+    }
+    return null;
   }
   
+  // Validate format
   if (!token.startsWith('sk_')) {
-    console.warn('⚠️  Warning: AI_BUILDER_TOKEN does not start with "sk_" - may be invalid');
+    console.error('❌ Error: AI_BUILDER_TOKEN must start with "sk_"');
+    console.error(`   Current value starts with: ${token.substring(0, 5)}...`);
+    throw new Error('AI_BUILDER_TOKEN format is invalid - must start with "sk_"');
   }
   
+  // Validate length
   if (token.length < 20) {
+    console.error('❌ Error: AI_BUILDER_TOKEN appears to be invalid (too short)');
+    console.error(`   Minimum length: 20, Current length: ${token.length}`);
     throw new Error('AI_BUILDER_TOKEN appears to be invalid (too short)');
   }
+  
+  // Check for revoked keys (documented as revoked)
+  const revokedKeyPrefixes = [
+    'sk_937d9f12' // Revoked January 24, 2026 - see ROOT_CAUSE_ANALYSIS.md
+  ];
+  
+  const isRevoked = revokedKeyPrefixes.some(prefix => token.startsWith(prefix));
+  if (isRevoked) {
+    console.error('❌ Error: This API key has been revoked and cannot be used');
+    console.error(`   Key prefix: ${token.substring(0, 12)}...`);
+    console.error('   Please obtain a new API key from https://space.ai-builders.com');
+    throw new Error('AI_BUILDER_TOKEN is revoked - please use a new key');
+  }
+  
+  // Check for placeholder/example keys
+  const placeholderKeys = [
+    'sk_your_token_here',
+    'sk_example',
+    'sk_test_example'
+  ];
+  
+  if (placeholderKeys.includes(token)) {
+    console.error('❌ Error: API key is a placeholder value');
+    console.error('   Please replace with your actual API key from https://space.ai-builders.com');
+    throw new Error('AI_BUILDER_TOKEN is a placeholder - please use your actual key');
+  }
+  
+  // Log success (with masked key)
+  const maskedToken = `${token.substring(0, 12)}...${token.substring(token.length - 4)}`;
+  console.log(`   AI_BUILDER_TOKEN validated: ${maskedToken}`);
   
   return token;
 }

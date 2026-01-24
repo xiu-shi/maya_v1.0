@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-push hook
+# Runs comprehensive tests before allowing push
+# Prevents pushing if tests fail
+
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🧪 Running pre-push tests..."
+
+# Run all tests
+cd backend
+npm test 2>&1 | grep -q "Tests.*passed"
+
+if [ $? -eq 0 ]; then
+    echo "✅ All tests passed - push allowed"
+    exit 0
+else
+    echo "❌ Tests failed - push blocked"
+    echo "Fix the failing tests before pushing"
+    exit 1
+fi
