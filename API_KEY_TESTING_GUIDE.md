@@ -132,8 +132,10 @@ cd Maya
 ### Valid Key Format
 ```
 sk_[alphanumeric]_[hexadecimal]
-Example: sk_9a342713_136e696672a6d8ae4701a0edcc8babbaefdc
+Example: sk_example_1234567890abcdef1234567890abcdef1234
 ```
+
+**IMPORTANT**: Your actual API key is stored in `Maya/backend/.env` file only. NEVER hardcode it in tests or documentation.
 
 ### Validation Checks
 1. **Prefix**: Must start with `sk_`
