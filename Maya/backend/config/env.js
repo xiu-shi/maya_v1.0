@@ -109,12 +109,12 @@ function validateToken(token) {
  */
 function parseOrigins(originsString) {
   if (!originsString) {
-    return ['http://localhost:3001', 'http://localhost:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:3000']; // Default includes both ports
+    return ['http://localhost:3000', 'http://127.0.0.1:3000']; // Default uses port 3000
   }
   
   const origins = originsString.split(',').map(origin => origin.trim()).filter(Boolean);
-  // Always include localhost:3001 and 127.0.0.1:3001 for development
-  const defaultOrigins = ['http://localhost:3001', 'http://127.0.0.1:3001'];
+  // Always include localhost:3000 and 127.0.0.1:3000 for development
+  const defaultOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
   const allOrigins = [...new Set([...defaultOrigins, ...origins])]; // Remove duplicates
   return allOrigins;
 }
@@ -126,7 +126,7 @@ const config = {
   
   // Server
   nodeEnv: getEnv('NODE_ENV', 'development'),
-  port: parseInt(getEnv('PORT', '3001'), 10), // Changed default to 3001 to avoid conflicts
+  port: parseInt(getEnv('PORT', '3000'), 10), // Default matches production deployment
   
   // CORS
   allowedOrigins: parseOrigins(getEnv('ALLOWED_ORIGINS')),

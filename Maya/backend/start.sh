@@ -17,8 +17,8 @@ echo -e "${YELLOW}🚀 Starting Maya Backend Server...${NC}"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-# Get port from environment or use default
-PORT=${PORT:-3001}
+# Get port from environment or use default (matching production)
+PORT=${PORT:-3000}
 
 # Step 1: Find and kill any processes using the port
 echo -e "${YELLOW}📋 Checking for processes on port ${PORT}...${NC}"
