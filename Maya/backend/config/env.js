@@ -72,7 +72,8 @@ function validateToken(token) {
   
   // Check for revoked keys (documented as revoked)
   const revokedKeyPrefixes = [
-    'sk_937d9f12' // Revoked January 24, 2026 - see ROOT_CAUSE_ANALYSIS.md
+    'sk_937d9f12', // Revoked January 24, 2026 - see ROOT_CAUSE_ANALYSIS.md
+    'sk_9a342713'  // Revoked January 24, 2026 - production deployment failed
   ];
   
   const isRevoked = revokedKeyPrefixes.some(prefix => token.startsWith(prefix));
