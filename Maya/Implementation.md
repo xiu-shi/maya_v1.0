@@ -1319,7 +1319,7 @@ npm run test:coverage       # With coverage
 **Date**: January 11, 2026, 09:00 - 14:00 GMT  
 **Status**: ✅ **RESOLVED** - All issues fixed, prevention measures implemented
 
-**Complete Timeline**: See [`tests/JAN_11_2026_TIMELINE.md`](../tests/JAN_11_2026_TIMELINE.md) for detailed timeline
+**Complete Timeline**: See git history (Jan 11, 2026) for detailed timeline
 
 #### Overview
 
@@ -1375,7 +1375,7 @@ Critical CPU high usage incidents (>90%) causing laptop freeze and system reboot
 - ✅ Test isolation verified
 - ✅ Functionality preserved (98.4% pass rate)
 
-**See**: [`tests/JAN_11_2026_TIMELINE.md`](../tests/JAN_11_2026_TIMELINE.md) for complete timeline, challenges, fixes, and evidence.
+**See**: Git history (Jan 11, 2026) for complete timeline, challenges, fixes, and evidence.
 
 ---
 
@@ -1872,8 +1872,7 @@ Maya was providing full context and Janet's details even for very brief queries,
 **Files Updated**:
 - `Maya/tests/e2e.html` - Added `dataLoaded` flag, localStorage fallback, DOM readiness checks, retry logic
 
-**See**: 
-- [`tests/documentation/JAN_11_2026_E2E_DASHBOARD_METRICS_LOADING_FIX.md`](../tests/documentation/JAN_11_2026_E2E_DASHBOARD_METRICS_LOADING_FIX.md) for complete documentation
+**See**: Git history (Jan 11, 2026) for complete documentation
 
 ---
 

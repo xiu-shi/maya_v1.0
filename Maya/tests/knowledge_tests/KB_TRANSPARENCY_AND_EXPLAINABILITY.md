@@ -46,7 +46,7 @@ Maya's KB system is **continuously evaluated** to ensure trust and confidence:
 
 **Quick Links**:
 - **[KB_MANAGEMENT_STRATEGY.md](./KB_MANAGEMENT_STRATEGY.md)** - Complete KB management guide (includes caching, monitoring, testing, and evaluation)
-- **[E2E_tests_9Jan.md](../../../E2E_tests_9Jan.md)** - Comprehensive E2E test report with detailed KB test methodology and execution results (70/70 tests passing ✅)
+- **E2E Test Documentation** - See `Maya/tests/` folder for comprehensive E2E test documentation and results
 
 ---
 
@@ -825,7 +825,7 @@ Maya provides **transparency and explainability** through:
 ## Related Documentation
 
 - **[KB_MANAGEMENT_STRATEGY.md](./KB_MANAGEMENT_STRATEGY.md)** - Complete KB management guide (includes caching, monitoring, and testing)
-- **[E2E_tests_9Jan.md](../../../E2E_tests_9Jan.md)** - Comprehensive E2E test report with detailed KB test methodology and execution results (70/70 tests passing ✅)
+- **E2E Test Documentation** - See `Maya/tests/` folder for comprehensive E2E test documentation and results
 - **[Implementation.md](../../Implementation.md)** - Technical implementation details
 
 ---
