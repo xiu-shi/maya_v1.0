@@ -14,7 +14,7 @@
 
 ## Recommended Protection
 
-See `BRANCH_PROTECTION_SETUP.md` in repository root for detailed setup instructions.
+See `../../GITHUB.md` in repository root for detailed setup instructions.
 
 ### Minimal Protection (Recommended):
 - ✅ Prevent force pushes

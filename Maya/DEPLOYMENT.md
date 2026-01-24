@@ -1170,8 +1170,8 @@ curl -X POST "https://space.ai-builders.com/backend/v1/deployments" \
 
 ### Prevention Guides
 - `DOM_TIMING_PATTERNS.md` - Prevention guide for DOM timing issues
-- `ROOT_CAUSE_ANALYSIS_CHAT_BREAKAGE.md` - Comprehensive root cause analysis
-- `CHAT_FIX_SUMMARY.md` - Quick reference for chat fixes
+- Root cause analysis documented in git history (Jan 18, 2026)
+- Chat fix summary available in git history
 
 ### Scripts
 - `scripts/pre-deployment-test.sh` - Automated pre-deployment checks
