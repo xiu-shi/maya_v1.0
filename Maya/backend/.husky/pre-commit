@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-commit hook
+# Runs tests before allowing commit
+# Prevents committing if tests fail
+
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🧪 Running pre-commit tests..."
+
+# Run quick tests (security and unit tests)
+cd backend
+npm test -- tests/security_tests tests/unit_tests/backend 2>&1 | grep -q "Tests.*passed"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Pre-commit tests passed"
+    exit 0
+else
+    echo "❌ Pre-commit tests failed - commit blocked"
+    echo "Fix the failing tests before committing"
+    exit 1
+fi

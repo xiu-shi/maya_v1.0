@@ -67,6 +67,24 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 echo ""
+echo -e "${BLUE}🧪 Running pre-deployment tests...${NC}"
+echo ""
+
+# Run pre-deployment tests
+cd backend
+if ./pre-deploy-tests.sh; then
+    echo -e "${GREEN}✅ All pre-deployment tests passed${NC}"
+    echo ""
+    cd ..
+else
+    echo -e "${RED}❌ Pre-deployment tests failed${NC}"
+    echo -e "${RED}Deployment aborted${NC}"
+    echo ""
+    cd ..
+    exit 1
+fi
+
+echo ""
 echo -e "${YELLOW}🔄 Deploying...${NC}"
 echo ""
 
