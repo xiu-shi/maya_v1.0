@@ -38,8 +38,9 @@ describe('API Key Validation & Security', () => {
 
   describe('API Key Format Validation', () => {
     it('should accept valid API key format (sk_* with sufficient length)', () => {
+      // Use only example keys for testing - NEVER hardcode actual keys
       const validKeys = [
-        'sk_9a342713_136e696672a6d8ae4701a0edcc8babbaefdc',
+        'sk_example_1234567890abcdef1234567890abcdef1234',
         'sk_test_1234567890abcdef',
         'sk_live_abcdef1234567890'
       ];
@@ -219,11 +220,14 @@ describe('API Key Validation & Security', () => {
     });
 
     it('should ensure old key is revoked after rotation', () => {
-      const oldKey = 'sk_937d9f12_5e4fc7f11ca47cf77cefec16b8611132466d';
-      const newKey = 'sk_9a342713_136e696672a6d8ae4701a0edcc8babbaefdc';
+      const oldRevokedKey = 'sk_937d9f12_5e4fc7f11ca47cf77cefec16b8611132466d';
+      // Current key comes from .env file - NEVER hardcode actual keys
+      const currentKey = process.env.AI_BUILDER_TOKEN;
       
       // Document that old key should be revoked
-      expect(oldKey).not.toBe(newKey);
+      if (currentKey && currentKey !== 'test-token' && currentKey !== 'test-token-for-testing') {
+        expect(currentKey).not.toBe(oldRevokedKey);
+      }
       
       // Test that old key should not work (tested in integration tests)
     });
