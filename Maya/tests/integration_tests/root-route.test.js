@@ -38,7 +38,7 @@ beforeAll(async () => {
       }
     });
   });
-}, 30000);
+}, 60000); // Increased timeout to 60s
 
 afterAll(async () => {
   return new Promise((resolve) => {

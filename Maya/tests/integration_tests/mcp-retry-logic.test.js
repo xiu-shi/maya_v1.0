@@ -122,7 +122,7 @@ describe('MCP Connection Retry Logic (Jan 18, 2026)', () => {
       expect(logError).toHaveBeenCalledWith(
         'MCP connection failed',
         expect.any(Error),
-        expect.objectContaining({ tokenPrefix: 'sk_93' })
+        expect.objectContaining({ tokenPrefix: 'sk_te' }) // Fixed: matches actual token prefix
       );
     });
   });

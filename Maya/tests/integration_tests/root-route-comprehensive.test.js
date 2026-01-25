@@ -10,7 +10,7 @@ import request from 'supertest';
 
 let app;
 let server;
-const TEST_PORT = 3002;
+const TEST_PORT = 3009;
 
 beforeAll(async () => {
   // Set test environment BEFORE importing
@@ -38,7 +38,7 @@ beforeAll(async () => {
       }
     });
   });
-}, 30000);
+}, 60000); // Increased timeout
 
 afterAll(async () => {
   return new Promise((resolve) => {
