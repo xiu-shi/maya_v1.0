@@ -107,7 +107,7 @@ function checkServerHealth() {
     log('✅ Server is running and healthy', 'green');
     log(`   Status: ${health.status}`, 'cyan');
     log(`   Environment: ${health.environment}`, 'cyan');
-    log(`   MCP Connected: ${health.mcpConnected}`, 'cyan');
+    log(`   API Ready: ${health.apiReady}`, 'cyan');
     return true;
   } catch (error) {
     report.serverStatus = {
@@ -285,7 +285,7 @@ function generateMarkdownReport(report) {
     if (report.serverStatus.health) {
       md += `- **Health Check:** ${report.serverStatus.health.status}\n`;
       md += `- **Environment:** ${report.serverStatus.health.environment}\n`;
-      md += `- **MCP Connected:** ${report.serverStatus.health.mcpConnected ? '✅' : '❌'}\n`;
+      md += `- **API Ready:** ${report.serverStatus.health.apiReady ? '✅' : '❌'}\n`;
     }
   }
   md += `\n`;
