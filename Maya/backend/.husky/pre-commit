@@ -5,6 +5,21 @@
 
 . "$(dirname "$0")/_/husky.sh"
 
+echo "🔒 Checking for sensitive files..."
+
+# CRITICAL: Block chat logs with PII from being committed
+CHAT_LOGS=$(git diff --cached --name-only | grep -E "chat-logs.*\.json|data/.*\.json")
+if [ -n "$CHAT_LOGS" ]; then
+    echo "❌ BLOCKED: Attempting to commit chat logs with PII!"
+    echo "   Chat logs contain user data and must NEVER be committed."
+    echo "   Files blocked:"
+    echo "$CHAT_LOGS" | sed 's/^/     - /'
+    echo ""
+    echo "   These files are gitignored for security reasons."
+    exit 1
+fi
+
+echo "✅ No sensitive files detected"
 echo "🧪 Running pre-commit tests..."
 
 # Run quick tests (security and unit tests)

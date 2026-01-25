@@ -37,9 +37,13 @@ Maya/knowledge/*.xlsx
 Maya/knowledge/embeddings/*
 Maya/knowledge/processed/*
 
-# Backend data
+# Backend data (includes chat logs with PII - NEVER commit!)
 Maya/backend/data/
 backend/data/
+**/chat-logs/
+**/chat-logs/*.json
+Maya/backend/data/chat-logs/
+Maya/backend/data/chat-logs/*.json
 
 # Temporary files
 *.tmp
