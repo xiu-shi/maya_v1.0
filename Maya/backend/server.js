@@ -721,19 +721,13 @@ app.use(errorHandler);
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logInfo('SIGTERM received, shutting down gracefully...');
-    const client = await getAPIClient();
-  if (client) {
-    await client.close();
-  }
+  // API client uses direct HTTP calls, no connection to close
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   logInfo('SIGINT received, shutting down gracefully...');
-    const client = await getAPIClient();
-  if (client) {
-    await client.close();
-  }
+  // API client uses direct HTTP calls, no connection to close
   process.exit(0);
 });
 
