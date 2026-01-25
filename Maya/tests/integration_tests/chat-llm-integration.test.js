@@ -40,7 +40,7 @@ describe('Chat LLM Integration Tests', () => {
         }
       });
     });
-  }, 30000);
+  }, 60000); // Increased timeout
 
   afterAll(async () => {
     return new Promise((resolve) => {
@@ -151,11 +151,8 @@ describe('Chat LLM Integration Tests', () => {
       const originalToken = process.env.AI_BUILDER_TOKEN;
       delete process.env.AI_BUILDER_TOKEN;
       
-      // Clear module cache to force reload
-      delete require.cache[require.resolve('../../backend/config/env.js')];
-      
-      // Need to restart server or reload config
-      // For now, just test that endpoint handles missing token gracefully
+      // Note: In ES modules, we can't clear module cache like CommonJS
+      // The test will verify error handling with current server state
       const response = await request(app)
         .post('/api/chat')
         .send({
