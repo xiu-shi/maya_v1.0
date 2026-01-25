@@ -82,6 +82,14 @@ QUICK_DEPLOY.sh
 deploy-*.sh
 !Maya/deploy-to-space.sh
 
+# Maya System Instructions (Core IP - NEVER commit!)
+# These contain Maya's behavioral rules and prompt engineering
+Maya/backend/system_prompt.txt
+Maya/backend/system_instruction.txt
+Maya/knowledge/system_instruction.md
+**/system_prompt.txt
+**/system_instruction.txt
+
 # Personal website repository (separate project)
 # This folder contains janetxiushi.me files (not related to Maya agent)
 my_site_3_mayaGPT_v3/
