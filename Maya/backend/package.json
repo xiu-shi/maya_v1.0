@@ -1,5 +1,5 @@
 {
-  "name": "maya-mcp-backend",
+  "name": "maya-api-backend",
   "version": "1.0.0",
   "description": "Backend API for Maya's Digital Twin chat interface using AI Builders API",
   "main": "server.js",
@@ -20,14 +20,13 @@
     "test:connection": "bash test-connection.sh",
     "test:api": "node test-api-endpoint.js",
     "test:models": "node test-models.js",
-    "get-api-info": "node get-api-info.js",
     "setup": "cp .env.example .env && echo '⚠️  Please edit .env and add your AI_BUILDER_TOKEN'"
   },
   "keywords": [
-    "mcp",
     "ai",
     "chat",
-    "maya"
+    "maya",
+    "api"
   ],
   "author": "Janet Xiu Shi",
   "license": "MIT",

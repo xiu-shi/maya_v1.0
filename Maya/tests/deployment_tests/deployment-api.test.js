@@ -279,6 +279,7 @@ describe('Deployment Security', () => {
   });
 
   test('deployment uses HTTPS', async () => {
+    const DEPLOYMENT_API_URL = 'https://space.ai-builders.com/backend/v1/deployments';
     expect(DEPLOYMENT_API_URL).toMatch(/^https:\/\//);
   });
 });

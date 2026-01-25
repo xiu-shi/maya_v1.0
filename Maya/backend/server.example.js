@@ -64,7 +64,7 @@ app.post('/api/chat',
       logInfo('Input warnings', { warnings });
     }
     
-    // TODO: Implement actual chat logic with MCP server
+    // TODO: Implement actual chat logic with API client
     // For now, return a placeholder response
     res.json({
       response: `You said: ${message}`,

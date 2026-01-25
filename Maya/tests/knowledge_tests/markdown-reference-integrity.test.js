@@ -725,7 +725,7 @@ describe('Markdown Reference Integrity', () => {
   test('all code files referencing markdown should have valid paths', () => {
     const codeFiles = [
       join(BACKEND_DIR, 'server.js'),
-      join(BACKEND_DIR, 'mcp-client.js'),
+      join(BACKEND_DIR, 'api-client.js'),
       join(BACKEND_DIR, 'utils/kb-loader.js'),
       join(BACKEND_DIR, 'utils/memory_cache/kb-cache.js'),
       join(BACKEND_DIR, 'utils/memory_cache/kb-monitor.js')
