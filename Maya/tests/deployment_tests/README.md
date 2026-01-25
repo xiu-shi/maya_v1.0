@@ -28,8 +28,8 @@ This test suite ensures:
 **Test Coverage**:
 - ✅ System prompt file exists and is valid
 - ✅ System prompt can be JSON-escaped without errors
-- ✅ mcp-client.js checks for `SYSTEM_INSTRUCTION` environment variable
-- ✅ mcp-client.js has fallback logic
+- ✅ API client (mcp-client.js) checks for `SYSTEM_INSTRUCTION` environment variable
+- ✅ API client has fallback logic
 - ✅ Deployment script and configuration exist
 - ✅ No secrets in tracked files
 - ✅ API endpoint is documented correctly

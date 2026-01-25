@@ -53,6 +53,9 @@ describe('Post-Deployment Verification', () => {
       expect(data.environment).toBe('production');
       expect(data).toHaveProperty('tokenConfigured');
       expect(data.tokenConfigured).toBe(true);
+      // API client is ready (no connection needed for direct API calls)
+      expect(data).toHaveProperty('apiReady');
+      expect(data.apiReady).toBe(true);
     }, 30000);
   });
 

@@ -162,7 +162,7 @@ describe('Root Route Comprehensive Tests', () => {
           history: []
         });
 
-      // May return 503 if MCP client not initialized, or 200 if working
+      // May return 503 if API client not initialized, or 200 if working
       expect([200, 503]).toContain(response.status);
     }, 15000);
   });
