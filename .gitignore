@@ -48,3 +48,26 @@ backend/data/
 # Snyk Security Extension - AI Rules (auto-generated)
 .cursor/rules/snyk_rules.mdc
 API_KEY_MANAGEMENT.md
+
+# Development documentation - KEEP LOCAL ONLY
+# Exclude all .md files except README.md and SECURITY.md (public-facing)
+*.md
+!README.md
+!SECURITY.md
+!Maya/README.md
+!backend/README.md
+!**/README.md
+
+# Specific dangerous documentation patterns
+*_GUIDE.md
+*_REVIEW*.md
+*_ANALYSIS*.md
+*_ISSUE*.md
+*_DEPLOYMENT*.md
+*_VERIFICATION*.md
+*_AUDIT*.md
+*_FIX*.md
+*_TEST*.md
+*_REPORT*.md
+SUPPORT_*.md
+ROOT_CAUSE_*.md
