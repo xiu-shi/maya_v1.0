@@ -81,3 +81,7 @@ QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
 !Maya/deploy-to-space.sh
+
+# Personal website repository (separate project)
+# This folder contains janetxiushi.me files (not related to Maya agent)
+my_site_3_mayaGPT_v3/
