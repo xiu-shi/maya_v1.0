@@ -8,7 +8,7 @@
  * - API key format validation
  * - API key presence detection
  * - API key revocation detection
- * - MCP connection with valid/invalid keys
+ * - API connection with valid/invalid keys
  * - Environment variable configuration
  * - Key rotation scenarios
  * 
@@ -164,7 +164,7 @@ describe('API Key Validation & Security', () => {
     it('should fail API connection with invalid key', async () => {
       process.env.AI_BUILDER_TOKEN = 'invalid_key_format';
       
-      // This would be tested by attempting MCP connection
+      // This would be tested by attempting API connection
       // Expected: Connection should fail
       expect(process.env.AI_BUILDER_TOKEN).not.toMatch(/^sk_/);
     });
