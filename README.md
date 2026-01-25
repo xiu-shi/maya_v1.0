@@ -4,6 +4,35 @@
 
 ---
 
+## 🚀 Quick Deployment (API Endpoint)
+
+**Yes, Maya is deployed via API endpoint!**
+
+### ⚠️ CRITICAL: Run Tests First
+
+```bash
+# 1. Run pre-deployment tests (MUST PASS)
+./Maya/tests/deployment_tests/run-pre-deployment-tests.sh
+
+# 2. Deploy via API (only if tests pass)
+./DEPLOY_WITH_ENV_VAR.sh YOUR_API_KEY
+
+# 3. Verify deployment
+./Maya/tests/deployment_tests/run-post-deployment-tests.sh YOUR_API_KEY
+```
+
+**📋 Deployment Process**:
+- **[Deployment Checklist](DEPLOYMENT_CHECKLIST.md)** - Step-by-step deployment checklist ✅
+- **[Deployment Tests](Maya/tests/deployment_tests/README.md)** - 95+ tests covering all scenarios
+
+**📖 Deployment Documentation**:
+- **[API Method Summary](DEPLOYMENT_API_METHOD_SUMMARY.md)** - Confirms API endpoint deployment ✅
+- **[Quick Reference](DEPLOYMENT_QUICK_REFERENCE.md)** - Common commands and troubleshooting
+- **[Deployment Record (Jan 25, 2026)](DEPLOYMENT_RECORD_JAN_25_2026.md)** - Complete deployment record
+- **[Full Guide](DEPLOYMENT_WITH_ENV_VARS_GUIDE.md)** - Comprehensive deployment guide
+
+---
+
 ## 💼 About Janet Xiu Shi
 
 **Business Technologist | Enterprise AI Strategist | Educator**

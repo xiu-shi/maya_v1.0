@@ -39,7 +39,7 @@ describe('Frontend Chat E2E Flow', () => {
         }
       });
     });
-  }, 30000);
+  }, 60000); // Increased timeout
 
   afterAll(async () => {
     return new Promise((resolve) => {

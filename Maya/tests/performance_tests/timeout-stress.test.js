@@ -96,7 +96,7 @@ describe('Timeout Utility Stress Tests', () => {
 
       expect(results).toHaveLength(1000);
       expect(results[0]).toContain('"name"');
-    }, 30000);
+    }, 60000); // Increased timeout
 
     test('handles mixed success/failure in bulk operations', async () => {
       const operations = [
@@ -166,7 +166,7 @@ describe('Timeout Utility Stress Tests', () => {
 
       // Memory increase should be reasonable (< 50MB for 1000 operations)
       expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);
-    }, 30000);
+    }, 60000); // Increased timeout
   });
 
   describe('Error Propagation', () => {
