@@ -1,0 +1,10 @@
+{
+  "repo_url": "https://github.com/xiu-shi/maya_v1.0",
+  "service_name": "maya-agent",
+  "branch": "main",
+  "port": 3000,
+  "env_vars": {
+    "SYSTEM_INSTRUCTION": "PLACEHOLDER_WILL_BE_REPLACED_BY_SCRIPT"
+  },
+  "streaming_log_timeout_seconds": 60
+}

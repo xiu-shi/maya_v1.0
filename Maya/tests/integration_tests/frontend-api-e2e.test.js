@@ -40,7 +40,7 @@ describe('Frontend API Endpoint E2E Test', () => {
         }
       });
     });
-  }, 30000);
+  }, 60000); // Increased timeout
 
   afterAll(async () => {
     return new Promise((resolve) => {

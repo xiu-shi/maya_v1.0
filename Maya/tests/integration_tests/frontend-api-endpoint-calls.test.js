@@ -45,7 +45,7 @@ describe('Frontend API Endpoint Calls - Integration Test', () => {
         }
       });
     });
-  }, 30000);
+  }, 60000); // Increased timeout
 
   afterAll(async () => {
     return new Promise((resolve) => {

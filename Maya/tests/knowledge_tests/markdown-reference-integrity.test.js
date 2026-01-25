@@ -279,7 +279,8 @@ describe('Markdown Reference Integrity', () => {
       'knowledge/FILE_REVIEW_ANALYSIS_2.md',
       'knowledge/DOCS_REVIEW_ANALYSIS_3.md',
       'tests/JAN_11_2026_TIMELINE.md', // Historical timeline document
-      'tests/CPU_USAGE_REVIEW_SUMMARY.md' // Historical review document
+      'tests/CPU_USAGE_REVIEW_SUMMARY.md', // Historical review document
+      'OPTION2_DOCUMENTATION_REVIEW.md' // OPTION2 consolidation review - January 25, 2026
     ];
     
     for (const ref of allReferences) {
@@ -456,7 +457,22 @@ describe('Markdown Reference Integrity', () => {
       'Maya/FRONTEND_API_ENDPOINT_TESTS.md', // Endpoint tests - consolidated into Maya/FRONTEND_API.md
       'Maya/FRONTEND_API_URL_FIX_VERIFICATION.md', // Fix verification - consolidated into Maya/FRONTEND_API.md
       'Maya/FRONTEND_API_URL_FIX.md', // URL fix - consolidated into Maya/FRONTEND_API.md
-      'Maya/FRONTEND_API_URL_VERIFICATION.md' // URL verification - consolidated into Maya/FRONTEND_API.md
+      'Maya/FRONTEND_API_URL_VERIFICATION.md', // URL verification - consolidated into Maya/FRONTEND_API.md
+      // OPTION2 and IP Protection documentation consolidation - January 25, 2026
+      'OPTION_2_DETAILED_PLAN.md', // Planning document - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION_2_COMPLETE_SUMMARY.md', // Summary - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION_2_COMPLETE_TECHNICAL_EXPLANATION.md', // Technical explanation - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION_2_BEHAVIOR_GUARANTEE.md', // Behavior guarantee - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION_2_IMPLEMENTATION_LOG.md', // Implementation log - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION_2_IMPLEMENTATION_PLAN.md', // Implementation plan - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'OPTION2_TESTABILITY_TRACEABILITY_REPORT.md', // Test report - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'TEST_RESULTS_OPTION2_JAN25_2026.md', // Test results - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'IP_PROTECTION_ARCHITECTURE_DIAGRAM.md', // Architecture diagrams - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'IP_PROTECTION_COMPREHENSIVE_AUDIT.md', // Audit - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'IP_MANAGEMENT_GUIDE.md', // Management guide - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'DEPLOYMENT_SYSTEM_INSTRUCTIONS.md', // Deployment guide - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'UPDATING_MAYA_INSTRUCTIONS.md', // Update guide - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
+      'CRITICAL_IP_FIX_JAN25_2026.md' // Critical fix - consolidated into MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md
     ];
     
     const existingOldFiles = [];
@@ -562,7 +578,22 @@ describe('Markdown Reference Integrity', () => {
       'FRONTEND_API_ENDPOINT_TESTS.md': 'Maya/FRONTEND_API.md', // Endpoint tests consolidated into FRONTEND_API.md
       'FRONTEND_API_URL_FIX_VERIFICATION.md': 'Maya/FRONTEND_API.md', // Fix verification consolidated into FRONTEND_API.md
       'FRONTEND_API_URL_FIX.md': 'Maya/FRONTEND_API.md', // URL fix consolidated into FRONTEND_API.md
-      'FRONTEND_API_URL_VERIFICATION.md': 'Maya/FRONTEND_API.md' // URL verification consolidated into FRONTEND_API.md
+      'FRONTEND_API_URL_VERIFICATION.md': 'Maya/FRONTEND_API.md', // URL verification consolidated into FRONTEND_API.md
+      // OPTION2 and IP Protection documentation consolidation - January 25, 2026
+      'OPTION_2_DETAILED_PLAN.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Planning document consolidated
+      'OPTION_2_COMPLETE_SUMMARY.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Summary consolidated
+      'OPTION_2_COMPLETE_TECHNICAL_EXPLANATION.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Technical explanation consolidated
+      'OPTION_2_BEHAVIOR_GUARANTEE.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Behavior guarantee consolidated
+      'OPTION_2_IMPLEMENTATION_LOG.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Implementation log consolidated
+      'OPTION_2_IMPLEMENTATION_PLAN.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Implementation plan consolidated
+      'OPTION2_TESTABILITY_TRACEABILITY_REPORT.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Test report consolidated
+      'TEST_RESULTS_OPTION2_JAN25_2026.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Test results consolidated
+      'IP_PROTECTION_ARCHITECTURE_DIAGRAM.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Architecture diagrams consolidated
+      'IP_PROTECTION_COMPREHENSIVE_AUDIT.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Audit consolidated
+      'IP_MANAGEMENT_GUIDE.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Management guide consolidated
+      'DEPLOYMENT_SYSTEM_INSTRUCTIONS.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Deployment guide consolidated
+      'UPDATING_MAYA_INSTRUCTIONS.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md', // Update guide consolidated
+      'CRITICAL_IP_FIX_JAN25_2026.md': 'MAYA_IP_PROTECTION_OPTION2_COMPLETE_GUIDE.md' // Critical fix consolidated
     };
     
     const incorrectRefs = [];
