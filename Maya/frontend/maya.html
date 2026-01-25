@@ -1036,12 +1036,16 @@
           e.stopImmediatePropagation();
         }, { capture: true });
         
+        // Mark as handler attached for debugging
+        item.setAttribute('data-handler-attached', 'true');
+        
         // Click handler to populate chat input and auto-submit for guided experience
         // Use capture: true to run BEFORE security handlers can block
-        item.addEventListener('click', function(e) {
+        const clickHandler = function(e) {
           // Stop propagation immediately to prevent security handlers from blocking
           e.stopPropagation();
           e.stopImmediatePropagation();
+          e.preventDefault(); // Also prevent default to ensure it works
           
           const prompt = this.getAttribute('data-prompt');
           const chatInput = document.getElementById('chatInput');
@@ -1073,6 +1077,9 @@
             // Set the prompt text
             chatInput.value = prompt;
             
+            // Trigger input event to ensure value is set
+            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+            
             // Focus the input
             chatInput.focus();
             
@@ -1098,18 +1105,56 @@
           } else {
             console.error('❌ Failed to populate prompt:', { chatInput: !!chatInput, prompt: !!prompt });
           }
-        }, { capture: true }); // Use capture phase to run BEFORE security handlers
+        };
+        
+        // Attach with capture phase AND as direct onclick (fallback)
+        item.addEventListener('click', clickHandler, { capture: true });
+        item.onclick = clickHandler; // Direct assignment as fallback
       });
       
       console.log(`✅ Prompt handlers initialized for ${promptItems.length} sample questions`);
     }
     
     // Initialize prompt handlers when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initPromptHandlers);
-    } else {
-      initPromptHandlers();
+    // Use multiple initialization strategies to ensure handlers attach
+    function ensurePromptHandlers() {
+      try {
+        initPromptHandlers();
+      } catch (error) {
+        console.error('❌ Error initializing prompt handlers:', error);
+        // Retry after a short delay
+        setTimeout(() => {
+          console.log('🔄 Retrying prompt handler initialization...');
+          try {
+            initPromptHandlers();
+          } catch (retryError) {
+            console.error('❌ Retry failed:', retryError);
+          }
+        }, 500);
+      }
     }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensurePromptHandlers);
+    } else {
+      ensurePromptHandlers();
+    }
+    
+    // Also try on window load as fallback
+    window.addEventListener('load', function() {
+      const promptItems = document.querySelectorAll('[data-prompt]');
+      if (promptItems.length > 0) {
+        // Check if handlers are already attached
+        const firstItem = promptItems[0];
+        const hasHandler = firstItem.onclick || 
+          (firstItem.getAttribute && firstItem.getAttribute('data-handler-attached'));
+        
+        if (!hasHandler) {
+          console.log('🔄 Window load: Re-initializing prompt handlers...');
+          ensurePromptHandlers();
+        }
+      }
+    });
 
     // Create new chat
     function createNewChat() {
@@ -2085,6 +2130,14 @@
       document.addEventListener('keydown', function(e) {
         const target = e.target;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+          return true;
+        }
+        
+        // ALWAYS allow clicks and interactions on sample questions
+        if (target.classList && target.classList.contains('maya-sample-question')) {
+          return true;
+        }
+        if (target.closest && target.closest('.maya-sample-question')) {
           return true;
         }
         
