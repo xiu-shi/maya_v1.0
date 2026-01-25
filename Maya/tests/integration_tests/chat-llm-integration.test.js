@@ -1,8 +1,8 @@
 /**
  * Integration Test: Chat LLM Integration
  * 
- * Tests that Maya correctly calls the LLM backend through MCP client
- * Verifies the full flow: API request → MCP client → LLM response
+ * Tests that Maya correctly calls the LLM backend through API client
+ * Verifies the full flow: API request → API client → AI Builders API → LLM response
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';

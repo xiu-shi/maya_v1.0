@@ -113,38 +113,38 @@ describe('IP Protection Verification - Option 2', () => {
   });
 
   describe('Code Inspection - No Hardcoded IP', () => {
-    it('should not have hardcoded system prompt in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+    it('should not have hardcoded system prompt in API client (mcp-client.js)', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Check for the OLD hardcoded pattern (should NOT exist)
       const hardcodedPattern = /const basePrompt = `You are Maya, Janet Xiu Shi's digital twin[\s\S]{100,}/;
       expect(content).not.toMatch(hardcodedPattern);
     });
 
-    it('should have getSystemPrompt function in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should have getSystemPrompt function in API client', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       expect(content).toContain('async function getSystemPrompt()');
     });
 
-    it('should load from environment variable in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should load from environment variable in API client', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       expect(content).toContain('process.env.SYSTEM_INSTRUCTION');
     });
 
-    it('should load from file in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should load from file in API client', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       expect(content).toContain('fs.readFile');
     });
 
-    it('should have emergency fallback in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should have emergency fallback in API client', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Should have a catch block with fallback
@@ -153,7 +153,7 @@ describe('IP Protection Verification - Option 2', () => {
     });
 
     it('should only have minimal fallback prompt (< 200 chars)', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Extract the fallback prompt
@@ -202,8 +202,8 @@ describe('IP Protection Verification - Option 2', () => {
       }
     });
 
-    it('should verify mcp-client.js is safe to be public', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should verify API client (mcp-client.js) is safe to be public', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Count occurrences of "You are Maya"
@@ -236,7 +236,7 @@ describe('IP Protection Verification - Option 2', () => {
 
   describe('Fallback Safety', () => {
     it('should verify fallback prompt is generic and minimal', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Extract fallback section
@@ -318,8 +318,8 @@ describe('IP Protection Verification - Option 2', () => {
   });
 
   describe('Traceability - Option 2 Implementation', () => {
-    it('should verify Option 2 is fully implemented in mcp-client.js', async () => {
-      const mcpClientPath = join(mayaBackendDir, 'mcp-client.js');
+    it('should verify Option 2 is fully implemented in API client', async () => {
+      const apiClientPath = join(mayaBackendDir, 'mcp-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Option 2 key features:

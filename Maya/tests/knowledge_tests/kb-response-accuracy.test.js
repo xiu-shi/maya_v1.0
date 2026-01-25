@@ -11,12 +11,12 @@ import { loadKBContext } from '../../backend/utils/kb-loader.js';
 import { getKBCache } from '../../backend/utils/memory_cache/kb-cache.js';
 
 describe('KB Response Accuracy - Maya Trust Tests', () => {
-  let mcpClient = null;
+  let apiClient = null;
   let kbContext = null;
 
   beforeEach(async () => {
-    // Initialize MCP client
-    mcpClient = new MayaMCPClient();
+    // Initialize API client
+    apiClient = new MayaMCPClient();
     
     // Load KB context for verification
     kbContext = await loadKBContext();

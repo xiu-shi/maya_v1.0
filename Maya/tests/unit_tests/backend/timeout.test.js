@@ -205,7 +205,8 @@ describe('Timeout Utility', () => {
     test('should have all required timeout values', () => {
       expect(TIMEOUTS.KB_LOAD).toBeGreaterThan(0);
       expect(TIMEOUTS.KB_REFRESH).toBeGreaterThan(0);
-      expect(TIMEOUTS.MCP_CONNECT).toBeGreaterThan(0);
+      // MCP_CONNECT timeout removed - API calls are immediate
+      // No connection timeout needed for direct API calls
       expect(TIMEOUTS.FILE_READ).toBeGreaterThan(0);
       expect(TIMEOUTS.FILE_WRITE).toBeGreaterThan(0);
       expect(TIMEOUTS.MODULE_IMPORT).toBeGreaterThan(0);
@@ -214,7 +215,7 @@ describe('Timeout Utility', () => {
 
     test('should have reasonable timeout values', () => {
       expect(TIMEOUTS.FILE_READ).toBeLessThan(TIMEOUTS.KB_LOAD);
-      expect(TIMEOUTS.MCP_CONNECT).toBeLessThan(TIMEOUTS.KB_LOAD);
+      // MCP_CONNECT timeout removed - API calls are immediate
       expect(TIMEOUTS.BULK_OPERATIONS).toBeGreaterThan(TIMEOUTS.FILE_READ);
     });
   });

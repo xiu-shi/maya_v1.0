@@ -86,8 +86,8 @@ describe('API Key Validation & Security', () => {
       // This test documents the old key as revoked
       expect(revokedKey).toMatch(/^sk_937d9f12/);
       
-      // In production, this key should fail MCP connection
-      // (Tested in MCP connection tests)
+      // In production, this key should fail API connection
+      // (Tested in API connection tests)
     });
   });
 
@@ -160,8 +160,8 @@ describe('API Key Validation & Security', () => {
     });
   });
 
-  describe('MCP Connection with API Key', () => {
-    it('should fail MCP connection with invalid key', async () => {
+  describe('API Connection with API Key', () => {
+    it('should fail API connection with invalid key', async () => {
       process.env.AI_BUILDER_TOKEN = 'invalid_key_format';
       
       // This would be tested by attempting MCP connection
@@ -169,17 +169,17 @@ describe('API Key Validation & Security', () => {
       expect(process.env.AI_BUILDER_TOKEN).not.toMatch(/^sk_/);
     });
 
-    it('should fail MCP connection with revoked key', async () => {
+    it('should fail API connection with revoked key', async () => {
       // Simulate revoked key scenario
       const revokedKey = 'sk_revoked_1234567890abcdef';
       process.env.AI_BUILDER_TOKEN = revokedKey;
       
-      // Expected: MCP connection should fail with 401/403
+      // Expected: API connection should fail with 401/403
       // This is tested in integration tests
       expect(revokedKey).toMatch(/^sk_/);
     });
 
-    it('should succeed MCP connection with valid key', async () => {
+    it('should succeed API connection with valid key', async () => {
       // In test environment, we use test tokens
       const validToken = process.env.AI_BUILDER_TOKEN || 'sk_test_1234567890abcdef1234';
       
@@ -291,7 +291,7 @@ describe('API Key Validation & Security', () => {
       }
     });
 
-    it('should validate MCP connection before deployment', async () => {
+    it('should validate API connection before deployment', async () => {
       // This should be tested before deployment
       // Integration test will verify actual connection
       const token = process.env.AI_BUILDER_TOKEN;
