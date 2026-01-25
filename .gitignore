@@ -71,3 +71,9 @@ API_KEY_MANAGEMENT.md
 *_REPORT*.md
 SUPPORT_*.md
 ROOT_CAUSE_*.md
+
+# Deployment scripts with potential hardcoded secrets
+QUICK_DEPLOY.sh
+*_DEPLOY.sh
+deploy-*.sh
+!Maya/deploy-to-space.sh
