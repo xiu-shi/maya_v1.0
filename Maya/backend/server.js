@@ -639,17 +639,16 @@ app.post('/api/chat',
         }
       }
       
-      // If still not connected after all retries
+      // If still not connected after all retries, continue anyway
+      // The chat() method will use direct API calls via chatWithAIBuildersAPI()
       if (!client.connected) {
         logError('MCP client failed to connect after all retries', lastError, {
           hasToken: !!config.aiBuilderToken,
           tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none',
           retries: maxRetries
         });
-        return res.status(503).json({
-          error: 'Service temporarily unavailable',
-          message: 'Unable to connect to AI service. Please try again in a moment.'
-        });
+        logInfo('Proceeding with direct API calls (MCP bypass mode)');
+        // Don't return 503 - continue with direct API calls
       }
     }
     
