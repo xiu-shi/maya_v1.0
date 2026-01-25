@@ -6,7 +6,7 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals';
-import { MayaMCPClient } from '../../backend/mcp-client.js';
+import { MayaAPIClient } from '../../backend/api-client.js';
 import { loadKBContext } from '../../backend/utils/kb-loader.js';
 import { getKBCache } from '../../backend/utils/memory_cache/kb-cache.js';
 
@@ -16,7 +16,7 @@ describe('KB Response Accuracy - Maya Trust Tests', () => {
 
   beforeEach(async () => {
     // Initialize API client
-    apiClient = new MayaMCPClient();
+    apiClient = new MayaAPIClient();
     
     // Load KB context for verification
     kbContext = await loadKBContext();

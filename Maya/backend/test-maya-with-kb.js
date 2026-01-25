@@ -4,13 +4,13 @@
  * Test chat functionality with KB context loaded
  */
 
-import { MayaMCPClient } from './mcp-client.js';
+import { MayaAPIClient } from './api-client.js';
 import { logInfo } from './utils/logger.js';
 
 async function testMayaWithKB() {
   console.log('🧪 Testing Maya with KB Integration...\n');
 
-  const client = new MayaMCPClient();
+  const client = new MayaAPIClient();
   
   const testQuestions = [
     "Tell me about Janet",

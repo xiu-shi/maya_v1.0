@@ -183,8 +183,8 @@ describe('System Prompt Loading - Option 2 Implementation', () => {
       
       // Should not expose technical implementation
       expect(responseText).not.toContain('getSystemPrompt');
-      // mcp-client.js is now API client - still should not be exposed
-      expect(responseText).not.toContain('mcp-client.js');
+      // api-client.js should not be exposed
+      expect(responseText).not.toContain('api-client.js');
       expect(responseText).not.toContain('fs.readFile');
     }, 30000);
   });
@@ -290,7 +290,7 @@ describe('System Prompt Loading - Option 2 Implementation', () => {
   describe('Traceability', () => {
     it('should verify Option 2 implementation is active', async () => {
       // Check that system prompt loading mechanism exists
-      const apiClientPath = join(__dirname, '../backend/mcp-client.js');
+      const apiClientPath = join(__dirname, '../backend/api-client.js');
       const content = await fs.readFile(mcpClientPath, 'utf-8');
       
       // Should have Option 2 implementation

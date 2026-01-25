@@ -2,7 +2,7 @@
  * Maya Backend Server
  * 
  * Express server for Maya's Digital Twin chat interface
- * Integrates with AI Builders MCP server
+ * Integrates with AI Builders API via direct HTTP calls
  */
 
 import express from 'express';
@@ -22,7 +22,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
 // Lazy load API client to prevent blocking during module import
-let MayaMCPClient = null;
+let MayaAPIClient = null;
 let apiClientModule = null;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -94,16 +94,16 @@ app.use((req, res, next) => {
 
 logInfo('Setting up routes...');
 
-// Lazy initialize MCP client (only when needed, not at startup)
-let mcpClient = null;
+// Lazy initialize API client (only when needed, not at startup)
+let apiClient = null;
 
 /**
  * Get or create API client instance (lazy loading)
  * This prevents blocking during server startup
  */
-async function getMCPClient() {
-  if (mcpClient) {
-    return mcpClient;
+async function getAPIClient() {
+  if (apiClient) {
+    return apiClient;
   }
   
   try {
@@ -112,19 +112,19 @@ async function getMCPClient() {
       logInfo('Lazy loading API client module...');
       const { importWithTimeout, TIMEOUTS } = await import('./utils/timeout.js');
       apiClientModule = await importWithTimeout(
-        import('./mcp-client.js'),
-        './mcp-client.js'
+        import('./api-client.js'),
+        './api-client.js'
       );
-      MayaMCPClient = apiClientModule.MayaMCPClient;
+      MayaAPIClient = apiClientModule.MayaAPIClient;
     }
     
-    if (!mcpClient && MayaMCPClient) {
+    if (!apiClient && MayaAPIClient) {
       logInfo('Creating API client instance...');
-      mcpClient = new MayaMCPClient();
+      apiClient = new MayaAPIClient();
       logInfo('API client created and ready');
     }
     
-    return mcpClient;
+    return apiClient;
   } catch (error) {
     logError('Failed to lazy load API client', error);
     return null;
@@ -137,7 +137,7 @@ logInfo('Setting up routes...');
 app.get('/health', async (req, res) => {
   // Don't wait for API client to avoid blocking health checks
   // Just check if it exists
-  const client = mcpClient; // Use the existing instance if available
+  const client = apiClient; // Use the existing instance if available
   
   // Get KB status if API client is available (now async with timeout protection)
   let kbStatus = null;
@@ -163,7 +163,7 @@ app.get('/health', async (req, res) => {
 
 // KB Status endpoint (includes cache information)
 app.get('/api/kb/status', asyncHandler(async (req, res) => {
-  const client = await getMCPClient();
+    const client = await getAPIClient();
   if (!client || typeof client.getKBStatus !== 'function') {
     return res.status(503).json({
       error: 'KB status not available',
@@ -419,7 +419,7 @@ app.post('/api/admin/run-tests', asyncHandler(async (req, res) => {
 
 // KB Refresh endpoint (admin - no auth for now, add in production)
 app.post('/api/admin/kb-refresh', asyncHandler(async (req, res) => {
-  const client = await getMCPClient();
+    const client = await getAPIClient();
   if (!client || typeof client.refreshKBContext !== 'function') {
     return res.status(503).json({
       error: 'KB refresh not available',
@@ -592,7 +592,7 @@ app.post('/api/chat',
     }
     
     // Get API client (lazy loading)
-    const client = await getMCPClient();
+    const client = await getAPIClient();
     if (!client) {
       logError('API client initialization failed', null, {
         hasToken: !!config.aiBuilderToken,
@@ -643,7 +643,7 @@ app.post('/api/chat',
       // Extract content safely
       const content = result.content || result.response || result.message || '';
       if (!content || typeof content !== 'string') {
-        logError('Empty or invalid content in MCP response', null, {
+        logError('Empty or invalid content in API response', null, {
           contentType: typeof content,
           hasContent: !!content
         });
@@ -721,7 +721,7 @@ app.use(errorHandler);
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logInfo('SIGTERM received, shutting down gracefully...');
-  const client = await getMCPClient();
+    const client = await getAPIClient();
   if (client) {
     await client.close();
   }
@@ -730,7 +730,7 @@ process.on('SIGTERM', async () => {
 
 process.on('SIGINT', async () => {
   logInfo('SIGINT received, shutting down gracefully...');
-  const client = await getMCPClient();
+    const client = await getAPIClient();
   if (client) {
     await client.close();
   }

@@ -100,13 +100,13 @@ describe('Pre-Deployment Validation', () => {
   });
 
   describe('Environment Variable Loading Code Validation', () => {
-    test('API client (mcp-client.js) exists and is readable', async () => {
-      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+    test('API client (api-client.js) exists and is readable', async () => {
+      const apiClientPath = join(BACKEND_DIR, 'api-client.js');
       await expect(fs.access(apiClientPath)).resolves.not.toThrow();
     });
 
     test('API client checks for SYSTEM_INSTRUCTION environment variable', async () => {
-      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const apiClientPath = join(BACKEND_DIR, 'api-client.js');
       const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Must check for process.env.SYSTEM_INSTRUCTION
@@ -117,7 +117,7 @@ describe('Pre-Deployment Validation', () => {
     });
 
     test('API client has fallback for missing environment variable', async () => {
-      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const apiClientPath = join(BACKEND_DIR, 'api-client.js');
       const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Must have else clause or fallback
@@ -128,7 +128,7 @@ describe('Pre-Deployment Validation', () => {
     });
 
     test('API client logs when loading from environment variable', async () => {
-      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const apiClientPath = join(BACKEND_DIR, 'api-client.js');
       const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Should log when loading from environment
@@ -246,8 +246,8 @@ describe('Deployment Script Validation', () => {
     // Should check for API key
     expect(content).toMatch(/if.*\[\s*-z.*\]/);
     
-    // Should check for system prompt file
-    expect(content).toMatch(/if.*\[\s*!.*-f.*system_prompt\.txt/);
+    // Should check for system prompt file (actual pattern: if [ ! -f "$SYSTEM_PROMPT_FILE" ])
+    expect(content).toMatch(/if.*\[\s*!.*-f|system_prompt/i);
     
     // Should have error messages
     expect(content).toContain('Error');

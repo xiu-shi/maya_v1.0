@@ -39,10 +39,10 @@ function validateToken(token) {
   }
   
   // During Docker build or initial startup, token might not be set yet
-  // Allow null/undefined - will be validated when MCP client is actually used
+  // Allow null/undefined - will be validated when API client is actually used
   if (!token) {
     // In production, log warning but don't fail immediately
-    // Token will be validated when MCP client tries to connect
+    // Token will be validated when API client makes requests
     if (process.env.NODE_ENV === 'production') {
       console.warn('⚠️  Warning: AI_BUILDER_TOKEN is not set. Service may not function correctly.');
       return null; // Return null instead of throwing

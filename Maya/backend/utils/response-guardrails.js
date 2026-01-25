@@ -45,7 +45,7 @@ const LEAKAGE_PATTERNS = [
   /\b(file\s*path|directory|folder\s*structure|Maya\/knowledge|backend\/utils)/i,
   /\b(server\s*config|API\s*endpoint|database|connection\s*string)/i,
   /\b(import|export|module|require|\.js|\.json)/i,
-  /\b(MCP\s*client|AI\s*Builders\s*API|middleware\s*for\s*validation)/i,
+  /\b(API\s*client|AI\s*Builders\s*API|middleware\s*for\s*validation)/i,
   
   // Code/Implementation
   /\b(function|const|let|var|async|await|promise|callback)\s*[\(=]/i,

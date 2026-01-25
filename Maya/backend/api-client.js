@@ -279,7 +279,7 @@ async function getSystemPrompt() {
   return basePrompt;
 }
 
-export class MayaMCPClient {
+export class MayaAPIClient {
   constructor() {
     this.token = config.aiBuilderToken;
   }
@@ -467,17 +467,7 @@ export class MayaMCPClient {
     }
   }
 
-  async close() {
-    if (this.client) {
-      try {
-        await this.client.close();
-        this.connected = false;
-        logInfo('MCP client closed');
-      } catch (error) {
-        logError('Error closing MCP client', error);
-      }
-    }
-  }
+  // No close method needed - API client uses direct HTTP calls, no persistent connection
 
   /**
    * Refresh KB context (force reload from disk)

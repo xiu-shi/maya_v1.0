@@ -94,7 +94,7 @@ async function findWorkingEndpoint() {
   console.log('\n❌ No working endpoint found.');
   console.log('\n💡 Next steps:');
   console.log('   1. Check AI Builders documentation');
-  console.log('   2. Use MCP tool: get_api_specification');
+    console.log('   2. Use direct API call to AI Builders');
   console.log('   3. Contact AI Builders support');
   
   return null;
