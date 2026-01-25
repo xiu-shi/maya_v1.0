@@ -1,14 +1,12 @@
 /**
- * MCP Client for Maya Chat
+ * Maya API Client
  * 
- * Handles communication with AI Builders MCP server
+ * Handles communication with AI Builders API via direct HTTP calls
  */
 
 import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import config from './config/env.js';
 import { logError, logInfo } from './utils/logger.js';
 import { loadKBContext } from './utils/kb-loader.js';
@@ -283,90 +281,13 @@ async function getSystemPrompt() {
 
 export class MayaMCPClient {
   constructor() {
-    this.client = null;
-    this.transport = null;
-    this.connected = false;
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 3;
+    this.token = config.aiBuilderToken;
   }
 
-  async connect() {
-    if (this.connected && this.client) {
-      return;
-    }
-
-    try {
-      logInfo('Connecting to MCP server...');
-      
-      this.transport = new StdioClientTransport({
-        command: 'npx',
-        args: ['-y', '@aibuilders/mcp-coach-server'],
-        env: {
-          ...process.env,
-          AI_BUILDER_TOKEN: config.aiBuilderToken
-        }
-      });
-
-      this.client = new Client({
-        name: 'maya-backend',
-        version: '1.0.0'
-      }, {
-        capabilities: {}
-      });
-
-      // Add timeout to prevent hanging
-      const connectPromise = this.client.connect(this.transport);
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('MCP connection timeout after 10 seconds')), 10000);
-      });
-
-      await Promise.race([connectPromise, timeoutPromise]);
-      this.connected = true;
-      this.reconnectAttempts = 0;
-      logInfo('MCP client connected successfully');
-    } catch (error) {
-      logError('MCP connection failed', error, {
-        errorMessage: error.message,
-        errorName: error.name,
-        hasToken: !!config.aiBuilderToken,
-        tokenLength: config.aiBuilderToken ? config.aiBuilderToken.length : 0,
-        nodeVersion: process.version,
-        platform: process.platform
-      });
-      this.connected = false;
-      // Clean up transport and client on failure
-      if (this.transport) {
-        try {
-          await this.transport.close();
-        } catch (e) {
-          // Ignore cleanup errors
-        }
-      }
-      this.transport = null;
-      this.client = null;
-      throw error;
-    }
-  }
-
+  /**
+   * Chat using AI Builders API directly
+   */
   async chat(message, history = []) {
-    // Since MCP server doesn't have direct chat completion,
-    // we'll use AI Builders API directly with the token
-    
-    // First, try to get API specification from MCP (if available)
-    try {
-      if (this.connected && this.client) {
-        const apiSpec = await this.client.callTool({
-          name: 'get_api_specification',
-          arguments: {}
-        });
-        logInfo('Retrieved API specification from MCP', { apiSpec });
-        // Could use this to get correct endpoint
-      }
-    } catch (error) {
-      // Ignore if tool not available
-      logInfo('Could not get API spec from MCP, using default', { error: error.message });
-    }
-    
     return await this.chatWithAIBuildersAPI(message, history);
   }
 
@@ -375,10 +296,9 @@ export class MayaMCPClient {
    * This uses the AI_BUILDER_TOKEN to call the AI Builders API
    */
   async chatWithAIBuildersAPI(message, history = []) {
-    // AI Builders API endpoint (from MCP get_api_specification tool)
+    // AI Builders API endpoint
     // Base URL: https://space.ai-builders.com/backend
     // Endpoint: /v1/chat/completions
-    // Define apiUrl outside try block so it's available in catch block
     const apiUrl = process.env.AI_BUILDERS_API_URL || 'https://space.ai-builders.com/backend/v1/chat/completions';
     
     try {

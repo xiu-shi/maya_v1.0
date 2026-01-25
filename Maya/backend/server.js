@@ -21,9 +21,9 @@ import { logChatMessage, getChatLogs, getChatLogsByConversation, getStorageStats
 import { exec } from 'child_process';
 import { promisify } from 'util';
 const execAsync = promisify(exec);
-// Lazy load MCP client to prevent blocking during module import
+// Lazy load API client to prevent blocking during module import
 let MayaMCPClient = null;
-let mcpClientModule = null;
+let apiClientModule = null;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -98,7 +98,7 @@ logInfo('Setting up routes...');
 let mcpClient = null;
 
 /**
- * Get or create MCP client instance (lazy loading)
+ * Get or create API client instance (lazy loading)
  * This prevents blocking during server startup
  */
 async function getMCPClient() {
@@ -107,30 +107,26 @@ async function getMCPClient() {
   }
   
   try {
-    // Lazy import the MCP client module with timeout protection (Issue #10)
-    if (!mcpClientModule) {
-      logInfo('Lazy loading MCP client module...');
+    // Lazy import the API client module with timeout protection (Issue #10)
+    if (!apiClientModule) {
+      logInfo('Lazy loading API client module...');
       const { importWithTimeout, TIMEOUTS } = await import('./utils/timeout.js');
-      mcpClientModule = await importWithTimeout(
+      apiClientModule = await importWithTimeout(
         import('./mcp-client.js'),
         './mcp-client.js'
       );
-      MayaMCPClient = mcpClientModule.MayaMCPClient;
+      MayaMCPClient = apiClientModule.MayaMCPClient;
     }
     
     if (!mcpClient && MayaMCPClient) {
-      logInfo('Creating MCP client instance...');
+      logInfo('Creating API client instance...');
       mcpClient = new MayaMCPClient();
-      logInfo('MCP client created, connecting in background...');
-      // Connect in background (non-blocking)
-      mcpClient.connect().catch(err => {
-        logError('MCP client initialization failed (will retry on first request)', err);
-      });
+      logInfo('API client created and ready');
     }
     
     return mcpClient;
   } catch (error) {
-    logError('Failed to lazy load MCP client', error);
+    logError('Failed to lazy load API client', error);
     return null;
   }
 }
@@ -139,11 +135,11 @@ logInfo('Setting up routes...');
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
-  // Don't wait for MCP client to avoid blocking health checks
-  // Just check if it exists, don't force connection
+  // Don't wait for API client to avoid blocking health checks
+  // Just check if it exists
   const client = mcpClient; // Use the existing instance if available
   
-  // Get KB status if MCP client is available (now async with timeout protection)
+  // Get KB status if API client is available (now async with timeout protection)
   let kbStatus = null;
   if (client && typeof client.getKBStatus === 'function') {
     try {
@@ -153,14 +149,13 @@ app.get('/health', async (req, res) => {
     }
   }
   
-  // Note: MCP client is lazy-loaded (connects on first chat request)
-  // mcpConnected may be false at startup - this is normal and expected
-  // Service is healthy if token is configured (MCP will connect when needed)
+  // Note: API client is lazy-loaded on first chat request
+  // Service is healthy if token is configured
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
-    mcpConnected: client?.connected || false,
+    apiReady: !!config.aiBuilderToken,
     tokenConfigured: !!config.aiBuilderToken,
     kb: kbStatus || { status: 'not_available' }
   });
@@ -172,7 +167,7 @@ app.get('/api/kb/status', asyncHandler(async (req, res) => {
   if (!client || typeof client.getKBStatus !== 'function') {
     return res.status(503).json({
       error: 'KB status not available',
-      message: 'MCP client not initialized'
+      message: 'API client not initialized'
     });
   }
   
@@ -428,7 +423,7 @@ app.post('/api/admin/kb-refresh', asyncHandler(async (req, res) => {
   if (!client || typeof client.refreshKBContext !== 'function') {
     return res.status(503).json({
       error: 'KB refresh not available',
-      message: 'MCP client not initialized'
+      message: 'API client not initialized'
     });
   }
   
@@ -596,10 +591,10 @@ app.post('/api/chat',
       });
     }
     
-    // Ensure MCP client is loaded and connected (lazy loading)
+    // Get API client (lazy loading)
     const client = await getMCPClient();
     if (!client) {
-      logError('MCP client initialization failed', null, {
+      logError('API client initialization failed', null, {
         hasToken: !!config.aiBuilderToken,
         tokenLength: config.aiBuilderToken ? config.aiBuilderToken.length : 0
       });
@@ -609,53 +604,12 @@ app.post('/api/chat',
       });
     }
     
-    if (!client.connected) {
-      // Retry connection with exponential backoff
-      let lastError = null;
-      const maxRetries = 3;
-      const baseDelay = 1000; // 1 second
-      
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          logInfo(`Attempting MCP connection (attempt ${attempt}/${maxRetries})...`);
-          await client.connect();
-          logInfo('MCP client connected successfully');
-          break; // Success, exit retry loop
-        } catch (error) {
-          lastError = error;
-          logError(`MCP connection attempt ${attempt} failed`, error, {
-            hasToken: !!config.aiBuilderToken,
-            tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none',
-            attempt: attempt,
-            maxRetries: maxRetries
-          });
-          
-          // If not the last attempt, wait before retrying
-          if (attempt < maxRetries) {
-            const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
-            logInfo(`Retrying MCP connection in ${delay}ms...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-          }
-        }
-      }
-      
-      // If still not connected after all retries, continue anyway
-      // The chat() method will use direct API calls via chatWithAIBuildersAPI()
-      if (!client.connected) {
-        logError('MCP client failed to connect after all retries', lastError, {
-          hasToken: !!config.aiBuilderToken,
-          tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 5) : 'none',
-          retries: maxRetries
-        });
-        logInfo('Proceeding with direct API calls (MCP bypass mode)');
-        // Don't return 503 - continue with direct API calls
-      }
-    }
+    // No connection check needed - direct API calls work immediately
     
     try {
-      // Validate MCP client has chat method
+      // Validate API client has chat method
       if (typeof client.chat !== 'function') {
-        logError('MCP client chat method not available', null, {
+        logError('API client chat method not available', null, {
           clientType: typeof client,
           clientMethods: client ? Object.keys(client) : []
         });
@@ -665,7 +619,7 @@ app.post('/api/chat',
         });
       }
       
-      // Get response from MCP client with timeout protection
+      // Get response from API client with timeout protection
       const chatTimeout = 60000; // 60 seconds timeout
       const chatPromise = client.chat(message, history);
       const timeoutPromise = new Promise((_, reject) => {
@@ -676,7 +630,7 @@ app.post('/api/chat',
       
       // Validate result structure
       if (!result || typeof result !== 'object') {
-        logError('Invalid MCP client response', null, {
+        logError('Invalid API client response', null, {
           resultType: typeof result,
           resultValue: result
         });
