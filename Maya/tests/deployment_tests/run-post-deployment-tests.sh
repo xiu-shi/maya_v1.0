@@ -107,7 +107,7 @@ else
     echo "Possible causes:"
     echo "1. Service is still starting up (wait 5-10 minutes)"
     echo "2. System instruction not loaded from environment variable"
-    echo "3. MCP connection issues"
+    echo "3. API connection issues"
     echo "4. Configuration errors"
     echo ""
     echo "Actions to take:"

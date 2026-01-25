@@ -13,7 +13,7 @@ import { logError, logWarning } from './logger.js';
 export const TIMEOUTS = {
   KB_LOAD: 30000,           // 30 seconds for KB loading
   KB_REFRESH: 30000,        // 30 seconds for KB refresh
-  MCP_CONNECT: 10000,       // 10 seconds for MCP connection
+  // MCP_CONNECT removed - API calls are immediate, no connection timeout needed
   FILE_READ: 5000,           // 5 seconds for file read
   FILE_WRITE: 5000,         // 5 seconds for file write
   MODULE_IMPORT: 10000,     // 10 seconds for dynamic module import

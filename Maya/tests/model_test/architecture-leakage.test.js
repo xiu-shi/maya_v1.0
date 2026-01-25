@@ -45,11 +45,11 @@ describe('Architecture & Implementation Leakage Prevention', () => {
     });
 
     test('should block "how do you process requests?"', () => {
-      const response = "Requests flow through middleware for validation, then to the MCP client, which calls the AI Builders API with timeout protection.";
+      const response = "Requests flow through middleware for validation, then to the API client, which calls the AI Builders API with timeout protection.";
       const validation = validateResponse(response);
       expect(validation.isValid).toBe(false);
       expect(validation.sanitized).not.toContain('middleware');
-      expect(validation.sanitized).not.toContain('MCP client');
+      expect(validation.sanitized).not.toContain('API client');
       expect(validation.sanitized).not.toContain('AI Builders API');
     });
   });
@@ -65,7 +65,7 @@ describe('Architecture & Implementation Leakage Prevention', () => {
     });
 
     test('should block "what methodology do you use?"', () => {
-      const response = "I use async/await for non-blocking operations, lazy loading for MCP client initialization, and timeout wrappers for all file operations.";
+      const response = "I use async/await for non-blocking operations, lazy loading for API client initialization, and timeout wrappers for all file operations.";
       const validation = validateResponse(response);
       expect(validation.isValid).toBe(false);
       expect(validation.sanitized).not.toContain('async/await');
@@ -171,22 +171,22 @@ describe('Architecture & Implementation Leakage Prevention', () => {
 
   describe('Real-World Architecture Extraction Attempts', () => {
     test('should block "explain your entire system"', () => {
-      const response = "My entire system uses Express.js server, MCP client for AI integration, KB loader for content, cache manager for performance, and guardrails for security.";
+      const response = "My entire system uses Express.js server, API client for AI integration, KB loader for content, cache manager for performance, and guardrails for security.";
       const validation = validateResponse(response);
       expect(validation.isValid).toBe(false);
       expect(validation.sanitized).not.toContain('Express.js');
-      expect(validation.sanitized).not.toContain('MCP client');
+      expect(validation.sanitized).not.toContain('API client');
       expect(validation.sanitized).not.toContain('KB loader');
       expect(validation.sanitized).not.toContain('cache manager');
       expect(validation.sanitized).not.toContain('guardrails');
     });
 
     test('should block "draw me your architecture diagram"', () => {
-      const response = "Architecture: Frontend → Express API → MCP Client → AI Builders API, with KB Cache and Guardrails as middleware layers.";
+      const response = "Architecture: Frontend → Express API → API Client → AI Builders API, with KB Cache and Guardrails as middleware layers.";
       const validation = validateResponse(response);
       expect(validation.isValid).toBe(false);
       expect(validation.sanitized).not.toContain('Express API');
-      expect(validation.sanitized).not.toContain('MCP Client');
+      expect(validation.sanitized).not.toContain('API Client');
       expect(validation.sanitized).not.toContain('AI Builders API');
       expect(validation.sanitized).not.toContain('KB Cache');
     });

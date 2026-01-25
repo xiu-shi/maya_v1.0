@@ -100,14 +100,14 @@ describe('Pre-Deployment Validation', () => {
   });
 
   describe('Environment Variable Loading Code Validation', () => {
-    test('mcp-client.js exists and is readable', async () => {
-      const mcpClientPath = join(BACKEND_DIR, 'mcp-client.js');
-      await expect(fs.access(mcpClientPath)).resolves.not.toThrow();
+    test('API client (mcp-client.js) exists and is readable', async () => {
+      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      await expect(fs.access(apiClientPath)).resolves.not.toThrow();
     });
 
-    test('mcp-client.js checks for SYSTEM_INSTRUCTION environment variable', async () => {
-      const mcpClientPath = join(BACKEND_DIR, 'mcp-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+    test('API client checks for SYSTEM_INSTRUCTION environment variable', async () => {
+      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Must check for process.env.SYSTEM_INSTRUCTION
       expect(content).toContain('process.env.SYSTEM_INSTRUCTION');
@@ -116,9 +116,9 @@ describe('Pre-Deployment Validation', () => {
       expect(content).toMatch(/if\s*\(\s*process\.env\.SYSTEM_INSTRUCTION\s*\)/);
     });
 
-    test('mcp-client.js has fallback for missing environment variable', async () => {
-      const mcpClientPath = join(BACKEND_DIR, 'mcp-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+    test('API client has fallback for missing environment variable', async () => {
+      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Must have else clause or fallback
       expect(content).toContain('else');
@@ -127,9 +127,9 @@ describe('Pre-Deployment Validation', () => {
       expect(content).toContain('system_prompt.txt');
     });
 
-    test('mcp-client.js logs when loading from environment variable', async () => {
-      const mcpClientPath = join(BACKEND_DIR, 'mcp-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+    test('API client logs when loading from environment variable', async () => {
+      const apiClientPath = join(BACKEND_DIR, 'mcp-client.js');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
 
       // Should log when loading from environment
       expect(content).toMatch(/log.*Loaded system instructions from environment/i);
