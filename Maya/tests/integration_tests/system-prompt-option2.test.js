@@ -291,7 +291,7 @@ describe('System Prompt Loading - Option 2 Implementation', () => {
     it('should verify Option 2 implementation is active', async () => {
       // Check that system prompt loading mechanism exists
       const apiClientPath = join(__dirname, '../backend/api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Should have Option 2 implementation
       expect(content).toContain('getSystemPrompt');

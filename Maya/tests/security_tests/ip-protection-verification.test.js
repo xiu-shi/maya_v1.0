@@ -124,28 +124,28 @@ describe('IP Protection Verification - Option 2', () => {
 
     it('should have getSystemPrompt function in API client', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       expect(content).toContain('async function getSystemPrompt()');
     });
 
     it('should load from environment variable in API client', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       expect(content).toContain('process.env.SYSTEM_INSTRUCTION');
     });
 
     it('should load from file in API client', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       expect(content).toContain('fs.readFile');
     });
 
     it('should have emergency fallback in API client', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Should have a catch block with fallback
       expect(content).toContain('catch');
@@ -154,7 +154,7 @@ describe('IP Protection Verification - Option 2', () => {
 
     it('should only have minimal fallback prompt (< 200 chars)', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Extract the fallback prompt
       const fallbackMatch = content.match(/basePrompt = '([^']+)'/);
@@ -204,7 +204,7 @@ describe('IP Protection Verification - Option 2', () => {
 
     it('should verify API client (api-client.js) is safe to be public', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Count occurrences of "You are Maya"
       const matches = content.match(/You are Maya/g);
@@ -237,7 +237,7 @@ describe('IP Protection Verification - Option 2', () => {
   describe('Fallback Safety', () => {
     it('should verify fallback prompt is generic and minimal', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Extract fallback section
       const fallbackSection = content.match(/catch[\s\S]{0,500}basePrompt[\s\S]{0,500}/);
@@ -320,7 +320,7 @@ describe('IP Protection Verification - Option 2', () => {
   describe('Traceability - Option 2 Implementation', () => {
     it('should verify Option 2 is fully implemented in API client', async () => {
       const apiClientPath = join(mayaBackendDir, 'api-client.js');
-      const content = await fs.readFile(mcpClientPath, 'utf-8');
+      const content = await fs.readFile(apiClientPath, 'utf-8');
       
       // Option 2 key features:
       // 1. Environment variable support

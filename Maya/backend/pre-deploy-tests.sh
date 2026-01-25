@@ -88,7 +88,7 @@ run_check "Check for obvious code errors" \
     "! grep -r 'console.log(.*AI_BUILDER_TOKEN' --include='*.js' --exclude-dir=tests . 2>/dev/null || \
      echo '  No API key logging found'"
 
-# 11. Validate MCP connection (local)
+# 11. Validate API connection (local)
 run_check "Validate API key format in .env" \
     "source .env && [ ! -z \"\$AI_BUILDER_TOKEN\" ] && \
      echo \"\$AI_BUILDER_TOKEN\" | grep -q '^sk_' && \
@@ -101,7 +101,7 @@ run_check "Check for old revoked keys" \
 
 # 13. Run integration tests (sample)
 run_check "Run sample integration tests" \
-    "npm test -- tests/integration_tests/mcp-retry-logic.test.js 2>&1 | grep -q 'Tests.*passed' && echo '  MCP retry tests passed'"
+    "npm test -- tests/deployment_tests/api-post-deployment-comprehensive.test.js 2>&1 | grep -q 'Tests.*passed' && echo '  API deployment tests passed'"
 
 # 14. Run new Jan 18 tests
 run_check "Run Jan 18, 2026 test improvements" \
