@@ -2418,6 +2418,19 @@
       document.addEventListener('keydown', function(e) {
         const target = e.target;
         
+        // CRITICAL: Always allow chat input and submit button interactions FIRST
+        // Check this BEFORE any other checks to ensure chat works
+        if (target && (
+          target.id === 'chatInput' ||
+          target.id === 'submitBtn' ||
+          target.closest('.maya-input-container') ||
+          target.closest('.maya-chat-input') ||
+          target.closest('#chatInput') ||
+          target.closest('#submitBtn')
+        )) {
+          return true; // Always allow keyboard events on chat input - DON'T BLOCK
+        }
+        
         // CRITICAL: Always allow sample questions to receive keyboard events
         if (target && (
           target.classList.contains('maya-sample-question') ||
@@ -2425,16 +2438,6 @@
           target.hasAttribute('data-prompt')
         )) {
           return true; // Always allow keyboard events on sample questions
-        }
-        
-        // CRITICAL: Always allow chat input and submit button interactions
-        if (target && (
-          target.id === 'chatInput' ||
-          target.id === 'submitBtn' ||
-          target.closest('.maya-input-container') ||
-          target.closest('.maya-chat-input')
-        )) {
-          return true; // Always allow keyboard events on chat input
         }
         
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
@@ -2469,10 +2472,19 @@
             window.outerWidth - window.innerWidth > threshold) {
           if (!devtools.open) {
             devtools.open = true;
-            console.clear();
-            console.log('%c⚠️ Developer Tools Detected', 'color: #ff6b6b; font-size: 16px; font-weight: bold;');
-            console.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 12px;');
-            console.log('%cUnauthorized code copying is prohibited.', 'color: #ff6b6b; font-size: 12px;');
+            // Wrap console.clear() in try-catch to prevent errors if console is restricted
+            try {
+              console.clear();
+            } catch (e) {
+              // Silently ignore if console.clear() is not available
+            }
+            try {
+              console.log('%c⚠️ Developer Tools Detected', 'color: #ff6b6b; font-size: 16px; font-weight: bold;');
+              console.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 12px;');
+              console.log('%cUnauthorized code copying is prohibited.', 'color: #ff6b6b; font-size: 12px;');
+            } catch (e) {
+              // Silently ignore if console.log is restricted
+            }
           }
         } else {
           devtools.open = false;
