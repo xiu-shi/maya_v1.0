@@ -43,41 +43,12 @@ else
     echo -e "${GREEN}✅ Created .env file with token${NC}"
 fi
 
-# 2. Update mcp_config.json (repo root)
-MCP_CONFIG="../../mcp_config.json"
-if [ -f "$MCP_CONFIG" ]; then
-    # Use node to update JSON safely
-    node -e "
-    const fs = require('fs');
-    const config = JSON.parse(fs.readFileSync('$MCP_CONFIG', 'utf8'));
-    config.mcpServers['ai-builders-coach'].env.AI_BUILDER_TOKEN = '$NEW_TOKEN';
-    fs.writeFileSync('$MCP_CONFIG', JSON.stringify(config, null, 2) + '\n');
-    "
-    echo -e "${GREEN}✅ Updated mcp_config.json${NC}"
-else
-    echo -e "${YELLOW}⚠️  mcp_config.json not found at $MCP_CONFIG${NC}"
-fi
-
-# 3. Update ~/.cursor/mcp.json
-CURSOR_MCP="$HOME/.cursor/mcp.json"
-if [ -f "$CURSOR_MCP" ]; then
-    # Use node to update JSON safely
-    node -e "
-    const fs = require('fs');
-    const config = JSON.parse(fs.readFileSync('$CURSOR_MCP', 'utf8'));
-    config.mcpServers['ai-builders-coach'].env.AI_BUILDER_TOKEN = '$NEW_TOKEN';
-    fs.writeFileSync('$CURSOR_MCP', JSON.stringify(config, null, 2) + '\n');
-    "
-    echo -e "${GREEN}✅ Updated ~/.cursor/mcp.json${NC}"
-    echo -e "${YELLOW}💡 You may need to restart Cursor for MCP changes to take effect${NC}"
-else
-    echo -e "${YELLOW}⚠️  ~/.cursor/mcp.json not found${NC}"
-fi
+# Note: MCP configuration removed - Maya now uses direct API calls
+# Token is only stored in .env file (above)
 
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ Token update complete!${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "\n${YELLOW}Next steps:${NC}"
 echo -e "1. Restart the server: ./stop.sh && ./start.sh"
-echo -e "2. Restart Cursor IDE (for MCP changes)"
-echo -e "3. Test the chat functionality"
+echo -e "2. Test the chat functionality"
