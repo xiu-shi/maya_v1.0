@@ -8,7 +8,7 @@ import { promises as fs } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import config from './config/env.js';
-import { logError, logInfo } from './utils/logger.js';
+import { logError, logInfo, logWarning } from './utils/logger.js';
 import { loadKBContext } from './utils/kb-loader.js';
 // Note: kb-monitor.js and kb-cache.js are IP-protected and kept local only
 // These modules are optional - gracefully handle if they don't exist (GitHub deployment)
@@ -343,6 +343,21 @@ export class MayaAPIClient {
     // Endpoint: /v1/chat/completions
     const apiUrl = process.env.AI_BUILDERS_API_URL || 'https://space.ai-builders.com/backend/v1/chat/completions';
     
+    // Check if token is available before making API call
+    if (!config.aiBuilderToken) {
+      const errorMsg = 'AI_BUILDER_TOKEN is not configured. The API key may not be set in the deployment environment.';
+      logError('Missing AI_BUILDER_TOKEN', null, {
+        nodeEnv: process.env.NODE_ENV,
+        hasTokenEnvVar: !!process.env.AI_BUILDER_TOKEN,
+        apiUrl: apiUrl
+      });
+      return {
+        content: `I'm currently experiencing connectivity issues with the AI service. The API endpoint may need to be configured. Please try again in a moment, or contact support if the issue persists.`,
+        role: 'assistant',
+        error: errorMsg
+      };
+    }
+    
     try {
       // Build messages array (getSystemPrompt is now async)
       const systemPrompt = await getSystemPrompt();
@@ -456,16 +471,21 @@ export class MayaAPIClient {
         content = 'I apologize, but I encountered an error processing your request.';
       }
       
-      // Apply response guardrails to prevent information leakage
-      const { validateResponse } = await import('./utils/response-guardrails.js');
-      const validation = validateResponse(content);
-      if (!validation.isValid) {
-        logWarning('Response sanitized due to information leakage', {
-          warnings: validation.warnings,
-          originalLength: content.length,
-          sanitizedLength: validation.sanitized.length
-        });
-        content = validation.sanitized;
+      // Apply response guardrails to prevent information leakage (if available)
+      try {
+        const { validateResponse } = await import('./utils/response-guardrails.js');
+        const validation = validateResponse(content);
+        if (!validation.isValid) {
+          logWarning('Response sanitized due to information leakage', {
+            warnings: validation.warnings,
+            originalLength: content.length,
+            sanitizedLength: validation.sanitized.length
+          });
+          content = validation.sanitized;
+        }
+      } catch (guardrailsError) {
+        // Guardrails module not available (GitHub deployment) - skip validation
+        logInfo('Response guardrails not available, skipping validation');
       }
       
       // Check if we should add KB update disclaimer (after 3+ consecutive questions about Janet)
@@ -483,28 +503,73 @@ export class MayaAPIClient {
         role: 'assistant'
       };
     } catch (error) {
-      logError('AI Builders API error', error, {
+      // Enhanced error logging with more context
+      const errorDetails = {
         url: apiUrl,
         model: process.env.AI_BUILDERS_MODEL || 'grok-4-fast',
         errorType: error.name,
         errorMessage: error.message,
-        stack: error.stack,
-        cause: error.cause
-      });
+        hasToken: !!config.aiBuilderToken,
+        tokenPrefix: config.aiBuilderToken ? config.aiBuilderToken.substring(0, 8) + '...' : 'none',
+        nodeEnv: process.env.NODE_ENV,
+        messageLength: message?.length || 0,
+        historyLength: history?.length || 0
+      };
       
-      // Check if it's a network/DNS error
-      if (error.message.includes('fetch failed') || error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
-        logInfo('Network error detected - API endpoint may be incorrect', {
+      // Add stack trace only in development
+      if (config.isDevelopment) {
+        errorDetails.stack = error.stack;
+        errorDetails.cause = error.cause;
+      }
+      
+      // Add status code if available (from API response errors)
+      if (error.statusCode || error.status) {
+        errorDetails.statusCode = error.statusCode || error.status;
+        errorDetails.errorData = error.data;
+      }
+      
+      logError('AI Builders API error', error, errorDetails);
+      
+      // Provide more specific error messages based on error type
+      let userMessage = `I'm currently experiencing connectivity issues with the AI service.`;
+      
+      // Network/DNS errors
+      if (error.message.includes('fetch failed') || error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED') || error.message.includes('ECONNRESET')) {
+        logInfo('Network error detected', {
           attemptedUrl: apiUrl,
-          suggestion: 'Try running: npm run get-api-info to find correct endpoint'
+          errorType: 'network',
+          suggestion: 'Check network connectivity and API endpoint URL'
         });
+        userMessage = `I'm having trouble connecting to the AI service. This may be a temporary network issue. Please try again in a moment.`;
+      }
+      // Authentication errors (401, 403)
+      else if (error.statusCode === 401 || error.statusCode === 403 || error.message.includes('401') || error.message.includes('403')) {
+        logError('Authentication error - API token may be invalid or expired', error, errorDetails);
+        userMessage = `I'm experiencing an authentication issue with the AI service. The API configuration may need to be updated. Please contact support if this persists.`;
+      }
+      // Rate limiting (429)
+      else if (error.statusCode === 429 || error.message.includes('429')) {
+        logWarning('Rate limit exceeded', errorDetails);
+        userMessage = `The AI service is currently handling many requests. Please wait a moment and try again.`;
+      }
+      // Server errors (500, 502, 503, 504)
+      else if (error.statusCode >= 500 || error.message.includes('500') || error.message.includes('502') || error.message.includes('503') || error.message.includes('504')) {
+        logError('AI service server error', error, errorDetails);
+        userMessage = `The AI service is temporarily unavailable. Please try again in a few moments.`;
+      }
+      // Missing token
+      else if (!config.aiBuilderToken) {
+        logError('Missing AI_BUILDER_TOKEN', error, errorDetails);
+        userMessage = `The AI service is not properly configured. Please contact support.`;
       }
       
       // Fallback: Return a helpful message
       return {
-        content: `I'm currently experiencing connectivity issues with the AI service. The API endpoint may need to be configured. Please try again in a moment, or contact support if the issue persists.`,
+        content: userMessage,
         role: 'assistant',
-        error: error.message
+        error: error.message,
+        errorType: error.name,
+        statusCode: error.statusCode || error.status
       };
     }
   }
