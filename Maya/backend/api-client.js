@@ -258,16 +258,26 @@ export async function getKBStatus() {
     const cacheStats = kbCache.getKBCacheStats();
     const cacheValidation = kbCache.validateKBCache();
     const memoryUsage = kbCache.getKBCacheMemoryUsage();
-  
-  return { 
-    stats, 
-    updates,
-    cache: {
-      ...cacheStats,
-      validation: cacheValidation,
-      memory: memoryUsage
-    }
-  };
+    
+    return { 
+      stats, 
+      updates,
+      cache: {
+        ...cacheStats,
+        validation: cacheValidation,
+        memory: memoryUsage
+      }
+    };
+  } catch (e) {
+    // Monitor/cache modules not available (GitHub deployment) - return basic status
+    return {
+      configured: true,
+      cache: {
+        available: false,
+        note: 'Cache module not available in public repository'
+      }
+    };
+  }
 }
 
 // Maya's system prompt (KB context will be injected dynamically)
