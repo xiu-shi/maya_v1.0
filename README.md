@@ -240,3 +240,4 @@ This repository is a portfolio/showcase project demonstrating technical implemen
   <strong>A personal solution to a professional challenge</strong><br>
   Because being unavailable shouldn't mean missing opportunities
 </p>
+
