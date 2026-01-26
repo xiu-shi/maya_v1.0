@@ -93,3 +93,14 @@ Maya/knowledge/system_instruction.md
 # Personal website repository (separate project)
 # This folder contains janetxiushi.me files (not related to Maya agent)
 my_site_3_mayaGPT_v3/
+
+# Test files - KEEP LOCAL ONLY
+# Exclude all test files from being committed
+**/*.test.js
+**/tests/**/*.js
+**/test/**/*.js
+Maya/tests/**/*
+Maya/backend/tests/**/*
+!Maya/tests/deployment_tests/run-pre-deployment-tests.sh
+!Maya/tests/deployment_tests/run-post-deployment-tests.sh
+!Maya/tests/deployment_tests/README.md
