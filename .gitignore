@@ -108,6 +108,14 @@ Maya/backend/utils/memory_cache/kb-monitor.js
 Maya/backend/utils/memory_cache/kb-cache.js
 Maya/deploy-to-space.sh
 
+# IP-Protected Test Files (Core IP - NEVER commit!)
+# These test files reveal cache behavior, evaluation methodologies, and performance benchmarks
+Maya/backend/test-kb-cache.js
+Maya/backend/test-kb-cache-eval.js
+Maya/tests/knowledge_tests/kb-cache.test.js
+Maya/tests/knowledge_tests/kb-cache-eval.test.js
+Maya/tests/knowledge_tests/kb-cache-performance.test.js
+
 # Personal website repository (separate project)
 # This folder contains janetxiushi.me files (not related to Maya agent)
 my_site_3_mayaGPT_v3/
