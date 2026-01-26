@@ -128,3 +128,4 @@ Maya/backend/tests/**/*
 !Maya/tests/deployment_tests/run-pre-deployment-tests.sh
 !Maya/tests/deployment_tests/run-post-deployment-tests.sh
 !Maya/tests/deployment_tests/README.md
+# Repository configuration
