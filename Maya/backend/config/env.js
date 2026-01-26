@@ -70,19 +70,8 @@ function validateToken(token) {
     throw new Error('AI_BUILDER_TOKEN appears to be invalid (too short)');
   }
   
-  // Check for revoked keys (documented as revoked)
-  const revokedKeyPrefixes = [
-    'sk_937d9f12', // Revoked January 24, 2026 - see ROOT_CAUSE_ANALYSIS.md
-    'sk_9a342713'  // Revoked January 24, 2026 - production deployment failed
-  ];
-  
-  const isRevoked = revokedKeyPrefixes.some(prefix => token.startsWith(prefix));
-  if (isRevoked) {
-    console.error('❌ Error: This API key has been revoked and cannot be used');
-    console.error(`   Key prefix: ${token.substring(0, 12)}...`);
-    console.error('   Please obtain a new API key from https://space.ai-builders.com');
-    throw new Error('AI_BUILDER_TOKEN is revoked - please use a new key');
-  }
+  // Note: Revoked key checking removed from public repository for security
+  // Revoked keys are validated server-side by the API provider
   
   // Check for placeholder/example keys
   const placeholderKeys = [
