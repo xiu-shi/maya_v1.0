@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "ai-builders-coach": {
-      "env": {
-        "AI_BUILDER_TOKEN": "YOUR_TOKEN_HERE"
-      }
-    }
-  }
-}
