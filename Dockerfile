@@ -1,5 +1,4 @@
 # Maya Backend Dockerfile
-# For deployment on AI Builder Space / Koyeb platform
 # Build context: repository root
 
 FROM node:18-alpine
