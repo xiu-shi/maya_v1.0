@@ -27,8 +27,10 @@ export const securityHeaders = helmet({
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: [
         "'self'",
-        "https://www.googletagmanager.com", // Google Analytics
-        "https://space.ai-builders.com" // AI Builders API (if needed)
+        "https://www.googletagmanager.com", // Google Tag Manager
+        "https://*.google-analytics.com", // Google Analytics (all regions)
+        "https://*.analytics.google.com", // Google Analytics (regional endpoints)
+        "https://space.ai-builders.com" // AI Builders API
       ],
       fontSrc: [
         "'self'",
