@@ -76,18 +76,20 @@ API_KEY_MANAGEMENT.md
 SUPPORT_*.md
 ROOT_CAUSE_*.md
 
-# Deployment scripts with potential hardcoded secrets
+# Deployment scripts with potential hardcoded secrets - KEEP LOCAL ONLY
 QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
-!Maya/deploy-to-space.sh
 DEPLOY_WITH_ENV_VAR.sh
+DEPLOY_WITH_ENV_VAR.sh
+!Maya/deploy-to-space.sh
 
 # Deployment configuration and documentation - KEEP LOCAL ONLY
 DEPLOYMENT_API_COMMAND.txt
 SYSTEM_PROMPT_FOR_DEPLOYMENT.txt
 *_FOR_DEPLOYMENT*.txt
 *_DEPLOYMENT*.txt
+*_DEPLOYMENT*.md
 deploy-config.json
 !deploy-config.json.example
 
