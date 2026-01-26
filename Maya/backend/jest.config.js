@@ -8,7 +8,8 @@ export default {
   setupFiles: ['<rootDir>/tests/setup.js'],
   moduleNameMapper: {
     '^supertest$': '<rootDir>/backend/node_modules/supertest/index.js',
-    '^express$': '<rootDir>/backend/node_modules/express/index.js'
+    '^express$': '<rootDir>/backend/node_modules/express/index.js',
+    '^jsdom$': '<rootDir>/backend/node_modules/jsdom/lib/api.js'
   },
   testMatch: [
     '**/tests/**/*.test.js'

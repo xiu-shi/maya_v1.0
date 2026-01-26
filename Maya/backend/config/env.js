@@ -150,8 +150,9 @@ const config = {
 };
 
 // Validate configuration
-if (config.port < 1 || config.port > 65535) {
-  throw new Error(`Invalid PORT: ${config.port}. Must be between 1 and 65535`);
+// Allow PORT=0 in test mode (OS will assign available port)
+if (config.port !== 0 && (config.port < 1 || config.port > 65535)) {
+  throw new Error(`Invalid PORT: ${config.port}. Must be between 1 and 65535 (or 0 in test mode)`);
 }
 
 if (config.maxMessageLength < 1 || config.maxMessageLength > 10000) {

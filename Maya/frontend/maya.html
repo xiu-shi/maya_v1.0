@@ -757,16 +757,16 @@
               <div style="background: var(--bg-secondary); padding: var(--spacing-lg); border-radius: 12px; margin-top: var(--spacing-lg); text-align: left;">
                 <p style="font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-primary);">💡 Try asking:</p>
                 <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-sm);">
-                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?" onclick="handleSampleQuestionClick(this)">
                     "I run a [your industry] business. How can AI help me reduce costs and improve efficiency?"
                   </li>
-                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?" onclick="handleSampleQuestionClick(this)">
                     "What are the biggest risks I should consider before adopting AI in my organization?"
                   </li>
-                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="How do I create an AI strategy that aligns with my business goals?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="How do I create an AI strategy that aligns with my business goals?" onclick="handleSampleQuestionClick(this)">
                     "How do I create an AI strategy that aligns with my business goals?"
                   </li>
-                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="Can you help me understand cloud migration costs and ROI?">
+                  <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="Can you help me understand cloud migration costs and ROI?" onclick="handleSampleQuestionClick(this)">
                     "Can you help me understand cloud migration costs and ROI?"
                   </li>
                 </ul>
@@ -787,7 +787,7 @@
               placeholder="Type your message here... (支持中文输入)"
               rows="1"
             ></textarea>
-            <button id="submitBtn" class="maya-submit-btn">Send</button>
+            <button id="submitBtn" type="button" class="maya-submit-btn">Send</button>
           </div>
         </div>
       </main>
@@ -842,6 +842,58 @@
     let currentChatId = null;
     let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
+    
+    // Global function for sample question clicks (accessible from onclick attribute)
+    // This ensures clicks work even if event listeners fail
+    window.handleSampleQuestionClick = function(element) {
+      const prompt = element.getAttribute('data-prompt');
+      const input = document.getElementById('chatInput');
+      
+      console.log('🎯 Direct onclick handler triggered:', prompt);
+      
+      if (!prompt || !input) {
+        console.error('❌ Missing prompt or input element');
+        return false;
+      }
+      
+      // Hide empty state
+      const emptyStateEl = document.getElementById('emptyState');
+      if (emptyStateEl) {
+        emptyStateEl.style.display = 'none';
+      }
+      
+      // Create new chat if none exists
+      if (!currentChatId) {
+        createNewChat();
+      }
+      
+      // Set prompt text
+      input.value = prompt;
+      
+      // Trigger input event for auto-resize
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      
+      // Focus input
+      input.focus();
+      
+      // Auto-resize
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 200) + 'px';
+      
+      // Visual feedback
+      input.style.transition = 'box-shadow 0.3s ease';
+      input.style.boxShadow = '0 0 0 2px var(--accent-color)';
+      setTimeout(() => {
+        input.style.boxShadow = '';
+      }, 500);
+      
+      // Auto-submit after short delay
+      setTimeout(() => {
+        sendMessage();
+      }, 200);
+      
+      return false; // Prevent default behavior
+    };
 
     // API Configuration
     const API_BASE_URL = (() => {
@@ -884,6 +936,9 @@
       renderChatHistory();
       if (chats.length > 0) {
         loadChat(chats[0].id);
+      } else {
+        // No chats exist - show empty state with sample questions
+        showEmptyState();
       }
     }
 
@@ -918,21 +973,28 @@
         console.log('✅ Auto-resize listener attached');
 
         // Send on Enter (Shift+Enter for new line)
+        // Use capture phase to ensure this runs before security handlers
         chatInput.addEventListener('keydown', function(e) {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
+            e.stopPropagation();
             console.log('⌨️ Enter key pressed, calling sendMessage');
             sendMessage();
+            return false;
           }
-        });
+        }, { capture: true });
         console.log('✅ Enter key listener attached');
 
         // Submit button click
+        // Use capture phase and stopPropagation to ensure this runs before security handlers
         submitBtn.addEventListener('click', function(e) {
           e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
           console.log('🖱️ Submit button clicked, calling sendMessage');
           sendMessage();
-        });
+          return false;
+        }, { capture: true });
         console.log('✅ Submit button listener attached');
 
         // New chat button click
@@ -990,6 +1052,22 @@
         listenersAttached = attachEventListeners();
       }
     });
+    
+    // Global fallback: Make sendMessage accessible and add direct button handler
+    window.sendMessage = sendMessage;
+    
+    // Direct onclick fallback for submit button (runs even if event listeners fail)
+    if (submitBtn) {
+      submitBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔄 Fallback onclick handler: Submit button clicked');
+        if (typeof sendMessage === 'function') {
+          sendMessage();
+        }
+        return false;
+      };
+    }
 
     // Initialize prompt click handlers (Fixed: Add DOM-ready check)
     function initPromptHandlers() {
@@ -1040,76 +1118,90 @@
         item.setAttribute('data-handler-attached', 'true');
         
         // Click handler to populate chat input and auto-submit for guided experience
-        // Use capture: true to run BEFORE security handlers can block
-        const clickHandler = function(e) {
+        // Use arrow function to preserve 'this' context, and capture phase to run BEFORE security handlers
+        const clickHandler = (e) => {
           // Stop propagation immediately to prevent security handlers from blocking
           e.stopPropagation();
           e.stopImmediatePropagation();
-          e.preventDefault(); // Also prevent default to ensure it works
+          e.preventDefault();
           
-          const prompt = this.getAttribute('data-prompt');
+          // Get prompt from the clicked element (handle both direct click and child element click)
+          const clickedElement = e.currentTarget || item;
+          const prompt = clickedElement.getAttribute('data-prompt');
           const chatInput = document.getElementById('chatInput');
           
           console.log(`💬 Sample question ${index + 1} clicked:`, prompt);
           console.log('🔍 Debug:', { 
             chatInput: !!chatInput, 
             prompt: !!prompt, 
-            element: this,
+            element: clickedElement,
             target: e.target,
             currentTarget: e.currentTarget
           });
           
-          // Force focus and ensure element is interactive
-          this.focus();
-          this.style.pointerEvents = 'auto';
-          
-          if (chatInput && prompt) {
-            // Hide empty state immediately for better UX
-            if (emptyState) {
-              emptyState.style.display = 'none';
-            }
-            
-            // Create new chat if none exists (for first-time users)
-            if (!currentChatId) {
-              createNewChat();
-            }
-            
-            // Set the prompt text
-            chatInput.value = prompt;
-            
-            // Trigger input event to ensure value is set
-            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-            
-            // Focus the input
-            chatInput.focus();
-            
-            // Auto-resize textarea to fit content
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-            
-            // Visual feedback - briefly highlight the input
-            chatInput.style.transition = 'box-shadow 0.3s ease';
-            chatInput.style.boxShadow = '0 0 0 2px var(--accent-color)';
-            setTimeout(() => {
-              chatInput.style.boxShadow = '';
-            }, 500);
-            
-            console.log('✅ Prompt populated in chat input');
-            
-            // Auto-submit for guided experience (first-time users)
-            // Small delay to ensure UI updates are complete
-            setTimeout(() => {
-              console.log('🚀 Auto-submitting sample question for guided experience');
-              sendMessage();
-            }, 150);
-          } else {
-            console.error('❌ Failed to populate prompt:', { chatInput: !!chatInput, prompt: !!prompt });
+          if (!chatInput) {
+            console.error('❌ chatInput element not found');
+            return;
           }
+          
+          if (!prompt) {
+            console.error('❌ No prompt found on clicked element');
+            return;
+          }
+          
+          // Hide empty state immediately for better UX
+          if (emptyState) {
+            emptyState.style.display = 'none';
+          }
+          
+          // Create new chat if none exists (for first-time users)
+          if (!currentChatId) {
+            createNewChat();
+          }
+          
+          // Set the prompt text
+          chatInput.value = prompt;
+          
+          // Trigger input event to ensure value is set and auto-resize works
+          const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+          chatInput.dispatchEvent(inputEvent);
+          
+          // Focus the input
+          chatInput.focus();
+          
+          // Auto-resize textarea to fit content
+          chatInput.style.height = 'auto';
+          chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+          
+          // Visual feedback - briefly highlight the input
+          chatInput.style.transition = 'box-shadow 0.3s ease';
+          chatInput.style.boxShadow = '0 0 0 2px var(--accent-color)';
+          setTimeout(() => {
+            chatInput.style.boxShadow = '';
+          }, 500);
+          
+          console.log('✅ Prompt populated in chat input:', prompt);
+          
+          // Auto-submit for guided experience (first-time users)
+          // Small delay to ensure UI updates are complete
+          setTimeout(() => {
+            console.log('🚀 Auto-submitting sample question for guided experience');
+            sendMessage();
+          }, 200);
         };
         
         // Attach with capture phase AND as direct onclick (fallback)
-        item.addEventListener('click', clickHandler, { capture: true });
+        // Use both methods to ensure clicks work
+        item.addEventListener('click', clickHandler, { capture: true, passive: false });
         item.onclick = clickHandler; // Direct assignment as fallback
+        
+        // Also handle mousedown as additional fallback
+        item.addEventListener('mousedown', (e) => {
+          if (e.button === 0) { // Left click only
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+          }
+        }, { capture: true });
       });
       
       console.log(`✅ Prompt handlers initialized for ${promptItems.length} sample questions`);
@@ -1120,6 +1212,58 @@
     function ensurePromptHandlers() {
       try {
         initPromptHandlers();
+        
+        // Also add a global click handler as ultimate fallback
+        // This catches clicks even if other handlers fail
+        document.addEventListener('click', function(e) {
+          // Check if clicked element or parent has data-prompt attribute
+          let target = e.target;
+          let promptElement = null;
+          
+          // Walk up the DOM tree to find element with data-prompt
+          while (target && target !== document.body) {
+            if (target.hasAttribute && target.hasAttribute('data-prompt')) {
+              promptElement = target;
+              break;
+            }
+            if (target.classList && target.classList.contains('maya-sample-question')) {
+              promptElement = target;
+              break;
+            }
+            target = target.parentElement;
+          }
+          
+          if (promptElement) {
+            const prompt = promptElement.getAttribute('data-prompt');
+            const chatInput = document.getElementById('chatInput');
+            
+            if (prompt && chatInput) {
+              console.log('🔄 Fallback handler: Sample question clicked:', prompt);
+              
+              // Hide empty state
+              if (emptyState) {
+                emptyState.style.display = 'none';
+              }
+              
+              // Create new chat if none exists
+              if (!currentChatId) {
+                createNewChat();
+              }
+              
+              // Set prompt and submit
+              chatInput.value = prompt;
+              chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+              chatInput.focus();
+              chatInput.style.height = 'auto';
+              chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+              
+              setTimeout(() => {
+                sendMessage();
+              }, 200);
+            }
+          }
+        }, true); // Use capture phase to catch before other handlers
+        
       } catch (error) {
         console.error('❌ Error initializing prompt handlers:', error);
         // Retry after a short delay
@@ -1169,11 +1313,80 @@
       saveChats();
       renderChatHistory();
       clearMessages();
+      // Show empty state with sample questions for new chat
+      showEmptyState();
       // Re-enable input when creating new chat
       chatInput.disabled = false;
       submitBtn.disabled = false;
       chatInput.placeholder = 'Type your message here... (支持中文输入)';
       chatInput.focus();
+    }
+    
+    // Show empty state with sample questions
+    function showEmptyState() {
+      if (!chatMessages) {
+        console.error('❌ chatMessages element not found');
+        return;
+      }
+      
+      // Check if empty state already exists in DOM
+      let existingEmptyState = chatMessages.querySelector('#emptyState');
+      if (existingEmptyState) {
+        existingEmptyState.style.display = 'flex';
+        // Update global reference
+        emptyState = existingEmptyState;
+        // Re-initialize prompt handlers to ensure they work
+        setTimeout(() => {
+          ensurePromptHandlers();
+        }, 100);
+        return;
+      }
+      
+      // Re-create empty state HTML if it was removed
+      const emptyStateHTML = `
+        <div class="maya-empty-state" id="emptyState">
+          <div class="maya-empty-state-icon">💬</div>
+          <div class="maya-empty-state-text">Start a conversation</div>
+          <div style="font-size: var(--font-size-base); color: var(--text-secondary); margin-top: var(--spacing-md); max-width: 600px; line-height: 1.6;">
+            <p style="margin-bottom: var(--spacing-md);">Ask me anything about AI strategy, cloud architecture, or digital transformation. Try one of the prompts below or type your own question.</p>
+            <p style="margin-bottom: var(--spacing-md); font-size: var(--font-size-sm); color: var(--text-muted); font-weight: 500;">DO NOT provide sensitive information.</p>
+            <div style="background: var(--bg-secondary); padding: var(--spacing-lg); border-radius: 12px; margin-top: var(--spacing-lg); text-align: left;">
+              <p style="font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--text-primary);">💡 Try asking:</p>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="I run a [your industry] business. How can AI help me reduce costs and improve efficiency?" onclick="handleSampleQuestionClick(this)">
+                  "I run a [your industry] business. How can AI help me reduce costs and improve efficiency?"
+                </li>
+                <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="What are the biggest risks I should consider before adopting AI in my organization?" onclick="handleSampleQuestionClick(this)">
+                  "What are the biggest risks I should consider before adopting AI in my organization?"
+                </li>
+                <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="How do I create an AI strategy that aligns with my business goals?" onclick="handleSampleQuestionClick(this)">
+                  "How do I create an AI strategy that aligns with my business goals?"
+                </li>
+                <li class="maya-sample-question" style="padding: var(--spacing-sm); background: var(--bg-tertiary); border-radius: 6px; cursor: pointer !important; transition: all var(--transition-fast); position: relative; z-index: 10; user-select: text !important; -webkit-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; pointer-events: auto !important;" data-prompt="Can you help me understand cloud migration costs and ROI?" onclick="handleSampleQuestionClick(this)">
+                  "Can you help me understand cloud migration costs and ROI?"
+                </li>
+              </ul>
+              <p style="margin-top: var(--spacing-md); font-size: var(--font-size-sm); color: var(--text-muted);">
+                Click any question above to start, or type your own. After exploring, <strong>book a strategy call</strong> to dive deeper into your specific situation.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      chatMessages.innerHTML = emptyStateHTML;
+      
+      // Update the emptyState reference
+      emptyState = document.getElementById('emptyState');
+      if (emptyState) {
+        console.log('✅ Empty state recreated with sample questions');
+        // Re-initialize prompt handlers for the new sample questions
+        setTimeout(() => {
+          ensurePromptHandlers();
+        }, 100);
+      } else {
+        console.error('❌ Failed to recreate empty state');
+      }
     }
 
     // Load chat
@@ -1185,6 +1398,12 @@
       messageHistory = chat.messages || [];
       renderMessages();
       renderChatHistory();
+      // Hide empty state if there are messages, show if empty
+      if (messageHistory.length === 0) {
+        showEmptyState();
+      } else if (emptyState) {
+        emptyState.style.display = 'none';
+      }
       chatInput.focus();
     }
 
@@ -1241,20 +1460,55 @@
 
       try {
         // Call backend API
-        const apiUrl = `${API_BASE_URL}/api/chat`;
+        // Ensure API URL is constructed correctly
+        let apiUrl;
+        if (API_BASE_URL === '') {
+          // Same origin - use relative URL
+          apiUrl = '/api/chat';
+        } else {
+          // Absolute URL
+          apiUrl = `${API_BASE_URL}/api/chat`;
+        }
+        
         console.log('📤 Sending request to:', apiUrl);
+        console.log('📤 API_BASE_URL:', API_BASE_URL);
+        console.log('📤 Full URL:', window.location.origin + apiUrl);
         console.log('📤 Request payload:', { message, history: messageHistory });
+        
+        // Create abort controller for timeout handling
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, 60000); // 60 second timeout
         
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: JSON.stringify({
             message,
             history: messageHistory
-          })
+          }),
+          signal: controller.signal
+        }).catch(fetchError => {
+          // Clear timeout if fetch completes
+          clearTimeout(timeoutId);
+          
+          // Handle fetch errors (network issues, CORS, etc.)
+          console.error('❌ Fetch error:', fetchError);
+          if (fetchError.name === 'AbortError') {
+            throw new Error('Request timeout - the server took too long to respond');
+          }
+          if (fetchError.message && fetchError.message.includes('Failed to fetch')) {
+            throw new Error('Network error - unable to connect to server');
+          }
+          throw fetchError;
         });
+        
+        // Clear timeout on successful fetch
+        clearTimeout(timeoutId);
 
         console.log('📥 Response status:', response.status, response.statusText);
         console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
@@ -1393,17 +1647,25 @@
         });
         
         // Show user-friendly error message (never reveal technical details)
-        let errorMessage = `I apologize, but I'm experiencing connection issues at the moment. Please try again in a few moments. If the issue persists, there may be a server-side problem that needs attention.`;
+        let errorMessage = `I apologize, but I'm experiencing connection issues at the moment. Please try again in a few moments.`;
         
-        // If it's a 503 error, log a helpful hint (but don't show to user)
+        // Provide more specific error messages based on error type
         if (error.status === 503) {
           console.warn('⚠️ Service Unavailable (503) - This usually means AI_BUILDER_TOKEN is not configured in deployment environment variables');
-        }
-        
-        // If it's a network error, provide more specific message
-        if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('Failed to fetch')) {
+          errorMessage = `I'm temporarily unavailable. The service may be starting up or experiencing issues. Please try again in a moment.`;
+        } else if (error.status === 401 || error.status === 403) {
+          errorMessage = `I'm unable to authenticate with the AI service. Please contact support if this issue persists.`;
+        } else if (error.status === 429) {
+          errorMessage = `I'm receiving too many requests right now. Please wait a moment and try again.`;
+        } else if (error.status >= 500) {
+          errorMessage = `I'm experiencing server-side issues. Please try again in a few moments.`;
+        } else if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('Failed to fetch')) {
           console.error('❌ Network error detected');
           errorMessage = `I'm having trouble connecting to the server. Please check your internet connection and try again.`;
+        } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+          errorMessage = `The request took too long to process. Please try again with a shorter message.`;
+        } else if (error.message.includes('JSON') || error.message.includes('parse')) {
+          errorMessage = `I received an invalid response from the server. Please try again.`;
         }
         
         console.log('💬 Adding error message to UI');
@@ -1681,9 +1943,8 @@
     // Clear messages
     function clearMessages() {
       chatMessages.innerHTML = '';
-      if (messageHistory.length === 0 && emptyState) {
-        emptyState.style.display = 'flex';
-      }
+      // Note: emptyState will be recreated by showEmptyState() if needed
+      // Don't try to show it here as it may have been removed by innerHTML = ''
     }
 
     // Render chat history
@@ -2055,9 +2316,19 @@
       _0x.forEach(function(m){const _=console[m];console[m]=function(){if(window.location.hostname!=='localhost'&&window.location.hostname!=='127.0.0.1'){console.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');return;}return _.apply(console,arguments);}});
       
       // Disable right-click context menu (but allow with Shift key for testing)
+      // IMPORTANT: Always allow clicks on sample questions
       document.addEventListener('contextmenu', function(e) {
         // Get the actual element (handle text nodes)
         const target = e.target && e.target.nodeType === Node.TEXT_NODE ? e.target.parentElement : e.target;
+        
+        // CRITICAL: Always allow sample questions to be clicked
+        if (target && (
+          target.classList.contains('maya-sample-question') ||
+          target.closest('.maya-sample-question') ||
+          target.hasAttribute('data-prompt')
+        )) {
+          return true; // Always allow right-click on sample questions
+        }
         
         // Allow inspect with Shift+Right-click (for testing/debugging)
         if (e.shiftKey) {
@@ -2069,14 +2340,22 @@
         }
         
         // Allow in input fields and interactive elements
+        // CRITICAL: Always allow chat input and submit button
+        if (target && (
+          target.id === 'chatInput' ||
+          target.id === 'submitBtn' ||
+          target.closest('.maya-input-container') ||
+          target.closest('.maya-chat-input')
+        )) {
+          return true; // Always allow chat interactions
+        }
+        
         if (target.tagName === 'INPUT' || 
             target.tagName === 'TEXTAREA' || 
             target.tagName === 'A' ||
             target.tagName === 'BUTTON' ||
-            target.classList.contains('maya-sample-question') ||
             target.closest('a') ||
             target.closest('button') ||
-            target.closest('.maya-sample-question') ||
             target.isContentEditable ||
             target.closest('.maya-chat-input') ||
             target.closest('.maya-chat-messages')) {
@@ -2089,14 +2368,24 @@
       }, false);
       
       // Disable text selection (but allow with Shift key for testing)
+      // IMPORTANT: Always allow selection and clicks on sample questions
       document.addEventListener('selectstart', function(e) {
+        // Get the actual element (handle text nodes)
+        const target = e.target.nodeType === Node.TEXT_NODE ? e.target.parentElement : e.target;
+        
+        // CRITICAL: Always allow sample questions to be selected and clicked
+        if (target && (
+          target.classList.contains('maya-sample-question') ||
+          target.closest('.maya-sample-question') ||
+          target.hasAttribute('data-prompt')
+        )) {
+          return true; // Always allow selection on sample questions
+        }
+        
         // Allow selection with Shift key (for testing/debugging)
         if (e.shiftKey) {
           return true;
         }
-        
-        // Get the actual element (handle text nodes)
-        const target = e.target.nodeType === Node.TEXT_NODE ? e.target.parentElement : e.target;
         
         // Allow in input fields and interactive elements
         if (!target) {
@@ -2106,10 +2395,8 @@
         if (target.tagName === 'INPUT' || 
             target.tagName === 'TEXTAREA' || 
             target.isContentEditable ||
-            target.classList.contains('maya-sample-question') ||
             target.closest('.maya-chat-input') ||
-            target.closest('.maya-chat-messages') ||
-            target.closest('.maya-sample-question')) {
+            target.closest('.maya-chat-messages')) {
           return true;
         }
         
@@ -2127,17 +2414,30 @@
       }, false);
       
       // Disable keyboard shortcuts
+      // IMPORTANT: Always allow interactions with sample questions and chat input
       document.addEventListener('keydown', function(e) {
         const target = e.target;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-          return true;
+        
+        // CRITICAL: Always allow sample questions to receive keyboard events
+        if (target && (
+          target.classList.contains('maya-sample-question') ||
+          target.closest('.maya-sample-question') ||
+          target.hasAttribute('data-prompt')
+        )) {
+          return true; // Always allow keyboard events on sample questions
         }
         
-        // ALWAYS allow clicks and interactions on sample questions
-        if (target.classList && target.classList.contains('maya-sample-question')) {
-          return true;
+        // CRITICAL: Always allow chat input and submit button interactions
+        if (target && (
+          target.id === 'chatInput' ||
+          target.id === 'submitBtn' ||
+          target.closest('.maya-input-container') ||
+          target.closest('.maya-chat-input')
+        )) {
+          return true; // Always allow keyboard events on chat input
         }
-        if (target.closest && target.closest('.maya-sample-question')) {
+        
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
           return true;
         }
         
@@ -2201,6 +2501,15 @@
           return true; // Allow if target is null
         }
         
+        // CRITICAL: Always allow copy from sample questions
+        if (target && (
+          target.classList.contains('maya-sample-question') ||
+          target.closest('.maya-sample-question') ||
+          target.hasAttribute('data-prompt')
+        )) {
+          return true; // Always allow copy from sample questions
+        }
+        
         // Check if selection is from sample questions or allowed areas
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
@@ -2211,6 +2520,7 @@
           if (containerElement && (
             containerElement.classList.contains('maya-sample-question') ||
             containerElement.closest('.maya-sample-question') ||
+            containerElement.hasAttribute('data-prompt') ||
             containerElement.closest('.maya-chat-input') ||
             containerElement.closest('.maya-chat-messages')
           )) {
@@ -2222,8 +2532,7 @@
             target.tagName === 'TEXTAREA' || 
             target.isContentEditable ||
             target.closest('.maya-chat-input') ||
-            target.closest('.maya-chat-messages') ||
-            target.closest('.maya-sample-question')) {
+            target.closest('.maya-chat-messages')) {
           return true;
         }
         
