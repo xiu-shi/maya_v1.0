@@ -10,8 +10,8 @@ import { dirname, join } from 'path';
 import config from './config/env.js';
 import { logError, logInfo } from './utils/logger.js';
 import { loadKBContext } from './utils/kb-loader.js';
-import { trackKBLoad, trackKBRefresh, getKBStats, checkKBUpdates } from './utils/memory_cache/kb-monitor.js';
-import { getKBCache, refreshKBCache, getKBCacheStats, validateKBCache, getKBCacheMemoryUsage } from './utils/memory_cache/kb-cache.js';
+// Note: kb-monitor.js and kb-cache.js are IP-protected and kept local only
+// These modules are optional - gracefully handle if they don't exist (GitHub deployment)
 
 // ES modules don't have __dirname by default, so we create it
 const __filename = fileURLToPath(import.meta.url);
@@ -172,23 +172,37 @@ function countConsecutiveJanetQuestions(currentMessage, history = []) {
 }
 
 /**
- * Load KB context lazily (non-blocking) with intelligent caching
- * Uses cache manager for memory management and validation
+ * Load KB context lazily (non-blocking)
+ * Uses cache manager if available (local), otherwise loads directly
  */
 async function ensureKBContext() {
   try {
-    const context = await getKBCache(false);
-    
-    if (context) {
-      // Count documents loaded (approximate from context structure)
-      const docCount = (context.match(/KNOWLEDGE BASE CONTEXT:/g) || []).length + 
-                       (context.split('\n\n').filter(s => s.includes('Summary:')).length);
-      trackKBLoad(context, docCount);
+    // Try to use cache if available (local development)
+    try {
+      const kbCache = await import('./utils/memory_cache/kb-cache.js');
+      const context = await kbCache.getKBCache(false);
+      if (context) {
+        // Try to track load if monitor available
+        try {
+          const kbMonitor = await import('./utils/memory_cache/kb-monitor.js');
+          const docCount = (context.match(/KNOWLEDGE BASE CONTEXT:/g) || []).length + 
+                           (context.split('\n\n').filter(s => s.includes('Summary:')).length);
+          kbMonitor.trackKBLoad(context, docCount);
+        } catch (e) {
+          // Monitor not available - skip tracking
+        }
+        return context || '';
+      }
+    } catch (e) {
+      // Cache module not available (GitHub deployment) - load directly
+      logInfo('Cache module not available, loading KB directly');
     }
     
+    // Fallback: Load KB directly
+    const context = await loadKBContext();
     return context || '';
   } catch (error) {
-    logError('Failed to get KB context from cache', error);
+    logError('Failed to get KB context', error);
     return '';
   }
 }
@@ -198,17 +212,32 @@ async function ensureKBContext() {
  * This is useful when KB files have been updated
  */
 export async function refreshKBContext() {
-  logInfo('Refreshing KB context via cache manager...');
+  logInfo('Refreshing KB context...');
   
   try {
-    const context = await refreshKBCache();
-    
-    if (context) {
-      const docCount = (context.match(/KNOWLEDGE BASE CONTEXT:/g) || []).length + 
-                       (context.split('\n\n').filter(s => s.includes('Summary:')).length);
-      trackKBRefresh(context, docCount);
+    // Try to use cache refresh if available (local development)
+    try {
+      const kbCache = await import('./utils/memory_cache/kb-cache.js');
+      const context = await kbCache.refreshKBCache();
+      if (context) {
+        // Try to track refresh if monitor available
+        try {
+          const kbMonitor = await import('./utils/memory_cache/kb-monitor.js');
+          const docCount = (context.match(/KNOWLEDGE BASE CONTEXT:/g) || []).length + 
+                           (context.split('\n\n').filter(s => s.includes('Summary:')).length);
+          kbMonitor.trackKBRefresh(context, docCount);
+        } catch (e) {
+          // Monitor not available - skip tracking
+        }
+        return context || '';
+      }
+    } catch (e) {
+      // Cache module not available (GitHub deployment) - load directly
+      logInfo('Cache module not available, refreshing KB directly');
     }
     
+    // Fallback: Load KB directly
+    const context = await loadKBContext();
     return context || '';
   } catch (error) {
     logError('Failed to refresh KB context', error);
@@ -217,15 +246,18 @@ export async function refreshKBContext() {
 }
 
 /**
- * Get KB statistics and status (includes cache information)
- * Now async due to checkKBUpdates() being async (Issue #10)
+ * Get KB statistics and status (includes cache information if available)
  */
 export async function getKBStatus() {
-  const stats = getKBStats();
-  const updates = await checkKBUpdates(); // Now async with timeout protection
-  const cacheStats = getKBCacheStats();
-  const cacheValidation = validateKBCache();
-  const memoryUsage = getKBCacheMemoryUsage();
+  // Try to get stats from monitor/cache if available (local development)
+  try {
+    const kbMonitor = await import('./utils/memory_cache/kb-monitor.js');
+    const kbCache = await import('./utils/memory_cache/kb-cache.js');
+    const stats = kbMonitor.getKBStats();
+    const updates = await kbMonitor.checkKBUpdates();
+    const cacheStats = kbCache.getKBCacheStats();
+    const cacheValidation = kbCache.validateKBCache();
+    const memoryUsage = kbCache.getKBCacheMemoryUsage();
   
   return { 
     stats, 
