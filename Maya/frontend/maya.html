@@ -835,7 +835,7 @@
     const chatInput = document.getElementById('chatInput');
     const submitBtn = document.getElementById('submitBtn');
     const newChatBtn = document.getElementById('newChatBtn');
-    const emptyState = document.getElementById('emptyState');
+    let emptyState = document.getElementById('emptyState'); // Use 'let' not 'const' - gets reassigned in showEmptyState()
     const chatHistory = document.getElementById('chatHistory');
 
     // Chat state
@@ -2323,12 +2323,14 @@
       
       // Disable console methods (obfuscated) - only in production
       // CRITICAL: Use originalConsole.log inside override to prevent infinite recursion
+      // NOTE: This creates "Console access restricted" warnings in production - this is intentional
       const _0x=['log','warn','error','info','debug','trace'];
       _0x.forEach(function(m){
         const originalMethod = originalConsole[m];
         console[m] = function(){
           if(window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'){
             // Use originalConsole.log, NOT console.log (prevents recursion)
+            // This warning is intentional - it's a security measure to discourage console access
             originalConsole.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');
             return;
           }
