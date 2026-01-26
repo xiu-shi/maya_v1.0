@@ -2307,13 +2307,34 @@
         window.top.location = window.self.location;
       }
       
-      // Copyright notice
-      console.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 14px; font-weight: bold;');
-      console.log('%cUnauthorized copying, reproduction, or distribution of this code is prohibited.', 'color: #ff6b6b; font-size: 12px;');
+      // Save original console methods BEFORE overriding (prevents infinite recursion)
+      const originalConsole = {
+        log: console.log.bind(console),
+        warn: console.warn.bind(console),
+        error: console.error.bind(console),
+        info: console.info.bind(console),
+        debug: console.debug.bind(console),
+        trace: console.trace.bind(console)
+      };
+      
+      // Copyright notice (use original console.log before override)
+      originalConsole.log('%c© 2026 Janet Xiu Shi. All rights reserved.', 'color: #ffd700; font-size: 14px; font-weight: bold;');
+      originalConsole.log('%cUnauthorized copying, reproduction, or distribution of this code is prohibited.', 'color: #ff6b6b; font-size: 12px;');
       
       // Disable console methods (obfuscated) - only in production
+      // CRITICAL: Use originalConsole.log inside override to prevent infinite recursion
       const _0x=['log','warn','error','info','debug','trace'];
-      _0x.forEach(function(m){const _=console[m];console[m]=function(){if(window.location.hostname!=='localhost'&&window.location.hostname!=='127.0.0.1'){console.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');return;}return _.apply(console,arguments);}});
+      _0x.forEach(function(m){
+        const originalMethod = originalConsole[m];
+        console[m] = function(){
+          if(window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'){
+            // Use originalConsole.log, NOT console.log (prevents recursion)
+            originalConsole.log('%c⚠️ Console access restricted', 'color: #ff6b6b; font-size: 12px;');
+            return;
+          }
+          return originalMethod.apply(console, arguments);
+        };
+      });
       
       // Disable right-click context menu (but allow with Shift key for testing)
       // IMPORTANT: Always allow clicks on sample questions
