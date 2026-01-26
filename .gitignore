@@ -76,7 +76,7 @@ API_KEY_MANAGEMENT.md
 SUPPORT_*.md
 ROOT_CAUSE_*.md
 
-# Deployment scripts with potential hardcoded secrets - KEEP LOCAL ONLY
+# Deployment scripts (local only)
 QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
@@ -84,7 +84,7 @@ DEPLOY_WITH_ENV_VAR.sh
 DEPLOY_WITH_ENV_VAR.sh
 !Maya/deploy-to-space.sh
 
-# Deployment configuration and documentation - KEEP LOCAL ONLY
+# Deployment configuration (local only)
 DEPLOYMENT_API_COMMAND.txt
 SYSTEM_PROMPT_FOR_DEPLOYMENT.txt
 *_FOR_DEPLOYMENT*.txt
@@ -101,15 +101,13 @@ Maya/knowledge/system_instruction.md
 **/system_prompt.txt
 **/system_instruction.txt
 
-# IP-Protected Production Code (Core IP - NEVER commit!)
-# These contain proprietary security mechanisms, caching strategies, and monitoring systems
+# IP-protected code (local only)
 Maya/backend/utils/response-guardrails.js
 Maya/backend/utils/memory_cache/kb-monitor.js
 Maya/backend/utils/memory_cache/kb-cache.js
 Maya/deploy-to-space.sh
 
-# IP-Protected Test Files (Core IP - NEVER commit!)
-# These test files reveal cache behavior, evaluation methodologies, and performance benchmarks
+# IP-protected test files (local only)
 Maya/backend/test-kb-cache.js
 Maya/backend/test-kb-cache-eval.js
 Maya/tests/knowledge_tests/kb-cache.test.js
