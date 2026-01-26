@@ -81,6 +81,15 @@ QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
 !Maya/deploy-to-space.sh
+DEPLOY_WITH_ENV_VAR.sh
+
+# Deployment configuration and documentation - KEEP LOCAL ONLY
+DEPLOYMENT_API_COMMAND.txt
+SYSTEM_PROMPT_FOR_DEPLOYMENT.txt
+*_FOR_DEPLOYMENT*.txt
+*_DEPLOYMENT*.txt
+deploy-config.json
+!deploy-config.json.example
 
 # Maya System Instructions (Core IP - NEVER commit!)
 # These contain Maya's behavioral rules and prompt engineering
