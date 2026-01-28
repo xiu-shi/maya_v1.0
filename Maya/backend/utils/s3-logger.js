@@ -11,7 +11,7 @@ import config from '../config/env.js';
 
 // S3 Configuration
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || '';
+const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'maya-ai-builder-chat-logs'; // Default bucket name
 const ENABLE_S3_LOGGING = process.env.ENABLE_S3_LOGGING === 'true';
 
 // Initialize S3 client (only if S3 is enabled and configured)
