@@ -1,0 +1,50 @@
+{
+  "fetchedAt": "2026-01-28T18:08:08.858Z",
+  "dateRange": {
+    "start": "2026-01-21",
+    "end": "2026-01-28",
+    "days": 7
+  },
+  "productionUrl": "https://maya-agent.ai-builders.space",
+  "summary": {
+    "totalLogs": 1,
+    "totalMessages": 1,
+    "totalConversations": 1,
+    "storageSizeMB": "0.00"
+  },
+  "stats": {
+    "totalFiles": 1,
+    "totalSize": 556,
+    "totalSizeMB": "0.00",
+    "totalMessages": 1,
+    "totalConversations": 1,
+    "averageMessagesPerConversation": "1.00",
+    "averageSizePerMessage": "556.00",
+    "files": [
+      {
+        "date": "2026-01-28",
+        "size": 556,
+        "messages": 1,
+        "conversations": 1
+      }
+    ]
+  },
+  "logs": [
+    {
+      "id": "msg_1769623660180_tj5f9o0qn",
+      "conversationId": "conv_1769623660180_ly6uz44he",
+      "timestamp": "2026-01-28T18:07:40.179Z",
+      "environment": "production",
+      "serverHost": "localhost",
+      "userMessage": "Test message for logging verification",
+      "assistantResponse": "Hi! I'm Maya, Janet's digital twin. Test received - how can I help you today? 😊",
+      "historyLength": 0,
+      "ip": "10.250.92.2",
+      "userAgent": "node",
+      "warnings": [],
+      "responseTime": 1661,
+      "messageLength": 37,
+      "responseLength": 80
+    }
+  ]
+}

@@ -133,6 +133,14 @@ const config = {
   enableHttpsRedirect: getEnv('ENABLE_HTTPS_REDIRECT', 'false') === 'true',
   trustProxy: getEnv('TRUST_PROXY', 'false') === 'true',
   
+  // S3 Logging (optional)
+  s3Logging: {
+    enabled: getEnv('ENABLE_S3_LOGGING', 'false') === 'true',
+    region: getEnv('AWS_REGION', 'us-east-1'),
+    bucket: getEnv('AWS_S3_BUCKET', ''),
+    configured: !!(getEnv('AWS_S3_BUCKET', '') && getEnv('AWS_ACCESS_KEY_ID') || getEnv('AWS_SECRET_ACCESS_KEY'))
+  },
+  
   // Validation
   isDevelopment: getEnv('NODE_ENV', 'development') === 'development',
   isProduction: getEnv('NODE_ENV', 'development') === 'production',
