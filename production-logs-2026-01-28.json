@@ -1,0 +1,50 @@
+{
+  "fetchedAt": "2026-01-28T17:07:36.559Z",
+  "dateRange": {
+    "start": "2026-01-21",
+    "end": "2026-01-28",
+    "days": 7
+  },
+  "productionUrl": "https://maya-agent.ai-builders.space",
+  "summary": {
+    "totalLogs": 1,
+    "totalMessages": 1,
+    "totalConversations": 1,
+    "storageSizeMB": "0.00"
+  },
+  "stats": {
+    "totalFiles": 1,
+    "totalSize": 1288,
+    "totalSizeMB": "0.00",
+    "totalMessages": 1,
+    "totalConversations": 1,
+    "averageMessagesPerConversation": "1.00",
+    "averageSizePerMessage": "1288.00",
+    "files": [
+      {
+        "date": "2026-01-28",
+        "size": 1288,
+        "messages": 1,
+        "conversations": 1
+      }
+    ]
+  },
+  "logs": [
+    {
+      "id": "msg_1769620045848_93trwlnxl",
+      "conversationId": "conv_1769620045848_z60l2wvxx",
+      "timestamp": "2026-01-28T17:07:25.848Z",
+      "environment": "production",
+      "serverHost": "localhost",
+      "userMessage": "Can you help me understand cloud migration costs and ROI?",
+      "assistantResponse": "I'm afraid I can't provide specific guidance on cloud migration costs or ROI calculations, as those require tailored analysis based on your unique environment, scale, and goals - which falls under Janet's consulting expertise.\n\nJanet has deep hands-on experience in enterprise cloud migrations, including Workday implementations and Connectd advisory work where she helped optimize cloud architecture and vendor selection, reducing costs by up to 30% for clients (per her verified knowledge base).\n\nFor personalized insights on cloud migration strategies, costs, and ROI frameworks, Janet would be happy to discuss directly. Please email her at info@janetxiushi.me to explore how she can support your project.",
+      "historyLength": 0,
+      "ip": "10.250.92.2",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0",
+      "warnings": [],
+      "responseTime": 3905,
+      "messageLength": 57,
+      "responseLength": 709
+    }
+  ]
+}
