@@ -159,6 +159,7 @@ Maya/backend/test-*.sh
 Maya/backend/pre-deploy-tests.sh
 Maya/backend/update-token.sh
 Maya/backend/test-report.json
+Maya/backend/scripts/validate-test-counts.js
 Maya/scripts/pre-deployment-test.sh
 Maya/scripts/run-tests-locally.sh
 Maya/frontend/test-*.html
