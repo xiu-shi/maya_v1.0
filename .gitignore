@@ -64,8 +64,17 @@ Maya/backend/data/chat-logs/*.json
 *.tmp
 *.temp
 
+# Cursor IDE configuration (local only)
+.cursor/
+.cursor/**
+.cursor/rules/
+*.mdc
+
+# VS Code configuration (local only)
+.vscode/
+.vscode/**
+
 # Snyk Security Extension - AI Rules (auto-generated)
-.cursor/rules/snyk_rules.mdc
 API_KEY_MANAGEMENT.md
 
 # Development documentation - KEEP LOCAL ONLY
@@ -143,4 +152,43 @@ Maya/backend/tests/**/*
 !Maya/tests/deployment_tests/run-pre-deployment-tests.sh
 !Maya/tests/deployment_tests/run-post-deployment-tests.sh
 !Maya/tests/deployment_tests/README.md
+
+# Local test and utility scripts (local only)
+Maya/backend/test-*.js
+Maya/backend/test-*.sh
+Maya/backend/pre-deploy-tests.sh
+Maya/backend/update-token.sh
+Maya/backend/test-report.json
+Maya/scripts/pre-deployment-test.sh
+Maya/scripts/run-tests-locally.sh
+Maya/frontend/test-*.html
+
+# Local utility scripts (keep start.sh and stop.sh for deployment)
+Maya/backend/test-connection.sh
+
+# Root-level documentation files (local only)
+S3_*.md
+LODASH_*.md
+MAYA_*.md
+CHAT_*.md
+CONVERSATION_*.md
+GITHUB_*.md
+IP_*.md
+HISTORY_*.md
+FORCE_*.md
+SAFE_*.md
+COMMIT_*.md
+BLOG_*.md
+PRODUCTION_*.md
+IMMEDIATE_*.md
+LOGGING_*.md
+*_SUMMARY.md
+*_PLAN.md
+*_VALIDATED.md
+*_DIAGRAM.md
+*_SETUP*.md
+*_IMPLEMENTATION*.md
+*_INVESTIGATION*.md
+*_SOLUTION*.md
+
 # Repository configuration
