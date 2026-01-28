@@ -11,7 +11,7 @@ import config from '../config/env.js';
 
 // S3 Configuration
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'maya-ai-builder-chat-logs'; // Default bucket name
+const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'maya-ai-builder-prod-logs'; // Default bucket name
 const ENABLE_S3_LOGGING = process.env.ENABLE_S3_LOGGING === 'true';
 
 // Initialize S3 client (only if S3 is enabled and configured)
@@ -84,13 +84,16 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
       Key: s3Key,
       Body: JSON.stringify(allLogs, null, 2),
       ContentType: 'application/json',
-      // Server-side encryption
+      // Server-side encryption (SSE-S3 - free tier)
       ServerSideEncryption: 'AES256',
+      // Enforce encryption (required by bucket policy)
+      // This ensures data at rest is encrypted
       // Metadata
       Metadata: {
         'log-date': date.toISOString().split('T')[0],
         'log-count': String(allLogs.length),
-        'uploaded-at': new Date().toISOString()
+        'uploaded-at': new Date().toISOString(),
+        'encryption': 'SSE-S3'
       }
     });
 
