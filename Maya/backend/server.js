@@ -521,6 +521,73 @@ app.get('/api/admin/chat-logs', asyncHandler(async (req, res) => {
   }
 }));
 
+// Logging status endpoint - check if logging is working properly
+app.get('/api/admin/logging-status', asyncHandler(async (req, res) => {
+  const { promises: fs } = await import('fs');
+  const pathModule = await import('path');
+  const { fileURLToPath } = await import('url');
+  const { dirname, join } = pathModule;
+  
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const LOGS_DIR = join(__dirname, 'data', 'chat-logs');
+  
+  const status = {
+    logsDirectory: LOGS_DIR,
+    directoryExists: false,
+    directoryWritable: false,
+    recentLogs: 0,
+    lastLogTime: null,
+    todayLogFile: null,
+    error: null
+  };
+  
+  try {
+    // Check if directory exists
+    try {
+      await fs.access(LOGS_DIR);
+      status.directoryExists = true;
+      
+      // Check if writable
+      const testFile = join(LOGS_DIR, '.test-write-' + Date.now());
+      await fs.writeFile(testFile, 'test');
+      await fs.unlink(testFile);
+      status.directoryWritable = true;
+      
+      // Get today's log file
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      const todayFile = join(LOGS_DIR, `${dateStr}.json`);
+      status.todayLogFile = todayFile;
+      
+      // Get recent logs count
+      try {
+        const logs = JSON.parse(await fs.readFile(todayFile, 'utf-8'));
+        status.recentLogs = Array.isArray(logs) ? logs.length : 0;
+        if (status.recentLogs > 0 && Array.isArray(logs)) {
+          status.lastLogTime = logs[logs.length - 1].timestamp;
+        }
+      } catch (e) {
+        // File doesn't exist yet - that's OK
+        if (e.code !== 'ENOENT') {
+          status.error = `Failed to read log file: ${e.message}`;
+        }
+      }
+    } catch (error) {
+      status.error = `Directory access error: ${error.message}`;
+      status.directoryExists = false;
+    }
+  } catch (error) {
+    status.error = error.message;
+  }
+  
+  res.json({
+    success: true,
+    status: status,
+    timestamp: new Date().toISOString()
+  });
+}));
+
 // Storage statistics endpoint
 app.get('/api/admin/chat-logs/stats', asyncHandler(async (req, res) => {
   // TODO: Add authentication/authorization check here

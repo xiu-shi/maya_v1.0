@@ -5,7 +5,7 @@
  * Privacy: Logs are stored server-side only, not exposed to users
  */
 
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logInfo, logError } from './logger.js';
@@ -122,7 +122,23 @@ export async function logChatMessage({
     
     return logEntry;
   } catch (error) {
-    logError('Failed to log chat message', error);
+    // Enhanced error logging for debugging
+    let hasLogsDir = false;
+    try {
+      await fs.access(LOGS_DIR);
+      hasLogsDir = true;
+    } catch {
+      hasLogsDir = false;
+    }
+    
+    logError('Failed to log chat message', error, {
+      logsDir: LOGS_DIR,
+      errorCode: error.code,
+      errorMessage: error.message,
+      nodeEnv: config.nodeEnv,
+      cwd: process.cwd(),
+      hasLogsDir: hasLogsDir
+    });
     // Don't throw - logging failure shouldn't break chat functionality
     return null;
   }
