@@ -193,7 +193,7 @@ export async function fetchLogsFromS3(startDate, endDate) {
 export function getS3LoggingStatus() {
   return {
     enabled: ENABLE_S3_LOGGING && !!AWS_S3_BUCKET,
-    configured: !!AWS_S3_BUCKET,
+    configured: !!process.env.AWS_S3_BUCKET, // Only true if explicitly set in env (not default)
     region: AWS_REGION,
     bucket: AWS_S3_BUCKET || "not configured",
     clientInitialized: !!s3Client,
