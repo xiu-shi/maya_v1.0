@@ -12,6 +12,16 @@ node_modules/
 # Logs
 *.log
 
+# Log analysis scripts and exports (local only)
+analyze-logs.js
+check-production-logging.js
+export-logs-periodically.sh
+fetch-production-logs.js
+production-logs-*.json
+log-exports/
+rewrite_commits.sh
+run-maya-locally.sh
+
 # System files
 .DS_Store
 .DS_Store?
