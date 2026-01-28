@@ -22,6 +22,11 @@ log-exports/
 rewrite_commits.sh
 run-maya-locally.sh
 
+# AWS configuration files (local only - contain specific configurations)
+aws-bucket-policy.json
+aws-iam-policies.json
+aws-bucket-policy-minimal.json
+
 # System files
 .DS_Store
 .DS_Store?
