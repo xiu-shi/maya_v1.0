@@ -172,7 +172,7 @@ function countConsecutiveJanetQuestions(currentMessage, history = []) {
 
 /**
  * Load KB context lazily (non-blocking)
- * Uses cache manager if available (local), otherwise loads directly
+ * Uses cache manager if available, otherwise loads directly
  */
 async function ensureKBContext() {
   try {
@@ -268,7 +268,7 @@ export async function getKBStatus() {
       }
     };
   } catch (e) {
-    // Monitor/cache modules not available (GitHub deployment) - return basic status
+    // Monitor/cache modules not available - return basic status
     return {
       configured: true,
       cache: {
@@ -483,8 +483,8 @@ export class MayaAPIClient {
           content = validation.sanitized;
         }
       } catch (guardrailsError) {
-        // Guardrails module not available (GitHub deployment) - skip validation
-        logInfo('Response guardrails not available, skipping validation');
+        // Validation module not available - skip validation
+        logInfo('Response validation not available, skipping');
       }
       
       // Check if we should add KB update disclaimer (after 3+ consecutive questions about Janet)
