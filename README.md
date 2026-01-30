@@ -17,6 +17,8 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 - **Education**: Teaching Enterprise Cloud and Generative AI, bringing real-world enterprise experience into the classroom
 
 **Credentials & Recognition:**
+- **Generative AI Leader** (Google, Jan 2026 - Jan 2029) - Comprehensive knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
+- **Samsara Framework 2.0** (FilmEU - European University, Jan 2026 - Jan 2027) - Pedagogy and Project-Based Learning certification
 - **Harvard Professional Educator Certificate** (Jul 2025) - Preparing leaders for digital transformation
 - **Lakera GenAI Security Report Contributor** (Nov 2025) - Recognized for AI governance and prompt-injection testing insights
 - **Workday VIBE Global Impact Award** (Oct 2023) - First-ever Product & Technology VIBE Award for leadership and cultural impact
