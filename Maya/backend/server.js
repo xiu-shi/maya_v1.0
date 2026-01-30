@@ -32,6 +32,7 @@ import {
 } from "./utils/sanitize-output.js";
 import {
   logChatMessage,
+  logChatAttempt,
   getChatLogs,
   getChatLogsByConversation,
   getStorageStats,
@@ -753,6 +754,21 @@ app.post(
         nodeEnv: config.nodeEnv,
         hasToken: !!process.env.AI_BUILDER_TOKEN,
       });
+      
+      // Log config error attempt
+      logChatAttempt({
+        userMessage: message,
+        ip: req.ip,
+        userAgent: req.get("user-agent"),
+        history: history,
+        status: 'config_error',
+        statusCode: 503,
+        errorType: 'missing_token',
+        errorMessage: 'AI_BUILDER_TOKEN environment variable is not set',
+      }).catch((err) => {
+        logError("Failed to log config error attempt", err);
+      });
+      
       return res.status(503).json({
         error: "Service configuration error",
         message:
@@ -770,6 +786,21 @@ app.post(
         hasToken: !!config.aiBuilderToken,
         tokenLength: config.aiBuilderToken ? config.aiBuilderToken.length : 0,
       });
+      
+      // Log API client initialization error
+      logChatAttempt({
+        userMessage: message,
+        ip: req.ip,
+        userAgent: req.get("user-agent"),
+        history: history,
+        status: 'config_error',
+        statusCode: 503,
+        errorType: 'api_client_init_failed',
+        errorMessage: 'Unable to initialize AI service client',
+      }).catch((err) => {
+        logError("Failed to log API client init error attempt", err);
+      });
+      
       return res.status(503).json({
         error: "Service temporarily unavailable",
         message:
@@ -786,6 +817,21 @@ app.post(
           clientType: typeof client,
           clientMethods: client ? Object.keys(client) : [],
         });
+        
+        // Log API method error
+        logChatAttempt({
+          userMessage: message,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          history: history,
+          status: 'config_error',
+          statusCode: 503,
+          errorType: 'chat_method_unavailable',
+          errorMessage: 'API client chat method not available',
+        }).catch((err) => {
+          logError("Failed to log API method error attempt", err);
+        });
+        
         return res.status(503).json({
           error: "Service temporarily unavailable",
           message:
@@ -811,6 +857,24 @@ app.post(
           resultType: typeof result,
           resultValue: result,
         });
+        
+        // Log API response error
+        const requestStartTime = req.startTime || Date.now();
+        const responseTime = Date.now() - requestStartTime;
+        logChatAttempt({
+          userMessage: message,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          history: history,
+          responseTime: responseTime,
+          status: 'api_error',
+          statusCode: 500,
+          errorType: 'invalid_api_response',
+          errorMessage: 'Invalid response structure from AI service',
+        }).catch((err) => {
+          logError("Failed to log API response error attempt", err);
+        });
+        
         return res.status(500).json({
           error: "Internal server error",
           message: "Invalid response from AI service. Please try again.",
@@ -824,6 +888,24 @@ app.post(
           contentType: typeof content,
           hasContent: !!content,
         });
+        
+        // Log empty response error
+        const requestStartTime = req.startTime || Date.now();
+        const responseTime = Date.now() - requestStartTime;
+        logChatAttempt({
+          userMessage: message,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          history: history,
+          responseTime: responseTime,
+          status: 'api_error',
+          statusCode: 500,
+          errorType: 'empty_api_response',
+          errorMessage: 'Empty or invalid content in API response',
+        }).catch((err) => {
+          logError("Failed to log empty response error attempt", err);
+        });
+        
         return res.status(500).json({
           error: "Internal server error",
           message: "Empty response from AI service. Please try again.",
@@ -861,6 +943,24 @@ app.post(
           messageLength: message.length,
           historyLength: history.length,
         });
+        
+        // Log timeout error
+        const requestStartTime = req.startTime || Date.now();
+        const responseTime = Date.now() - requestStartTime;
+        logChatAttempt({
+          userMessage: message,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          history: history,
+          responseTime: responseTime,
+          status: 'timeout',
+          statusCode: 504,
+          errorType: 'request_timeout',
+          errorMessage: `Request timeout after ${chatTimeout}ms`,
+        }).catch((err) => {
+          logError("Failed to log timeout error attempt", err);
+        });
+        
         return res.status(504).json({
           error: "Request timeout",
           message:
@@ -880,6 +980,25 @@ app.post(
 
       // Determine appropriate status code
       const statusCode = error.statusCode || error.status || 500;
+      const errorType = statusCode === 503 ? 'api_error' : 'unknown_error';
+      
+      // Log API or unknown error
+      const requestStartTime = req.startTime || Date.now();
+      const responseTime = Date.now() - requestStartTime;
+      logChatAttempt({
+        userMessage: message,
+        ip: req.ip,
+        userAgent: req.get("user-agent"),
+        history: history,
+        responseTime: responseTime,
+        status: errorType,
+        statusCode: statusCode,
+        errorType: error.name || 'unknown',
+        errorMessage: error.message ? error.message.substring(0, 500) : 'Unknown error occurred',
+      }).catch((err) => {
+        logError("Failed to log error attempt", err);
+      });
+
       res.status(statusCode).json({
         error:
           statusCode === 503

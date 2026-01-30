@@ -6,6 +6,8 @@
 
 import cors from 'cors';
 import config from '../config/env.js';
+import { logChatAttempt } from '../utils/chat-logger.js';
+import { logWarning } from '../utils/logger.js';
 
 /**
  * CORS options
@@ -89,6 +91,21 @@ export const corsMiddleware = cors(corsOptions);
  */
 export function corsErrorHandler(err, req, res, next) {
   if (err && err.message && err.message.includes('CORS')) {
+    // Log CORS error for chat requests
+    if (req.path === '/api/chat' && req.body?.message) {
+      logChatAttempt({
+        userMessage: req.body.message || '',
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        status: 'cors_error',
+        statusCode: 403,
+        errorType: 'cors_policy_violation',
+        errorMessage: `CORS policy violation: ${err.message.substring(0, 200)}`,
+      }).catch(logErr => {
+        logWarning('Failed to log CORS error', { error: logErr.message });
+      });
+    }
+    
     return res.status(403).json({
       error: 'CORS policy violation',
       message: 'Your origin is not allowed to access this API'
