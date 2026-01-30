@@ -1,9 +1,18 @@
 # Dependencies
 node_modules/
 
-# Environment variables
+# Environment variables and secrets
 .env
 .env.*
+*.secret
+*.key
+*.token
+*.credential
+*.password
+*api*key*
+*secret*
+*credential*
+*password*
 
 # Logs
 *.log
