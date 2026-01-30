@@ -9,6 +9,7 @@
 ### 1. Tracked Files - IP-Protected File Names
 - Ensures IP-protected code files are not tracked in Git
 - Checks for: `response-guardrails`, `kb-monitor`, `kb-cache`, `system_prompt`, etc.
+- Note: These are generic pattern names used for detection, not actual file paths
 
 ### 2. Tracked Files - Test Files
 - Ensures test files are not tracked (except deployment tests)
@@ -39,7 +40,7 @@
 
 ### 8. Documentation References
 - Ensures documentation doesn't reference IP-protected files
-- Checks for references to `Implementation.md` in tracked docs
+- Checks for references to IP-protected documentation files in tracked docs
 
 ## Running Tests
 

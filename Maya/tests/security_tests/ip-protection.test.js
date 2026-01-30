@@ -106,6 +106,10 @@ describe('IP Protection - GitHub Repository Checks', () => {
       for (const file of trackedFiles) {
         // Check if it's a test file
         if (/\.(test|spec)\.js$/i.test(file)) {
+          // Allow security tests (needed for CI/CD IP protection)
+          if (/security_tests/i.test(file)) {
+            continue;
+          }
           // Check if it's an allowed deployment test
           const isAllowed = allowedTestPatterns.some(pattern => pattern.test(file));
           if (!isAllowed) {
@@ -345,6 +349,11 @@ describe('IP Protection - GitHub Repository Checks', () => {
       const violations = [];
 
       for (const file of jsFiles.slice(0, 50)) { // Limit to first 50 files for performance
+        // Skip security test files - they use IP patterns for detection (this is OK)
+        if (/security_tests/i.test(file)) {
+          continue;
+        }
+        
         const filePath = join(repoRoot, file);
         const content = readFileSafe(filePath);
         
