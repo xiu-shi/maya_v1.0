@@ -10,8 +10,7 @@ import { dirname, join } from 'path';
 import config from './config/env.js';
 import { logError, logInfo, logWarning } from './utils/logger.js';
 import { loadKBContext } from './utils/kb-loader.js';
-// Note: kb-monitor.js and kb-cache.js are IP-protected and kept local only
-// These modules are optional - gracefully handle if they don't exist (GitHub deployment)
+// Optional modules - gracefully handle if they don't exist
 
 // ES modules don't have __dirname by default, so we create it
 const __filename = fileURLToPath(import.meta.url);
@@ -177,7 +176,7 @@ function countConsecutiveJanetQuestions(currentMessage, history = []) {
  */
 async function ensureKBContext() {
   try {
-    // Try to use cache if available (local development)
+    // Try to use cache if available
     try {
       const kbCache = await import('./utils/memory_cache/kb-cache.js');
       const context = await kbCache.getKBCache(false);
@@ -194,7 +193,7 @@ async function ensureKBContext() {
         return context || '';
       }
     } catch (e) {
-      // Cache module not available (GitHub deployment) - load directly
+      // Cache module not available - load directly
       logInfo('Cache module not available, loading KB directly');
     }
     
@@ -215,7 +214,7 @@ export async function refreshKBContext() {
   logInfo('Refreshing KB context...');
   
   try {
-    // Try to use cache refresh if available (local development)
+    // Try to use cache refresh if available
     try {
       const kbCache = await import('./utils/memory_cache/kb-cache.js');
       const context = await kbCache.refreshKBCache();
@@ -232,7 +231,7 @@ export async function refreshKBContext() {
         return context || '';
       }
     } catch (e) {
-      // Cache module not available (GitHub deployment) - load directly
+      // Cache module not available - load directly
       logInfo('Cache module not available, refreshing KB directly');
     }
     
@@ -249,7 +248,7 @@ export async function refreshKBContext() {
  * Get KB statistics and status (includes cache information if available)
  */
 export async function getKBStatus() {
-  // Try to get stats from monitor/cache if available (local development)
+  // Try to get stats from monitor/cache if available
   try {
     const kbMonitor = await import('./utils/memory_cache/kb-monitor.js');
     const kbCache = await import('./utils/memory_cache/kb-cache.js');
@@ -471,7 +470,7 @@ export class MayaAPIClient {
         content = 'I apologize, but I encountered an error processing your request.';
       }
       
-      // Apply response guardrails to prevent information leakage (if available)
+      // Apply response validation (if available)
       try {
         const { validateResponse } = await import('./utils/response-guardrails.js');
         const validation = validateResponse(content);
