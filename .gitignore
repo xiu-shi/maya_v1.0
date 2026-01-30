@@ -1,10 +1,24 @@
-# Environment variables and secrets
+# Environment variables and secrets - NEVER COMMIT!
 .env
 .env.*
 mcp_config.json
 *.secret
 *.key
 *.token
+*.credential
+*.password
+*api*key*
+*API*KEY*
+*secret*
+*SECRET*
+*credential*
+*CREDENTIAL*
+*password*
+*PASSWORD*
+*access*key*
+*ACCESS*KEY*
+*private*key*
+*PRIVATE*KEY*
 
 # Dependencies
 node_modules/
@@ -78,13 +92,16 @@ Maya/backend/data/chat-logs/*.json
 API_KEY_MANAGEMENT.md
 
 # Development documentation - KEEP LOCAL ONLY
-# Exclude all .md files except README.md and SECURITY.md (public-facing)
+# Exclude all .md files except README.md, SECURITY.md, and knowledge base docs
 *.md
 !README.md
 !SECURITY.md
 !Maya/README.md
 !backend/README.md
 !**/README.md
+# Allow knowledge base markdown files (Maya's content)
+!Maya/knowledge/docs/**/*.md
+!Maya/knowledge/**/*.md
 
 # Specific dangerous documentation patterns
 *_GUIDE.md
@@ -100,19 +117,30 @@ API_KEY_MANAGEMENT.md
 SUPPORT_*.md
 ROOT_CAUSE_*.md
 
-# Deployment scripts (local only)
+# Scripts - KEEP LOCAL ONLY (except specific deployment scripts)
+# Exclude all .sh scripts except those explicitly allowed
+*.sh
+!Maya/deploy-to-space.sh
+!Maya/tests/deployment_tests/run-pre-deployment-tests.sh
+!Maya/tests/deployment_tests/run-post-deployment-tests.sh
+!Maya/backend/start.sh
+!Maya/backend/stop.sh
+
+# Specific script patterns to exclude
 QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
 DEPLOY_WITH_ENV_VAR.sh
-DEPLOY_WITH_ENV_VAR.sh
-!Maya/deploy-to-space.sh
-
-# AWS setup scripts (local only)
 setup-aws-s3.sh
 verify-aws-s3.sh
 *setup-aws*.sh
 *verify-aws*.sh
+*test*.sh
+*TEST*.sh
+*check*.sh
+*verify*.sh
+*setup*.sh
+*SETUP*.sh
 
 # Deployment configuration (local only)
 DEPLOYMENT_API_COMMAND.txt
@@ -149,29 +177,40 @@ Maya/tests/knowledge_tests/kb-cache-performance.test.js
 my_site_3_mayaGPT_v3/
 
 # Test files - KEEP LOCAL ONLY
-# Exclude all test files from being committed
+# Exclude ALL test files from being committed
 **/*.test.js
-**/tests/**/*.js
-**/test/**/*.js
+**/*.spec.js
+**/tests/**/*
+**/test/**/*
+**/__tests__/**/*
 Maya/tests/**/*
 Maya/backend/tests/**/*
+backend/tests/**/*
+tests/**/*
+# Exception: Allow deployment test scripts (needed for CI/CD)
 !Maya/tests/deployment_tests/run-pre-deployment-tests.sh
 !Maya/tests/deployment_tests/run-post-deployment-tests.sh
 !Maya/tests/deployment_tests/README.md
+# Exception: Allow test configuration files needed for CI/CD
+!Maya/tests/setup.js
+!Maya/tests/package.json
 
 # Local test and utility scripts (local only)
-Maya/backend/test-*.js
-Maya/backend/test-*.sh
-Maya/backend/pre-deploy-tests.sh
-Maya/backend/update-token.sh
-Maya/backend/test-report.json
-Maya/backend/scripts/validate-test-counts.js
-Maya/scripts/pre-deployment-test.sh
-Maya/scripts/run-tests-locally.sh
-Maya/frontend/test-*.html
-
-# Local utility scripts (keep start.sh and stop.sh for deployment)
-Maya/backend/test-connection.sh
+**/test-*.js
+**/test-*.sh
+**/test-*.html
+**/*test*.js
+**/*test*.sh
+**/*test*.html
+**/pre-deploy*.sh
+**/update-token.sh
+**/test-report.json
+**/validate-test-counts.js
+**/run-tests-locally.sh
+**/test-connection.sh
+**/verify-api-key*.js
+**/check-*.js
+**/check-*.sh
 
 # Root-level documentation files (local only)
 S3_*.md
@@ -197,5 +236,13 @@ LOGGING_*.md
 *_IMPLEMENTATION*.md
 *_INVESTIGATION*.md
 *_SOLUTION*.md
+
+# Additional security patterns
+**/*credentials*
+**/*CREDENTIALS*
+**/*config.local*
+**/*CONFIG.LOCAL*
+**/*local.config*
+**/*LOCAL.CONFIG*
 
 # Repository configuration
