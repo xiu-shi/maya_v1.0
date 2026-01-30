@@ -4,7 +4,7 @@ ChatGPT-like interface for Janet Xiu Shi's Digital Twin, powered by AI Builders 
 
 ## 📚 Documentation
 
-**👉 [Complete Implementation Documentation](./Implementation.md)** - All progress, timestamps, security, and testing details
+For implementation details, see the project repository documentation.
 
 ## 🚀 Quick Start
 
@@ -36,7 +36,6 @@ Maya/
 ├── frontend/          # Frontend files
 ├── backend/           # Backend API server
 ├── tests/             # Test files
-├── Implementation.md  # Complete documentation
 └── README.md          # This file
 ```
 
@@ -67,7 +66,5 @@ Maya/
 - **Performance**: Optimized caching and response times
 - **Memory Safety**: Efficient memory usage
 - **KB Accuracy**: Validation and integrity checks ensure reliable responses
-
-See [Implementation.md](./Implementation.md) for complete details.
 
 
