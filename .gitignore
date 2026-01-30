@@ -108,6 +108,12 @@ DEPLOY_WITH_ENV_VAR.sh
 DEPLOY_WITH_ENV_VAR.sh
 !Maya/deploy-to-space.sh
 
+# AWS setup scripts (local only)
+setup-aws-s3.sh
+verify-aws-s3.sh
+*setup-aws*.sh
+*verify-aws*.sh
+
 # Deployment configuration (local only)
 DEPLOYMENT_API_COMMAND.txt
 SYSTEM_PROMPT_FOR_DEPLOYMENT.txt
