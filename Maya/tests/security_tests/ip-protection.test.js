@@ -200,17 +200,32 @@ describe('IP Protection - GitHub Repository Checks', () => {
         return;
       }
 
-      const gitignorePath = join(repoRoot, '.gitignore');
-      const content = readFileSafe(gitignorePath);
+      // In CI, check the git-tracked version (what's actually committed)
+      // This ensures we're checking what's on GitHub, not local modifications
+      let content;
+      try {
+        const output = execSync('git show HEAD:.gitignore', { 
+          cwd: repoRoot, 
+          encoding: 'utf-8',
+          stdio: 'pipe'
+        });
+        content = output;
+      } catch (error) {
+        // Fallback to file system if git show fails
+        const gitignorePath = join(repoRoot, '.gitignore');
+        content = readFileSafe(gitignorePath);
+      }
 
       if (!content) {
         throw new Error('.gitignore file not found');
       }
 
+      // More specific patterns to avoid false positives
+      // These patterns should only match IP-revealing comments, not generic terms
       const ipRevealingPatterns = [
-        /IP-protected/i,
-        /Core IP/i,
-        /Maya System Instructions/i
+        /#.*IP-protected/i,           // Comment containing "IP-protected"
+        /#.*Core IP/i,                 // Comment containing "Core IP"
+        /#.*Maya System Instructions/i // Comment containing "Maya System Instructions"
       ];
 
       const violations = [];
@@ -224,7 +239,8 @@ describe('IP Protection - GitHub Repository Checks', () => {
         throw new Error(
           `.gitignore contains IP-revealing comments. ` +
           `GitHub repository should use minimal .gitignore version. ` +
-          `Pre-commit hook should swap detailed → minimal before commit.`
+          `Pre-commit hook should swap detailed → minimal before commit. ` +
+          `Found ${violations.length} violation(s).`
         );
       }
     });
