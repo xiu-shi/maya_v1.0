@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+*.secret
+*.key
+*.token
+*.credential
+*.password
+*api*key*
+*secret*
+*credential*
+*password*
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# System files
+.DS_Store
+._*
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE configuration
+.cursor/
+.vscode/
+*.mdc
+
+# Data directories
+**/data/
+**/chat-logs/
+
+# Large files
+*.pdf
+*.docx
+*.xlsx
+
+# Test files
+**/*.test.js
+**/tests/**/*
+# Exception: Security tests required for CI/CD
+!Maya/tests/security_tests/*.test.js
+
+# Scripts (except deployment)
+*.sh
+!Maya/deploy-to-space.sh
+!Maya/backend/start.sh
+!Maya/backend/stop.sh
+
+# Documentation (except README)
+*.md
+!README.md
+!SECURITY.md
+!**/README.md
+!Maya/knowledge/**/*.md

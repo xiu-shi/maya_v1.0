@@ -32,9 +32,34 @@ jobs:
         working-directory: Maya/backend
         run: npm ci
       
+      - name: Verify test files exist
+        working-directory: Maya/backend
+        run: |
+          echo "Verifying test files exist..."
+          if [ ! -f "../tests/security_tests/ip-protection.test.js" ]; then
+            echo "::error::Test file not found: ip-protection.test.js"
+            echo "Current directory: $(pwd)"
+            echo "Files in tests/security_tests/:"
+            ls -la ../tests/security_tests/ || echo "Directory does not exist"
+            exit 1
+          fi
+          if [ ! -f "../tests/security_tests/ip-protection-cicd.test.js" ]; then
+            echo "::error::Test file not found: ip-protection-cicd.test.js"
+            echo "Current directory: $(pwd)"
+            echo "Files in tests/security_tests/:"
+            ls -la ../tests/security_tests/ || echo "Directory does not exist"
+            exit 1
+          fi
+          echo "✅ All test files found"
+      
       - name: Run IP Protection Tests
         working-directory: Maya/backend
-        run: npm test -- tests/security_tests/ip-protection.test.js tests/security_tests/ip-protection-cicd.test.js
+        run: |
+          echo "Running IP protection tests..."
+          echo "Working directory: $(pwd)"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          npm test -- tests/security_tests/ip-protection.test.js tests/security_tests/ip-protection-cicd.test.js
         continue-on-error: false
       
       - name: Report Results
