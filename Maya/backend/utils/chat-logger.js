@@ -62,27 +62,35 @@ function generateConversationId() {
 }
 
 /**
- * Log a chat message
+ * Log a chat attempt (successful or failed)
  *
  * @param {Object} data - Chat data
  * @param {string} data.userMessage - User's message
- * @param {string} data.assistantResponse - Maya's response
+ * @param {string} data.assistantResponse - Maya's response (optional for failed attempts)
  * @param {Array} data.history - Conversation history (optional)
  * @param {string} data.ip - Client IP address
  * @param {string} data.userAgent - User agent string
  * @param {Array} data.warnings - Validation warnings (optional)
  * @param {number} data.responseTime - Response time in ms (optional)
  * @param {string} data.conversationId - Conversation ID (optional, auto-generated if not provided)
+ * @param {string} data.status - Status: 'success', 'rate_limited', 'validation_error', 'cors_error', 'timeout', 'config_error', 'api_error', 'unknown_error'
+ * @param {number} data.statusCode - HTTP status code (optional)
+ * @param {string} data.errorType - Error type/category (optional)
+ * @param {string} data.errorMessage - Error message (optional, sanitized)
  */
-export async function logChatMessage({
+export async function logChatAttempt({
   userMessage,
-  assistantResponse,
+  assistantResponse = null,
   history = [],
   ip,
   userAgent,
   warnings = [],
-  responseTime,
+  responseTime = null,
   conversationId,
+  status = 'success',
+  statusCode = 200,
+  errorType = null,
+  errorMessage = null,
 }) {
   try {
     await ensureLogsDirectory();
@@ -93,22 +101,29 @@ export async function logChatMessage({
     // Generate conversation ID if not provided
     const convId = conversationId || generateConversationId();
 
-    // Create log entry
+    // Sanitize user message (limit length, handle null/undefined)
+    const sanitizedMessage = userMessage ? userMessage.substring(0, 5000) : '';
+    
+    // Create log entry with status information
     const logEntry = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       conversationId: convId,
       timestamp: now.toISOString(),
-      environment: config.nodeEnv, // 'development' or 'production'
-      serverHost: process.env.SERVER_HOST || "localhost", // Server identifier
-      userMessage: userMessage.substring(0, 5000), // Limit message length
-      assistantResponse: assistantResponse.substring(0, 5000), // Limit response length
-      historyLength: history.length,
+      status: status, // 'success', 'rate_limited', 'validation_error', 'cors_error', 'timeout', 'config_error', 'api_error', 'unknown_error'
+      statusCode: statusCode,
+      environment: config.nodeEnv,
+      serverHost: process.env.SERVER_HOST || "localhost",
+      userMessage: sanitizedMessage,
+      assistantResponse: assistantResponse ? assistantResponse.substring(0, 5000) : null,
+      historyLength: history ? history.length : 0,
       ip: ip || "unknown",
       userAgent: userAgent || "unknown",
-      warnings: warnings,
-      responseTime: responseTime || null,
-      messageLength: userMessage.length,
-      responseLength: assistantResponse.length,
+      warnings: warnings || [],
+      responseTime: responseTime,
+      messageLength: sanitizedMessage.length,
+      responseLength: assistantResponse ? assistantResponse.length : 0,
+      errorType: errorType || null,
+      errorMessage: errorMessage ? errorMessage.substring(0, 500) : null, // Limit error message length
     };
 
     // Read existing logs for today
@@ -130,18 +145,17 @@ export async function logChatMessage({
     await fs.writeFile(logFilePath, JSON.stringify(logs, null, 2), "utf-8");
 
     // Upload to S3 (async, non-blocking, optional)
-    // Don't wait for S3 upload - it happens in background
     uploadToS3Async(logEntry, logs).catch(err => {
-      // Log error but don't fail - S3 is optional
       logWarning('S3 upload failed (continuing with file logging)', {
         error: err.message
       });
     });
 
-    logInfo("Chat message logged", {
+    logInfo("Chat attempt logged", {
       conversationId: convId,
-      messageLength: userMessage.length,
-      responseLength: assistantResponse.length,
+      status: status,
+      statusCode: statusCode,
+      messageLength: sanitizedMessage.length,
       date: now.toISOString().split("T")[0],
     });
 
@@ -156,17 +170,52 @@ export async function logChatMessage({
       hasLogsDir = false;
     }
 
-    logError("Failed to log chat message", error, {
+    logError("Failed to log chat attempt", error, {
       logsDir: LOGS_DIR,
       errorCode: error.code,
       errorMessage: error.message,
       nodeEnv: config.nodeEnv,
       cwd: process.cwd(),
       hasLogsDir: hasLogsDir,
+      status: status,
     });
     // Don't throw - logging failure shouldn't break chat functionality
     return null;
   }
+}
+
+/**
+ * Log a successful chat message (backward compatibility)
+ *
+ * @param {Object} data - Chat data (same as logChatAttempt)
+ */
+/**
+ * Log a successful chat message (backward compatibility)
+ *
+ * @param {Object} data - Chat data (same as logChatAttempt)
+ */
+export async function logChatMessage({
+  userMessage,
+  assistantResponse,
+  history = [],
+  ip,
+  userAgent,
+  warnings = [],
+  responseTime,
+  conversationId,
+}) {
+  return logChatAttempt({
+    userMessage,
+    assistantResponse,
+    history,
+    ip,
+    userAgent,
+    warnings,
+    responseTime,
+    conversationId,
+    status: 'success',
+    statusCode: 200,
+  });
 }
 
 /**

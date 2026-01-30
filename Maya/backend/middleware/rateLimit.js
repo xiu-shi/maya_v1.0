@@ -6,6 +6,8 @@
 
 import rateLimit from 'express-rate-limit';
 import config from '../config/env.js';
+import { logChatAttempt } from '../utils/chat-logger.js';
+import { logWarning } from '../utils/logger.js';
 
 /**
  * General API rate limiter
@@ -19,7 +21,23 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
-  handler: (req, res) => {
+  handler: async (req, res) => {
+    // Log rate-limited chat attempt
+    const userMessage = req.body?.message || '';
+    if (req.path === '/api/chat' && userMessage) {
+      logChatAttempt({
+        userMessage: userMessage,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        status: 'rate_limited',
+        statusCode: 429,
+        errorType: 'rate_limit_exceeded',
+        errorMessage: `Rate limit exceeded. Maximum ${config.rateLimitMaxRequests} requests per ${config.rateLimitWindowMs / 1000} seconds.`,
+      }).catch(err => {
+        logWarning('Failed to log rate-limited attempt', { error: err.message });
+      });
+    }
+    
     res.status(429).json({
       error: 'Too many requests',
       message: `Rate limit exceeded. Maximum ${config.rateLimitMaxRequests} requests per ${config.rateLimitWindowMs / 1000} seconds.`,

@@ -6,6 +6,7 @@
 
 import { sanitizeChatInput } from '../utils/sanitize.js';
 import { logWarning, logError } from '../utils/logger.js';
+import { logChatAttempt } from '../utils/chat-logger.js';
 import config from '../config/env.js';
 
 /**
@@ -35,6 +36,21 @@ export function validateChatRequest(req, res, next) {
     
     // Check for errors
     if (sanitized.errors.length > 0) {
+      // Log validation error for chat requests
+      if (req.path === '/api/chat' && req.body?.message) {
+        logChatAttempt({
+          userMessage: req.body.message,
+          ip: req.ip,
+          userAgent: req.get('user-agent'),
+          status: 'validation_error',
+          statusCode: 400,
+          errorType: 'validation_failed',
+          errorMessage: sanitized.errors.join('; ').substring(0, 500), // Limit error message length
+        }).catch(err => {
+          logWarning('Failed to log validation error', { error: err.message });
+        });
+      }
+      
       return res.status(400).json({
         error: 'Validation failed',
         details: sanitized.errors
