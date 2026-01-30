@@ -118,15 +118,16 @@ SUPPORT_*.md
 ROOT_CAUSE_*.md
 
 # Scripts - KEEP LOCAL ONLY (except specific deployment scripts)
-# Exclude all .sh scripts except those explicitly allowed
+# Exclude all .sh scripts except those explicitly allowed for deployment
 *.sh
+# Exception: Allow only these specific deployment scripts
 !Maya/deploy-to-space.sh
 !Maya/tests/deployment_tests/run-pre-deployment-tests.sh
 !Maya/tests/deployment_tests/run-post-deployment-tests.sh
 !Maya/backend/start.sh
 !Maya/backend/stop.sh
 
-# Specific script patterns to exclude
+# Explicitly exclude all other script patterns
 QUICK_DEPLOY.sh
 *_DEPLOY.sh
 deploy-*.sh
@@ -141,6 +142,10 @@ verify-aws-s3.sh
 *verify*.sh
 *setup*.sh
 *SETUP*.sh
+analyze-*.sh
+export-*.sh
+fetch-*.sh
+check-*.sh
 
 # Deployment configuration (local only)
 DEPLOYMENT_API_COMMAND.txt
