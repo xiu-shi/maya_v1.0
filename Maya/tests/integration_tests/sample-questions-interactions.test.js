@@ -39,14 +39,14 @@ describe('Sample Questions Interactions (Jan 18, 2026)', () => {
     it('should have correct data-prompt attributes', () => {
       expect(mayaHtml).toContain('How can AI help me reduce costs');
       expect(mayaHtml).toContain('biggest risks');
-      expect(mayaHtml).toContain('AI strategy that aligns');
+      expect(mayaHtml).toContain('How can AI help my business'); // Updated question text
       expect(mayaHtml).toContain('cloud migration costs');
     });
 
     it('should have maya-sample-question class', () => {
       const classMatches = mayaHtml.match(/class="[^"]*maya-sample-question[^"]*"/g);
       expect(classMatches).toBeTruthy();
-      expect(classMatches.length).toBe(4);
+      expect(classMatches.length).toBe(8); // Updated to 8 sample questions
     });
   });
 
