@@ -1,253 +1,53 @@
-# Environment variables and secrets - NEVER COMMIT!
-.env
-.env.*
-mcp_config.json
-*.secret
-*.key
-*.token
-*.credential
-*.password
-*api*key*
-*API*KEY*
-*secret*
-*SECRET*
-*credential*
-*CREDENTIAL*
-*password*
-*PASSWORD*
-*access*key*
-*ACCESS*KEY*
-*private*key*
-*PRIVATE*KEY*
-
 # Dependencies
 node_modules/
 
+# Environment variables
+.env
+.env.*
+
 # Logs
 *.log
-
-# Log analysis scripts and exports (local only)
-analyze-logs.js
-check-production-logging.js
-export-logs-periodically.sh
-fetch-production-logs.js
-production-logs-*.json
-log-exports/
-rewrite_commits.sh
-run-maya-locally.sh
-
-# AWS configuration files (local only - contain specific configurations)
-aws-bucket-policy.json
-aws-iam-policies.json
-aws-bucket-policy-minimal.json
-
-# System files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
 # Build outputs
 dist/
 build/
 coverage/
 
-# Discovery results (may contain sensitive info)
-mcp-discovery-results.json
-**/mcp-discovery-results.json
-
-# Maya knowledge base - large files
-Maya/knowledge/*.pdf
-Maya/knowledge/*.docx
-Maya/knowledge/*.xlsx
-Maya/knowledge/embeddings/*
-Maya/knowledge/processed/*
-
-# Backend data (includes chat logs with PII - NEVER commit!)
-Maya/backend/data/
-backend/data/
-**/chat-logs/
-**/chat-logs/*.json
-Maya/backend/data/chat-logs/
-Maya/backend/data/chat-logs/*.json
+# System files
+.DS_Store
+._*
 
 # Temporary files
 *.tmp
 *.temp
 
-# Cursor IDE configuration (local only)
+# IDE configuration
 .cursor/
-.cursor/**
-.cursor/rules/
+.vscode/
 *.mdc
 
-# VS Code configuration (local only)
-.vscode/
-.vscode/**
+# Data directories
+**/data/
+**/chat-logs/
 
-# Snyk Security Extension - AI Rules (auto-generated)
-API_KEY_MANAGEMENT.md
+# Large files
+*.pdf
+*.docx
+*.xlsx
 
-# Development documentation - KEEP LOCAL ONLY
-# Exclude all .md files except README.md, SECURITY.md, and knowledge base docs
-*.md
-!README.md
-!SECURITY.md
-!Maya/README.md
-!backend/README.md
-!**/README.md
-# Allow knowledge base markdown files (Maya's content)
-!Maya/knowledge/docs/**/*.md
-!Maya/knowledge/**/*.md
+# Test files
+**/*.test.js
+**/tests/**/*
 
-# Specific dangerous documentation patterns
-*_GUIDE.md
-*_REVIEW*.md
-*_ANALYSIS*.md
-*_ISSUE*.md
-*_DEPLOYMENT*.md
-*_VERIFICATION*.md
-*_AUDIT*.md
-*_FIX*.md
-*_TEST*.md
-*_REPORT*.md
-SUPPORT_*.md
-ROOT_CAUSE_*.md
-
-# Scripts - KEEP LOCAL ONLY (except specific deployment scripts)
-# Exclude all .sh scripts except those explicitly allowed for deployment
+# Scripts (except deployment)
 *.sh
-# Exception: Allow only these specific deployment scripts
 !Maya/deploy-to-space.sh
-!Maya/tests/deployment_tests/run-pre-deployment-tests.sh
-!Maya/tests/deployment_tests/run-post-deployment-tests.sh
 !Maya/backend/start.sh
 !Maya/backend/stop.sh
 
-# Explicitly exclude all other script patterns
-QUICK_DEPLOY.sh
-*_DEPLOY.sh
-deploy-*.sh
-DEPLOY_WITH_ENV_VAR.sh
-setup-aws-s3.sh
-verify-aws-s3.sh
-*setup-aws*.sh
-*verify-aws*.sh
-*test*.sh
-*TEST*.sh
-*check*.sh
-*verify*.sh
-*setup*.sh
-*SETUP*.sh
-analyze-*.sh
-export-*.sh
-fetch-*.sh
-check-*.sh
-
-# Deployment configuration (local only)
-DEPLOYMENT_API_COMMAND.txt
-SYSTEM_PROMPT_FOR_DEPLOYMENT.txt
-*_FOR_DEPLOYMENT*.txt
-*_DEPLOYMENT*.txt
-*_DEPLOYMENT*.md
-deploy-config.json
-!deploy-config.json.example
-
-# Maya System Instructions (Core IP - NEVER commit!)
-# These contain Maya's behavioral rules and prompt engineering
-Maya/backend/system_prompt.txt
-Maya/backend/system_instruction.txt
-Maya/knowledge/system_instruction.md
-**/system_prompt.txt
-**/system_instruction.txt
-
-# IP-protected code (local only)
-Maya/backend/utils/response-guardrails.js
-Maya/backend/utils/memory_cache/kb-monitor.js
-Maya/backend/utils/memory_cache/kb-cache.js
-Maya/deploy-to-space.sh
-
-# IP-protected test files (local only)
-Maya/backend/test-kb-cache.js
-Maya/backend/test-kb-cache-eval.js
-Maya/tests/knowledge_tests/kb-cache.test.js
-Maya/tests/knowledge_tests/kb-cache-eval.test.js
-Maya/tests/knowledge_tests/kb-cache-performance.test.js
-
-# Personal website repository (separate project)
-# This folder contains janetxiushi.me files (not related to Maya agent)
-my_site_3_mayaGPT_v3/
-
-# Test files - KEEP LOCAL ONLY
-# Exclude ALL test files from being committed
-**/*.test.js
-**/*.spec.js
-**/tests/**/*
-**/test/**/*
-**/__tests__/**/*
-Maya/tests/**/*
-Maya/backend/tests/**/*
-backend/tests/**/*
-tests/**/*
-# Exception: Allow deployment test scripts (needed for CI/CD)
-!Maya/tests/deployment_tests/run-pre-deployment-tests.sh
-!Maya/tests/deployment_tests/run-post-deployment-tests.sh
-!Maya/tests/deployment_tests/README.md
-# Exception: Allow test configuration files needed for CI/CD
-!Maya/tests/setup.js
-!Maya/tests/package.json
-
-# Local test and utility scripts (local only)
-**/test-*.js
-**/test-*.sh
-**/test-*.html
-**/*test*.js
-**/*test*.sh
-**/*test*.html
-**/pre-deploy*.sh
-**/update-token.sh
-**/test-report.json
-**/validate-test-counts.js
-**/run-tests-locally.sh
-**/test-connection.sh
-**/verify-api-key*.js
-**/check-*.js
-**/check-*.sh
-
-# Root-level documentation files (local only)
-S3_*.md
-LODASH_*.md
-MAYA_*.md
-CHAT_*.md
-CONVERSATION_*.md
-GITHUB_*.md
-IP_*.md
-HISTORY_*.md
-FORCE_*.md
-SAFE_*.md
-COMMIT_*.md
-BLOG_*.md
-PRODUCTION_*.md
-IMMEDIATE_*.md
-LOGGING_*.md
-*_SUMMARY.md
-*_PLAN.md
-*_VALIDATED.md
-*_DIAGRAM.md
-*_SETUP*.md
-*_IMPLEMENTATION*.md
-*_INVESTIGATION*.md
-*_SOLUTION*.md
-
-# Additional security patterns
-**/*credentials*
-**/*CREDENTIALS*
-**/*config.local*
-**/*CONFIG.LOCAL*
-**/*local.config*
-**/*LOCAL.CONFIG*
-
-# Repository configuration
+# Documentation (except README)
+*.md
+!README.md
+!SECURITY.md
+!**/README.md
+!Maya/knowledge/**/*.md
