@@ -36,6 +36,7 @@ import {
   getChatLogs,
   getChatLogsByConversation,
   getStorageStats,
+  getS3UploadMetrics,
 } from "./utils/chat-logger.js";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -589,6 +590,139 @@ app.get(
         message: error.message,
       });
     }
+  }),
+);
+
+// Logging health endpoint - comprehensive health check
+app.get(
+  "/api/admin/logging-health",
+  asyncHandler(async (req, res) => {
+    const { promises: fs } = await import("fs");
+    const pathModule = await import("path");
+    const { fileURLToPath } = await import("url");
+    const { dirname, join } = pathModule;
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const LOGS_DIR = join(__dirname, "data", "chat-logs");
+
+    const health = {
+      localLogging: {
+        enabled: true,
+        logsDir: LOGS_DIR,
+        directoryExists: false,
+        directoryWritable: false,
+        filesCount: 0,
+        latestLog: null,
+        todayLogCount: 0,
+      },
+      s3Logging: {
+        enabled: process.env.ENABLE_S3_LOGGING === 'true',
+        configured: !!(process.env.AWS_S3_BUCKET && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
+        bucket: process.env.AWS_S3_BUCKET || null,
+        region: process.env.AWS_REGION || 'eu-west-1',
+        connectionTest: false,
+        lastUpload: null,
+        uploadFailures: 0,
+        uploadSuccesses: 0,
+        successRate: '0%',
+        consecutiveFailures: 0,
+      },
+      recentLogs: {
+        last24Hours: 0,
+        last7Days: 0,
+        last30Days: 0,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      // Check local logging
+      try {
+        await fs.access(LOGS_DIR);
+        health.localLogging.directoryExists = true;
+
+        // Check if writable
+        const testFile = join(LOGS_DIR, ".test-write-" + Date.now());
+        await fs.writeFile(testFile, "test");
+        await fs.unlink(testFile);
+        health.localLogging.directoryWritable = true;
+
+        // Get log files
+        try {
+          const files = await fs.readdir(LOGS_DIR);
+          const logFiles = files.filter(f => f.endsWith('.json'));
+          health.localLogging.filesCount = logFiles.length;
+
+          if (logFiles.length > 0) {
+            // Get latest log file
+            logFiles.sort().reverse();
+            health.localLogging.latestLog = logFiles[0];
+
+            // Get today's log count
+            const today = new Date();
+            const dateStr = today.toISOString().split("T")[0];
+            const todayFile = join(LOGS_DIR, `${dateStr}.json`);
+            try {
+              const logs = JSON.parse(await fs.readFile(todayFile, "utf-8"));
+              health.localLogging.todayLogCount = Array.isArray(logs) ? logs.length : 0;
+            } catch (e) {
+              // File doesn't exist yet
+            }
+          }
+        } catch (e) {
+          // Directory read failed
+        }
+      } catch (error) {
+        health.localLogging.directoryExists = false;
+      }
+
+      // Check S3 logging
+      if (health.s3Logging.enabled && health.s3Logging.configured) {
+        try {
+          const { getS3LoggingStatus, testS3Connection } = await import('./utils/s3-logger.js');
+          const s3Status = getS3LoggingStatus();
+          health.s3Logging.connectionTest = await testS3Connection();
+          health.s3Logging.bucket = s3Status.bucket;
+          health.s3Logging.region = s3Status.region;
+        } catch (error) {
+          health.s3Logging.connectionTest = false;
+        }
+
+        // Get S3 upload metrics
+        const metrics = getS3UploadMetrics();
+        health.s3Logging.lastUpload = metrics.lastUploadTime;
+        health.s3Logging.uploadFailures = metrics.totalFailures;
+        health.s3Logging.uploadSuccesses = metrics.totalSuccesses;
+        health.s3Logging.successRate = metrics.successRate;
+        health.s3Logging.consecutiveFailures = metrics.consecutiveFailures;
+      }
+
+      // Get recent log counts
+      try {
+        const now = new Date();
+        const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const logs24h = await getChatLogs(last24Hours, now);
+        const logs7d = await getChatLogs(last7Days, now);
+        const logs30d = await getChatLogs(last30Days, now);
+
+        health.recentLogs.last24Hours = logs24h.length;
+        health.recentLogs.last7Days = logs7d.length;
+        health.recentLogs.last30Days = logs30d.length;
+      } catch (error) {
+        // Failed to get recent logs
+      }
+    } catch (error) {
+      // Overall error
+    }
+
+    res.json({
+      success: true,
+      health: health,
+    });
   }),
 );
 
