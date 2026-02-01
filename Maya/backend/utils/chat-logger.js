@@ -47,10 +47,18 @@ async function ensureLogsDirectory() {
 
 /**
  * Get log file path for a given date
- * Format: YYYY-MM-DD.json
+ * Format: YYYY-MM-DD.json (UTC/GMT normalized)
+ * 
+ * Ensures dates are normalized to UTC/GMT regardless of server timezone
  */
 function getLogFilePath(date = new Date()) {
-  const dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+  // Normalize to UTC/GMT - use UTC methods to ensure consistent date regardless of server timezone
+  const utcDate = new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  ));
+  const dateStr = utcDate.toISOString().split("T")[0]; // YYYY-MM-DD in UTC
   return path.join(LOGS_DIR, `${dateStr}.json`);
 }
 
@@ -95,7 +103,9 @@ export async function logChatAttempt({
   try {
     await ensureLogsDirectory();
 
+    // Normalize to UTC/GMT - ensure consistent timezone regardless of server settings
     const now = new Date();
+    // Timestamp is already in ISO format (UTC) when stored, but ensure date path uses UTC
     const logFilePath = getLogFilePath(now);
 
     // Generate conversation ID if not provided
@@ -231,13 +241,24 @@ export async function getChatLogs(startDate, endDate) {
     await ensureLogsDirectory();
 
     const logs = [];
-    const currentDate = new Date(startDate);
+    
+    // Normalize dates to UTC for consistent processing
+    const startUTC = new Date(Date.UTC(
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth(),
+      startDate.getUTCDate()
+    ));
+    const endUTC = new Date(Date.UTC(
+      endDate.getUTCFullYear(),
+      endDate.getUTCMonth(),
+      endDate.getUTCDate()
+    ));
     
     // Try to fetch from S3 first (if enabled)
     if (process.env.ENABLE_S3_LOGGING === 'true' && process.env.AWS_S3_BUCKET) {
       try {
         const { fetchLogsFromS3 } = await import('./s3-logger.js');
-        const s3Logs = await fetchLogsFromS3(startDate, endDate);
+        const s3Logs = await fetchLogsFromS3(startUTC, endUTC);
         logs.push(...s3Logs);
       } catch (error) {
         // S3 fetch failed - continue with file-based logs
@@ -248,7 +269,9 @@ export async function getChatLogs(startDate, endDate) {
     }
 
     // Also fetch from local files (merge with S3 logs)
-    while (currentDate <= endDate) {
+    const currentDate = new Date(startUTC);
+
+    while (currentDate <= endUTC) {
       const logFilePath = getLogFilePath(currentDate);
 
       try {
@@ -265,8 +288,8 @@ export async function getChatLogs(startDate, endDate) {
         }
       }
 
-      // Move to next day
-      currentDate.setDate(currentDate.getDate() + 1);
+      // Move to next day (UTC)
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
     // Remove duplicates (same log might be in both S3 and local)

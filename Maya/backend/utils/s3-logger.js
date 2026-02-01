@@ -49,12 +49,15 @@ if (ENABLE_S3_LOGGING && AWS_S3_BUCKET) {
 
 /**
  * Get S3 key for a log file (date-based path)
- * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DD.json
+ * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DD.json (UTC/GMT normalized)
+ * 
+ * Ensures dates are normalized to UTC/GMT regardless of server timezone
  */
 function getS3Key(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  // Normalize to UTC/GMT - use UTC methods to ensure consistent date regardless of server timezone
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   const dateStr = `${year}-${month}-${day}`;
 
   return `chat-logs/${year}/${month}/${day}/${dateStr}.json`;
@@ -136,10 +139,21 @@ export async function fetchLogsFromS3(startDate, endDate) {
 
   try {
     const logs = [];
-    const currentDate = new Date(startDate);
+    // Normalize dates to UTC for consistent iteration
+    const startUTC = new Date(Date.UTC(
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth(),
+      startDate.getUTCDate()
+    ));
+    const endUTC = new Date(Date.UTC(
+      endDate.getUTCFullYear(),
+      endDate.getUTCMonth(),
+      endDate.getUTCDate()
+    ));
+    const currentDate = new Date(startUTC);
 
-    // Iterate through date range
-    while (currentDate <= endDate) {
+    // Iterate through date range (UTC)
+    while (currentDate <= endUTC) {
       const s3Key = getS3Key(currentDate);
 
       try {
@@ -165,8 +179,8 @@ export async function fetchLogsFromS3(startDate, endDate) {
         }
       }
 
-      // Move to next day
-      currentDate.setDate(currentDate.getDate() + 1);
+      // Move to next day (UTC)
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
     // Sort by timestamp (newest first)

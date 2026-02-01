@@ -494,12 +494,16 @@ app.get(
     // TODO: Add authentication/authorization check here
     // For now, this endpoint is accessible - consider adding API key or IP whitelist
 
+    // Normalize dates to UTC/GMT - ensure consistent timezone handling
     const startDate = req.query.startDate
-      ? new Date(req.query.startDate)
+      ? new Date(req.query.startDate) // Parse as UTC if ISO format
       : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Default: last 7 days
     const endDate = req.query.endDate
-      ? new Date(req.query.endDate)
-      : new Date();
+      ? new Date(req.query.endDate) // Parse as UTC if ISO format
+      : new Date(); // Current time (will be normalized to UTC in logging functions)
+    
+    // Ensure dates are normalized to UTC for consistent processing
+    // Dates are already in UTC when parsed from ISO strings or created with Date.now()
     const groupBy = req.query.groupBy || "none"; // 'none', 'conversation', 'day', 'month', 'year'
     const includeRemote = req.query.includeRemote === "true"; // Option to include remote logs
     const remoteServer =
