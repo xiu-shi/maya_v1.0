@@ -47,6 +47,8 @@ coverage/
 # Test files
 **/*.test.js
 **/tests/**/*
+# Exception: Security tests required for CI/CD
+!Maya/tests/security_tests/*.test.js
 
 # Scripts (except deployment)
 *.sh

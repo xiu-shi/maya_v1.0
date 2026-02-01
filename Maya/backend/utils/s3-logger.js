@@ -116,12 +116,13 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
     return true;
   } catch (error) {
     // Log error but don't throw - S3 failure shouldn't break chat
+    const errorDate = new Date(logEntry.timestamp || new Date());
     logError("Failed to upload log to S3", error, {
       bucket: AWS_S3_BUCKET,
       errorCode: error.code,
       errorMessage: error.message,
       errorName: error.name,
-      s3Key: getS3Key(date),
+      s3Key: getS3Key(errorDate),
       logEntryId: logEntry.id,
       timestamp: logEntry.timestamp,
       isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
