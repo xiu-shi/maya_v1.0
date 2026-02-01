@@ -158,13 +158,50 @@ export function getS3UploadMetrics() {
 
 /**
  * Ensure logs directory exists
+ * More robust implementation with better error handling
  */
 async function ensureLogsDirectory() {
   try {
-    await fs.mkdir(LOGS_DIR, { recursive: true });
+    // Check if directory already exists
+    try {
+      await fs.access(LOGS_DIR);
+      // Directory exists, verify it's writable
+      const testFile = path.join(LOGS_DIR, `.test-write-${Date.now()}`);
+      await fs.writeFile(testFile, "test");
+      await fs.unlink(testFile);
+      return; // Directory exists and is writable
+    } catch (accessError) {
+      // Directory doesn't exist or not accessible, create it
+      if (accessError.code === 'ENOENT') {
+        // Create directory recursively (creates parent directories if needed)
+        await fs.mkdir(LOGS_DIR, { recursive: true });
+        
+        // Verify directory was created successfully
+        await fs.access(LOGS_DIR);
+        
+        // Test write permissions
+        const testFile = path.join(LOGS_DIR, `.test-write-${Date.now()}`);
+        await fs.writeFile(testFile, "test");
+        await fs.unlink(testFile);
+        
+        logInfo("Logs directory created successfully", { path: LOGS_DIR });
+        return;
+      } else {
+        // Other access error (permissions, etc.)
+        throw accessError;
+      }
+    }
   } catch (error) {
-    logError("Failed to create logs directory", error);
-    throw error;
+    // Enhanced error logging
+    logError("Failed to ensure logs directory exists", error, {
+      logsDir: LOGS_DIR,
+      errorCode: error.code,
+      errorMessage: error.message,
+      cwd: process.cwd(),
+    });
+    // Don't throw - logging failure shouldn't break chat functionality
+    // But log the error so we can monitor it
+    return;
   }
 }
 
