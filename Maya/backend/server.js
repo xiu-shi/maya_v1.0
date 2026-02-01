@@ -167,12 +167,23 @@ app.get("/health", async (req, res) => {
   const client = apiClient; // Use the existing instance if available
 
   // Get KB status if API client is available (now async with timeout protection)
+  // Add timeout to prevent health check from hanging
   let kbStatus = null;
   if (client && typeof client.getKBStatus === "function") {
     try {
-      kbStatus = await client.getKBStatus(); // Now async
+      // Add timeout wrapper to prevent health check from hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("KB status timeout")), 2000)
+      );
+      kbStatus = await Promise.race([
+        client.getKBStatus(),
+        timeoutPromise
+      ]);
     } catch (error) {
-      // Ignore KB status errors in health check
+      // Ignore KB status errors in health check - don't fail health check if KB status unavailable
+      logInfo("KB status unavailable in health check (non-critical)", {
+        error: error.message
+      });
     }
   }
 
