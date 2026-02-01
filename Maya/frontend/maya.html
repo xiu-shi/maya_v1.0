@@ -887,6 +887,15 @@
         input.style.boxShadow = '';
       }, 500);
       
+      // Track sample question click (direct onclick handler)
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'sample_question_clicked', {
+          'event_category': 'engagement',
+          'event_label': 'sample_question_direct',
+          'question': prompt.substring(0, 50)
+        });
+      }
+      
       // Auto-submit after short delay
       setTimeout(() => {
         sendMessage();
@@ -1181,6 +1190,15 @@
           }, 500);
           
           console.log('✅ Prompt populated in chat input:', prompt);
+          
+          // Track sample question click
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'sample_question_clicked', {
+              'event_category': 'engagement',
+              'event_label': 'sample_question',
+              'question': prompt.substring(0, 50)
+            });
+          }
           
           // Auto-submit for guided experience (first-time users)
           // Small delay to ensure UI updates are complete
