@@ -17,21 +17,144 @@ const __dirname = path.dirname(__filename);
 // Storage directory: Maya/backend/data/chat-logs/
 const LOGS_DIR = path.join(__dirname, "..", "data", "chat-logs");
 
-// S3 upload function (lazy-loaded, optional)
-let uploadToS3Async = async (logEntry, existingLogs) => {
-  // Default: no-op if S3 not configured
-  if (process.env.ENABLE_S3_LOGGING !== 'true' || !process.env.AWS_S3_BUCKET) {
-    return;
+// S3 upload metrics tracking
+let s3UploadMetrics = {
+  totalAttempts: 0,
+  totalSuccesses: 0,
+  totalFailures: 0,
+  lastUploadTime: null,
+  lastUploadError: null,
+  consecutiveFailures: 0,
+};
+
+/**
+ * Check if an error is retryable
+ */
+function isRetryableError(error) {
+  if (!error || !error.code) return true; // Default to retryable if unknown
+  
+  // Non-retryable errors
+  const nonRetryableErrors = [
+    'AccessDenied',
+    'InvalidAccessKeyId',
+    'SignatureDoesNotMatch',
+    'InvalidBucketName',
+    'NoSuchBucket',
+  ];
+  
+  if (nonRetryableErrors.includes(error.code)) {
+    return false;
   }
   
-  try {
-    const { uploadLogToS3 } = await import('./s3-logger.js');
-    await uploadLogToS3(logEntry, existingLogs);
-  } catch (error) {
-    // S3 module not available or failed - silently fail
-    // Error already logged in uploadLogToS3
+  // Retryable errors (network, timeout, throttling, etc.)
+  return true;
+}
+
+/**
+ * S3 upload function with retry logic (lazy-loaded, optional)
+ * Implements exponential backoff retry strategy
+ */
+let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
+  // Default: no-op if S3 not configured
+  if (process.env.ENABLE_S3_LOGGING !== 'true' || !process.env.AWS_S3_BUCKET) {
+    return false;
   }
+  
+  s3UploadMetrics.totalAttempts++;
+  
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const { uploadLogToS3 } = await import('./s3-logger.js');
+      const success = await uploadLogToS3(logEntry, existingLogs);
+      
+      if (success) {
+        s3UploadMetrics.totalSuccesses++;
+        s3UploadMetrics.lastUploadTime = new Date().toISOString();
+        s3UploadMetrics.lastUploadError = null;
+        s3UploadMetrics.consecutiveFailures = 0;
+        return true;
+      } else {
+        // uploadLogToS3 returned false (error logged internally)
+        s3UploadMetrics.totalFailures++;
+        s3UploadMetrics.consecutiveFailures++;
+        
+        if (attempt < retries - 1) {
+          // Wait before retry (exponential backoff: 1s, 2s, 4s)
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    } catch (error) {
+      s3UploadMetrics.totalFailures++;
+      s3UploadMetrics.lastUploadError = {
+        code: error.code || 'UnknownError',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      };
+      s3UploadMetrics.consecutiveFailures++;
+      
+      // Check if error is retryable
+      if (!isRetryableError(error)) {
+        logError('S3 upload failed (non-retryable error)', error, {
+          bucket: process.env.AWS_S3_BUCKET,
+          errorCode: error.code,
+          errorMessage: error.message,
+          errorName: error.name,
+          logEntryId: logEntry.id,
+          timestamp: logEntry.timestamp,
+          isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
+          isPermissionError: error.code === 'AccessDenied',
+          retryable: false,
+        });
+        return false;
+      }
+      
+      // Log error (will retry)
+      if (attempt < retries - 1) {
+        logWarning('S3 upload failed, retrying', {
+          bucket: process.env.AWS_S3_BUCKET,
+          errorCode: error.code,
+          errorMessage: error.message,
+          attempt: attempt + 1,
+          maxRetries: retries,
+          nextRetryIn: `${Math.pow(2, attempt) * 1000}ms`,
+        });
+        
+        // Wait before retry (exponential backoff: 1s, 2s, 4s)
+        const delay = Math.pow(2, attempt) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        // Final attempt failed
+        logError('S3 upload failed after retries', error, {
+          bucket: process.env.AWS_S3_BUCKET,
+          errorCode: error.code,
+          errorMessage: error.message,
+          errorName: error.name,
+          logEntryId: logEntry.id,
+          timestamp: logEntry.timestamp,
+          retries: retries,
+          isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
+          isPermissionError: error.code === 'AccessDenied',
+          retryable: isRetryableError(error),
+        });
+      }
+    }
+  }
+  
+  return false;
 };
+
+/**
+ * Get S3 upload metrics
+ */
+export function getS3UploadMetrics() {
+  return {
+    ...s3UploadMetrics,
+    successRate: s3UploadMetrics.totalAttempts > 0
+      ? (s3UploadMetrics.totalSuccesses / s3UploadMetrics.totalAttempts * 100).toFixed(2) + '%'
+      : '0%',
+  };
+}
 
 /**
  * Ensure logs directory exists
@@ -154,10 +277,13 @@ export async function logChatAttempt({
     // Write back to file
     await fs.writeFile(logFilePath, JSON.stringify(logs, null, 2), "utf-8");
 
-    // Upload to S3 (async, non-blocking, optional)
+    // Upload to S3 (async, non-blocking, optional, with retry logic)
     uploadToS3Async(logEntry, logs).catch(err => {
+      // Error already logged in uploadToS3Async with retry logic
+      // This catch is just a safety net
       logWarning('S3 upload failed (continuing with file logging)', {
-        error: err.message
+        error: err.message,
+        logEntryId: logEntry.id,
       });
     });
 

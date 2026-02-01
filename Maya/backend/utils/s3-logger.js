@@ -120,6 +120,14 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
       bucket: AWS_S3_BUCKET,
       errorCode: error.code,
       errorMessage: error.message,
+      errorName: error.name,
+      s3Key: getS3Key(date),
+      logEntryId: logEntry.id,
+      timestamp: logEntry.timestamp,
+      isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
+      isPermissionError: error.code === 'AccessDenied',
+      isNetworkError: error.code === 'NetworkingError' || error.code === 'TimeoutError',
+      retryable: error.code !== 'AccessDenied' && error.code !== 'InvalidAccessKeyId' && error.code !== 'NoSuchBucket',
     });
     return false;
   }
