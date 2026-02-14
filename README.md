@@ -14,7 +14,10 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 - **Connectd**: Current role as business technologist and strategic advisor
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
 - **Huawei**: Contributed to strategic telecommunications and broadband deployments with EU compliance focus
-- **Education**: Teaching Enterprise Cloud and Generative AI, bringing real-world enterprise experience into the classroom
+- **Education**: Industry Expert Lecturer at IADT (Dún Laoghaire Institute of Art, Design + Technology), teaching:
+  - **Enterprise Cloud** - Strategic cloud adoption and architecture
+  - **Generative AI** - AI transformation and responsible AI adoption
+  - **Web Application Development in the AI Era** - Modern web development with AI-first thinking for Year 1 non-CS students
 
 **Credentials & Recognition:**
 - **Generative AI Leader** (Google, Jan 2026) - Knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
@@ -27,8 +30,9 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 
 **How Janet Helps:**
 - **For Founders & Leaders**: Aligning AI and cloud strategy with business goals, turning technical complexity into competitive advantage
-- **For Educators & Institutions**: Designing future-ready AI learning, integrating AI into curriculum with pedagogical rigor
+- **For Educators & Institutions**: Designing future-ready AI learning, integrating AI into curriculum with pedagogical rigor, creating AI-first web development courses
 - **For Organizations**: AI security consulting, governance frameworks, and digital transformation strategy
+- **For Students**: Teaching practical, industry-relevant skills in Enterprise Cloud, Generative AI, and Web Application Development with real-world case studies
 
 ---
 
@@ -85,7 +89,9 @@ Maya is a ChatGPT-like AI agent that represents me when I'm unavailable. Think o
 - "What's Janet's experience with AI governance?" *(Lakera contributor, AI security certified)*
 - "How can Janet help with our cloud strategy?" *(AWS & Google Cloud certified, enterprise experience)*
 - "What's her teaching approach for enterprise AI?" *(Harvard-certified educator, practitioner background)*
+- "What courses does Janet teach?" *(Enterprise Cloud, Generative AI, Web Application Development in the AI Era)*
 - "Can she speak at our event about digital transformation?" *(GDG Chapter Lead, conference experience)*
+- "Tell me about the web development course curriculum" *(12-week AI-first web development course for non-CS students)*
 
 ### Why This Matters
 
@@ -128,6 +134,15 @@ Natural Response ──→ Accurate, conversational answer
 - Professional tone matching my communication style
 - Privacy-focused (no personal data collection)
 - Security-first design with comprehensive protection measures
+- Comprehensive Knowledge Base covering expertise, teaching, and professional background
+
+**Knowledge Base Scope:**
+Maya's knowledge base includes:
+- **Expertise Areas**: AI Security, Digital Transformation, Web Application Development (AI Era)
+- **Teaching**: Enterprise Cloud, Generative AI, Web Application Development curricula
+- **Professional Experience**: Workday, Huawei, Connectd, IADT
+- **Certifications & Education**: Harvard, AWS, Google Cloud, Lakera, Samsara Framework
+- **Honors & Awards**: Workday VIBE Award, Lakera GenAI Report Contributor
 
 ---
 
@@ -147,8 +162,8 @@ maya_v1.0/
 │   └── knowledge/           # My professional information
 │       └── docs/
 │           ├── bio/         # Background
-│           ├── experience/  # Workday, Huawei, Connectd
-│           ├── expertise/   # AI security, cloud strategy
+│           ├── experience/  # Workday, Huawei, Connectd, IADT
+│           ├── expertise/   # AI security, digital transformation, web development (AI era)
 │           ├── cert_educ/   # Harvard, AWS, Google, Lakera
 │           └── honors_awards/ # VIBE Award, Lakera recognition
 │
@@ -199,13 +214,17 @@ This isn't just a prototype - it's production-ready:
 "What's Janet's experience with AI governance?" → Get detailed answer about Lakera contributions, AI security certification, and enterprise governance work
 
 **For Educators:**  
-"How does Janet teach Enterprise Cloud?" → Learn about Harvard-certified educator approach and real-world case study methodology
+"How does Janet teach Enterprise Cloud?" → Learn about Harvard-certified educator approach and real-world case study methodology  
+"What's the Web Application Development course curriculum?" → Get details about the 12-week AI-first web development course, dual audience approach, and semantic HTML focus
 
 **For Partners:**  
 "Can Janet speak at our AI security conference?" → Understand speaking topics based on GDG leadership and Lakera recognition
 
 **For Students:**  
 "What certifications should I pursue for AI/cloud careers?" → Get insights from Janet's AWS, Google Cloud, and Harvard educator credentials
+
+**For Educators & Curriculum Designers:**  
+"What courses does Janet teach?" → Learn about Enterprise Cloud, Generative AI, and Web Application Development in the AI Era courses at IADT
 
 ---
 
