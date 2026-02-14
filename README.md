@@ -91,7 +91,7 @@ Maya is a ChatGPT-like AI agent that represents me when I'm unavailable. Think o
 - "What's her teaching approach for enterprise AI?" *(Harvard-certified educator, practitioner background)*
 - "What courses does Janet teach?" *(Enterprise Cloud, Generative AI, Web Application Development in the AI Era)*
 - "Can she speak at our event about digital transformation?" *(GDG Chapter Lead, conference experience)*
-- "Tell me about the web development course curriculum" *(12-week AI-first web development course for non-CS students)*
+- "Tell me about the web development course curriculum" *(AI and agentic ready modern web application development course for non-CS students)*
 
 ### Why This Matters
 
@@ -215,7 +215,7 @@ This isn't just a prototype - it's production-ready:
 
 **For Educators:**  
 "How does Janet teach Enterprise Cloud?" → Learn about Harvard-certified educator approach and real-world case study methodology  
-"What's the Web Application Development course curriculum?" → Get details about the 12-week AI-first web development course, dual audience approach, and semantic HTML focus
+"What's the Web Application Development course curriculum?" → Get details about the AI and agentic ready modern web application development course, dual audience approach, and semantic HTML focus
 
 **For Partners:**  
 "Can Janet speak at our AI security conference?" → Understand speaking topics based on GDG leadership and Lakera recognition
