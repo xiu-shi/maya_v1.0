@@ -110,6 +110,41 @@ function extractKBInfo(content) {
     }
   }
   
+  // Enhanced extraction: If no key points found, try to extract from bullet lists in first few sections
+  if (info.keyPoints.length === 0) {
+    // Look for bullet points in the first 3000 characters (usually contains key info)
+    const earlyContent = content.substring(0, 3000);
+    const bulletLines = earlyContent
+      .split('\n')
+      .filter(line => {
+        const trimmed = line.trim();
+        return (trimmed.startsWith('-') || trimmed.startsWith('*')) && trimmed.length > 10;
+      })
+      .slice(0, 10); // Limit to first 10 bullets
+    
+    if (bulletLines.length > 0) {
+      info.keyPoints = bulletLines
+        .map(line => line.replace(/^[-*]\s*/, '').trim())
+        .filter(point => point.length > 0 && point.length < 200); // Filter out too short or too long
+    }
+  }
+  
+  // Enhanced: Extract more content if summary is too short
+  if (info.summary && info.summary.length < 100) {
+    // Try to get more content from Executive Summary section
+    const execIndex = contentLower.indexOf('## executive summary');
+    if (execIndex !== -1) {
+      const afterExec = content.substring(execIndex + 22);
+      const nextSectionIndex = afterExec.search(/\n## |\n---/);
+      const execContent = nextSectionIndex !== -1 
+        ? afterExec.substring(0, Math.min(nextSectionIndex, 800))
+        : afterExec.substring(0, 800);
+      if (execContent.trim().length > info.summary.length) {
+        info.summary = execContent.trim();
+      }
+    }
+  }
+  
   return info;
 }
 
