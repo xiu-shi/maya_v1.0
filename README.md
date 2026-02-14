@@ -17,7 +17,7 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 - **Education**: Industry Expert Lecturer at IADT (Dún Laoghaire Institute of Art, Design + Technology), preparing future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset through:
   - **Enterprise Cloud** - Strategic cloud adoption and architecture for AI-powered organizations
   - **Generative AI** - AI transformation, responsible AI adoption, and understanding the agentic era
-  - **Web Application Development in the AI Era** - AI-first web development with dual-audience thinking (humans and AI agents) for Year 1 non-CS students
+  - **Web Application Development in the AI Era** - AI-first web development with dual-audience thinking (humans and AI agents) for non-CS background students in business major
 
 **Credentials & Recognition:**
 - **Generative AI Leader** (Google, Jan 2026) - Knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
@@ -91,7 +91,7 @@ Maya is a ChatGPT-like AI agent that represents me when I'm unavailable. Think o
 - "What's her teaching approach for enterprise AI?" *(Harvard-certified educator, practitioner background)*
 - "What courses does Janet teach?" *(Enterprise Cloud, Generative AI, Web Application Development in the AI Era)*
 - "Can she speak at our event about digital transformation?" *(GDG Chapter Lead, conference experience)*
-- "Tell me about the web development course curriculum" *(AI and agentic ready modern web application development course for non-CS students)*
+- "Tell me about the web development course curriculum" *(AI and agentic ready modern web application development course for non-CS background students in business major)*
 
 ### Why This Matters
 
