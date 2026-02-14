@@ -14,10 +14,10 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 - **Connectd**: Current role as business technologist and strategic advisor
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
 - **Huawei**: Contributed to strategic telecommunications and broadband deployments with EU compliance focus
-- **Education**: Industry Expert Lecturer at IADT (Dún Laoghaire Institute of Art, Design + Technology), teaching:
-  - **Enterprise Cloud** - Strategic cloud adoption and architecture
-  - **Generative AI** - AI transformation and responsible AI adoption
-  - **Web Application Development in the AI Era** - Modern web development with AI-first thinking for Year 1 non-CS students
+- **Education**: Industry Expert Lecturer at IADT (Dún Laoghaire Institute of Art, Design + Technology), preparing future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset through:
+  - **Enterprise Cloud** - Strategic cloud adoption and architecture for AI-powered organizations
+  - **Generative AI** - AI transformation, responsible AI adoption, and understanding the agentic era
+  - **Web Application Development in the AI Era** - AI-first web development with dual-audience thinking (humans and AI agents) for Year 1 non-CS students
 
 **Credentials & Recognition:**
 - **Generative AI Leader** (Google, Jan 2026) - Knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
@@ -30,9 +30,9 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 
 **How Janet Helps:**
 - **For Founders & Leaders**: Aligning AI and cloud strategy with business goals, turning technical complexity into competitive advantage
-- **For Educators & Institutions**: Designing future-ready AI learning, integrating AI into curriculum with pedagogical rigor, creating AI-first web development courses
+- **For Educators & Institutions**: Designing future-ready AI learning that prepares digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
 - **For Organizations**: AI security consulting, governance frameworks, and digital transformation strategy
-- **For Students**: Teaching practical, industry-relevant skills in Enterprise Cloud, Generative AI, and Web Application Development with real-world case studies
+- **For Students**: Building AI-native capabilities through Enterprise Cloud, Generative AI, and Web Application Development—equipping future digital leaders to thrive in the agentic era with practical, industry-relevant skills and real-world case studies
 
 ---
 
@@ -139,7 +139,7 @@ Natural Response ──→ Accurate, conversational answer
 **Knowledge Base Scope:**
 Maya's knowledge base includes:
 - **Expertise Areas**: AI Security, Digital Transformation, Web Application Development (AI Era)
-- **Teaching**: Enterprise Cloud, Generative AI, Web Application Development curricula
+- **Teaching Philosophy**: Preparing future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset through Enterprise Cloud, Generative AI, and Web Application Development curricula
 - **Professional Experience**: Workday, Huawei, Connectd, IADT
 - **Certifications & Education**: Harvard, AWS, Google Cloud, Lakera, Samsara Framework
 - **Honors & Awards**: Workday VIBE Award, Lakera GenAI Report Contributor
@@ -224,7 +224,7 @@ This isn't just a prototype - it's production-ready:
 "What certifications should I pursue for AI/cloud careers?" → Get insights from Janet's AWS, Google Cloud, and Harvard educator credentials
 
 **For Educators & Curriculum Designers:**  
-"What courses does Janet teach?" → Learn about Enterprise Cloud, Generative AI, and Web Application Development in the AI Era courses at IADT
+"What courses does Janet teach?" → Discover how Enterprise Cloud, Generative AI, and Web Application Development in the AI Era courses prepare future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
 
 ---
 
