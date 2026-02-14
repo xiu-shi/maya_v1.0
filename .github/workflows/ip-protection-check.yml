@@ -1,3 +1,16 @@
+# GitHub Actions Workflow: IP Protection Check
+# 
+# Last Updated: February 14, 2026 23:31:01 GMT
+# Changes Made:
+#   - Fixed path resolution: Changed from `tests/security_tests/` to `../tests/security_tests/`
+#     to correctly resolve paths when running from `Maya/backend` working directory
+#   - Added diagnostic logging: Enhanced error messages with current directory, repository root,
+#     expected paths, and file listings for better CI debugging
+#   - Improved error reporting: Added explicit path verification step before running tests
+# 
+# Purpose: Automatically check IP protection compliance on push, PR, and daily schedule
+# Tests: IP protection rules, file tracking, commit messages, .gitignore compliance
+
 name: IP Protection Check
 
 on:
@@ -36,21 +49,32 @@ jobs:
         working-directory: Maya/backend
         run: |
           echo "Verifying test files exist..."
+          echo "Current directory: $(pwd)"
+          echo "Repository root: $(cd ../.. && pwd)"
+          echo "Checking for test files..."
+          
+          # Check from backend directory
           if [ ! -f "../tests/security_tests/ip-protection.test.js" ]; then
             echo "::error::Test file not found: ip-protection.test.js"
-            echo "Current directory: $(pwd)"
-            echo "Files in tests/security_tests/:"
+            echo "Expected path: $(pwd)/../tests/security_tests/ip-protection.test.js"
+            echo "Files in ../tests/:"
+            ls -la ../tests/ || echo "Directory does not exist"
+            echo "Files in ../tests/security_tests/:"
             ls -la ../tests/security_tests/ || echo "Directory does not exist"
             exit 1
           fi
+          
           if [ ! -f "../tests/security_tests/ip-protection-cicd.test.js" ]; then
             echo "::error::Test file not found: ip-protection-cicd.test.js"
-            echo "Current directory: $(pwd)"
-            echo "Files in tests/security_tests/:"
+            echo "Expected path: $(pwd)/../tests/security_tests/ip-protection-cicd.test.js"
+            echo "Files in ../tests/security_tests/:"
             ls -la ../tests/security_tests/ || echo "Directory does not exist"
             exit 1
           fi
+          
           echo "✅ All test files found"
+          echo "Test file 1: $(ls -la ../tests/security_tests/ip-protection.test.js)"
+          echo "Test file 2: $(ls -la ../tests/security_tests/ip-protection-cicd.test.js)"
       
       - name: Run IP Protection Tests
         working-directory: Maya/backend
@@ -59,7 +83,11 @@ jobs:
           echo "Working directory: $(pwd)"
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
-          npm test -- tests/security_tests/ip-protection.test.js tests/security_tests/ip-protection-cicd.test.js
+          echo "Checking test file paths..."
+          ls -la ../tests/security_tests/ || echo "Directory listing failed"
+          echo "Running tests with explicit paths..."
+          # Use relative paths from backend directory
+          npm test -- ../tests/security_tests/ip-protection.test.js ../tests/security_tests/ip-protection-cicd.test.js
         continue-on-error: false
       
       - name: Report Results
