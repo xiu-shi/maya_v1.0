@@ -52,9 +52,21 @@ function extractKBInfo(content) {
   const info = { summary: '', keyPoints: [], details: '' };
   
   // Extract Summary section (safer string-based approach)
-  const summaryIndex = content.toLowerCase().indexOf('## summary');
+  // Check for both "## Summary" and "## Executive Summary"
+  const contentLower = content.toLowerCase();
+  let summaryIndex = contentLower.indexOf('## summary');
+  let summaryOffset = 10; // Length of "## Summary"
+  
+  // If not found, try "## Executive Summary"
+  if (summaryIndex === -1) {
+    summaryIndex = contentLower.indexOf('## executive summary');
+    if (summaryIndex !== -1) {
+      summaryOffset = 22; // Length of "## Executive Summary"
+    }
+  }
+  
   if (summaryIndex !== -1) {
-    const afterSummary = content.substring(summaryIndex + 10);
+    const afterSummary = content.substring(summaryIndex + summaryOffset);
     const nextSectionIndex = afterSummary.search(/\n## |\n$/);
     const summaryContent = nextSectionIndex !== -1 
       ? afterSummary.substring(0, nextSectionIndex)
