@@ -102,51 +102,37 @@ async function processQueue(s3Key, uploadFunction) {
 
     if (logsToUpload.length > 0) {
       try {
-        // Upload all accumulated logs at once (more efficient)
-        // Use the latest log entry's timestamp for the S3 key
         const latestLog = logsToUpload[logsToUpload.length - 1];
-        
-        // Fetch existing logs from S3 first (if any)
-        // This ensures we merge with logs that were uploaded by other concurrent requests
+
+        // Unique-key format: one object per message; no fetch/merge (avoids overwrite on fetch failure)
+        const { isLegacyDayKey } = await import('./s3-logger.js');
         let existingLogs = [];
-        try {
-          const { fetchLogsFromS3 } = await import('./s3-logger.js');
-          const date = new Date(latestLog.timestamp || new Date());
-          const startDate = new Date(Date.UTC(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate()
-          ));
-          const endDate = new Date(Date.UTC(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate()
-          ));
-          
-          // Fetch with timeout protection
-          existingLogs = await withTimeout(
-            fetchLogsFromS3(startDate, endDate),
-            TIMEOUTS.S3_FETCH,
-            `S3 fetch for merge: ${s3Key}`
-          );
-          
-          // Validate fetched logs
-          if (!Array.isArray(existingLogs)) {
-            logWarning('Invalid logs fetched from S3', {
+        if (isLegacyDayKey(s3Key)) {
+          try {
+            const { fetchLogsFromS3 } = await import('./s3-logger.js');
+            const date = new Date(latestLog.timestamp || new Date());
+            const startDate = new Date(Date.UTC(
+              date.getUTCFullYear(),
+              date.getUTCMonth(),
+              date.getUTCDate()
+            ));
+            const endDate = new Date(Date.UTC(
+              date.getUTCFullYear(),
+              date.getUTCMonth(),
+              date.getUTCDate()
+            ));
+            existingLogs = await withTimeout(
+              fetchLogsFromS3(startDate, endDate),
+              TIMEOUTS.S3_FETCH,
+              `S3 fetch for merge: ${s3Key}`
+            );
+            if (!Array.isArray(existingLogs)) existingLogs = [];
+          } catch (error) {
+            logWarning('Failed to fetch existing logs from S3 for merge', {
+              error: error.message,
               s3Key,
-              type: typeof existingLogs,
             });
-            existingLogs = [];
           }
-        } catch (error) {
-          // S3 fetch failed - continue with new logs only
-          // This is OK - we'll upload what we have, and next upload will merge
-          logWarning('Failed to fetch existing logs from S3 for merge', {
-            error: error.message,
-            s3Key,
-            isTimeout: error.message && error.message.includes('timed out'),
-            note: 'Will upload new logs only, next upload will merge',
-          });
         }
 
         // Merge existing logs with new logs (deduplicate by ID)

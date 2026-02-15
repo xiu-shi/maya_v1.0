@@ -138,29 +138,54 @@ if (ENABLE_S3_LOGGING && AWS_S3_BUCKET) {
 }
 
 /**
- * Get S3 key for a log file (date-based path)
+ * Get S3 key for a log file (date-based path) – legacy single-file-per-day
  * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DD.json (UTC/GMT normalized)
- * 
- * Ensures dates are normalized to UTC/GMT regardless of server timezone
+ * Used for listing/fetching; new writes use getS3KeyForEntry for unique keys.
  */
 export function getS3Key(date = new Date()) {
-  // Normalize to UTC/GMT - use UTC methods to ensure consistent date regardless of server timezone
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");
   const dateStr = `${year}-${month}-${day}`;
-
   return `chat-logs/${year}/${month}/${day}/${dateStr}.json`;
 }
 
 /**
- * Upload log entry to S3
+ * Get unique S3 key for a single log entry (no overwrite).
+ * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DDTHH-mm-ss-sssZ_<ip>_<region>_<short-id>.json
+ * Ensures each day's logs are captured by unique timestamp, IP, and optional region; previous messages are never overwritten.
  *
- * Strategy: Read existing logs for the day, append new entry, upload entire file
- * This batches uploads and reduces API calls
+ * @param {Object} logEntry - Log entry with timestamp, ip, id, and optional region
+ * @returns {string} Unique S3 key
+ */
+export function getS3KeyForEntry(logEntry) {
+  const date = new Date(logEntry.timestamp || Date.now());
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const iso = date.toISOString();
+  const safeTimestamp = iso.replace(/:/g, "-").replace(/\./g, "-");
+  const sanitizedIp = (logEntry.ip || "unknown")
+    .replace(/\./g, "-")
+    .replace(/[^a-zA-Z0-9-]/g, "");
+  const sanitizedRegion = (logEntry.region || "unknown")
+    .replace(/[^a-zA-Z0-9-]/g, "")
+    .slice(0, 10);
+  const shortId = (logEntry.id || "unknown").replace(/[^a-zA-Z0-9_]/g, "").slice(0, 20);
+  const filename = `${safeTimestamp}_${sanitizedIp || "unknown"}_${sanitizedRegion}_${shortId || "id"}.json`;
+  return `chat-logs/${year}/${month}/${day}/${filename}`;
+}
+
+/** True if key is the legacy single-file-per-day key (no unique suffix). */
+export function isLegacyDayKey(s3Key) {
+  return /\/\d{4}-\d{2}-\d{2}\.json$/.test(s3Key);
+}
+
+/**
+ * Upload log entry to S3 (unique key per message; no overwrite).
  *
  * @param {Object} logEntry - Log entry to upload
- * @param {Array} existingLogs - Existing logs for the day (from file system)
+ * @param {Array} existingLogs - Ignored; each message is written to its own key
  * @returns {Promise<boolean>} True if upload successful
  */
 /**
@@ -205,25 +230,19 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
 
   try {
     const date = new Date(logEntry.timestamp || new Date());
-    const s3Key = getS3Key(date);
+    // Unique key per message: no overwrite; each day captured by unique timestamp and IP
+    const s3Key = getS3KeyForEntry(logEntry);
+    const payload = [logEntry];
 
-    // Merge existing logs with new entry
-    const allLogs = [...existingLogs, logEntry];
-
-    // Upload entire daily log file with timeout protection
     const command = new PutObjectCommand({
       Bucket: AWS_S3_BUCKET,
       Key: s3Key,
-      Body: JSON.stringify(allLogs, null, 2),
+      Body: JSON.stringify(payload, null, 2),
       ContentType: "application/json",
-      // Server-side encryption (SSE-S3 - free tier)
       ServerSideEncryption: "AES256",
-      // Enforce encryption (required by bucket policy)
-      // This ensures data at rest is encrypted
-      // Metadata
       Metadata: {
         "log-date": date.toISOString().split("T")[0],
-        "log-count": String(allLogs.length),
+        "log-count": "1",
         "uploaded-at": new Date().toISOString(),
         encryption: "SSE-S3",
       },
@@ -242,7 +261,7 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
     logInfo("Log uploaded to S3", {
       bucket: AWS_S3_BUCKET,
       key: s3Key,
-      logCount: allLogs.length,
+      logCount: payload.length,
     });
 
     return true;
@@ -316,45 +335,68 @@ export async function fetchLogsFromS3(startDate, endDate) {
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
-    // Fetch logs in parallel for better performance
+    // For each day: list all objects under chat-logs/YYYY/MM/DD/ (legacy + unique keys), then get each
     const fetchPromises = datesToFetch.map(async (date) => {
-      const s3Key = getS3Key(date);
-      
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(date.getUTCDate()).padStart(2, "0");
+      const prefix = `chat-logs/${year}/${month}/${day}/`;
+
+      let keys = [];
       try {
-        const command = new GetObjectCommand({
+        const listCommand = new ListObjectsV2Command({
           Bucket: AWS_S3_BUCKET,
-          Key: s3Key,
+          Prefix: prefix,
+          MaxKeys: 1000,
         });
-
-        // Wrap each fetch with timeout
-        // Use minimum 5s per request, or distribute total timeout across requests
         const perRequestTimeout = Math.max(5000, TIMEOUTS.S3_FETCH / datesToFetch.length);
-        const response = await withTimeout(
-          s3Client.send(command),
+        const listResponse = await withTimeout(
+          s3Client.send(listCommand),
           perRequestTimeout,
-          `S3 fetch: ${s3Key}`
+          `S3 list: ${prefix}`
         );
-        
-        const body = await response.Body.transformToString();
-        const dayLogs = JSON.parse(body);
-
-        return Array.isArray(dayLogs) ? dayLogs : [];
+        keys = (listResponse.Contents || []).map((o) => o.Key).filter(Boolean);
       } catch (error) {
-        // File doesn't exist for this date - skip (not an error)
-        if (error.name === "NoSuchKey" || (error.message && error.message.includes("NoSuchKey"))) {
-          return [];
-        }
-        
-        // Timeout or other error - log but don't fail entire fetch
         const sanitizedError = sanitizeError(error);
-        logWarning("Failed to fetch log from S3", {
-          key: s3Key,
+        logWarning("Failed to list S3 keys", {
+          prefix,
           error: sanitizedError.message || error.message,
-          errorCode: error.code,
-          isTimeout: error.message && error.message.includes('timed out'),
         });
         return [];
       }
+
+      const dayLogs = [];
+      for (const key of keys) {
+        try {
+          const getCommand = new GetObjectCommand({
+            Bucket: AWS_S3_BUCKET,
+            Key: key,
+          });
+          const perRequestTimeout = Math.max(3000, TIMEOUTS.S3_FETCH / (datesToFetch.length * Math.max(keys.length, 1)));
+          const response = await withTimeout(
+            s3Client.send(getCommand),
+            perRequestTimeout,
+            `S3 get: ${key}`
+          );
+          const body = await response.Body.transformToString();
+          const parsed = JSON.parse(body);
+          if (Array.isArray(parsed)) {
+            dayLogs.push(...parsed);
+          } else if (parsed && typeof parsed === "object" && (parsed.id || parsed.timestamp)) {
+            dayLogs.push(parsed);
+          }
+        } catch (error) {
+          if (error.name === "NoSuchKey" || (error.message && error.message.includes("NoSuchKey"))) {
+            continue;
+          }
+          const sanitizedError = sanitizeError(error);
+          logWarning("Failed to fetch log from S3", {
+            key,
+            error: sanitizedError.message || error.message,
+          });
+        }
+      }
+      return dayLogs;
     });
 
     // Wait for all fetches to complete (parallel execution)

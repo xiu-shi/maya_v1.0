@@ -69,15 +69,12 @@ let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
   
   s3UploadMetrics.totalAttempts++;
   
-  // Get S3 key for this log entry
-  const date = new Date(logEntry.timestamp || new Date());
-  const { getS3Key } = await import('./s3-logger.js');
-  const s3Key = getS3Key(date);
-  
-  // Use queue to prevent concurrent upload conflicts
+  // Unique key per message (timestamp + IP + id) so we never overwrite previous messages
+  const { getS3KeyForEntry } = await import('./s3-logger.js');
+  const s3Key = getS3KeyForEntry(logEntry);
+
   const { queueS3Upload } = await import('./s3-upload-queue.js');
-  
-  // Queue the upload (handles concurrency automatically)
+
   return queueS3Upload(s3Key, logEntry, async (entry, logs) => {
     // This function is called by the queue when it's safe to upload
     for (let attempt = 0; attempt < retries; attempt++) {
@@ -256,6 +253,7 @@ function generateConversationId() {
  * @param {string} data.assistantResponse - Maya's response (optional for failed attempts)
  * @param {Array} data.history - Conversation history (optional)
  * @param {string} data.ip - Client IP address
+ * @param {string} data.region - Optional client region (e.g. CloudFront-Viewer-Country or GeoIP)
  * @param {string} data.userAgent - User agent string
  * @param {Array} data.warnings - Validation warnings (optional)
  * @param {number} data.responseTime - Response time in ms (optional)
@@ -270,6 +268,7 @@ export async function logChatAttempt({
   assistantResponse = null,
   history = [],
   ip,
+  region = null,
   userAgent,
   warnings = [],
   responseTime = null,
@@ -306,6 +305,7 @@ export async function logChatAttempt({
       assistantResponse: assistantResponse ? assistantResponse.substring(0, 5000) : null,
       historyLength: history ? history.length : 0,
       ip: ip || "unknown",
+      region: region || "unknown",
       userAgent: userAgent || "unknown",
       warnings: warnings || [],
       responseTime: responseTime,
@@ -420,6 +420,7 @@ export async function logChatMessage({
   assistantResponse,
   history = [],
   ip,
+  region = null,
   userAgent,
   warnings = [],
   responseTime,
@@ -430,6 +431,7 @@ export async function logChatMessage({
     assistantResponse,
     history,
     ip,
+    region,
     userAgent,
     warnings,
     responseTime,
