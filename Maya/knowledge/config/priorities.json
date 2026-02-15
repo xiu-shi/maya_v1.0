@@ -4,14 +4,15 @@
     "docs/expertise/ai-security.md",
     "docs/expertise/digital-transformation.md",
     "docs/expertise/web-application-development-ai-era.md",
-    "docs/expertise/medium-articles.md",
+    "docs/expertise/medium-articles.md","docs/expertise/corporate-ai-training.md",
     "docs/cert_educ/certifications.md",
     "docs/cert_educ/education.md",
     "docs/honors_awards/lakera-genai-report-2025.md",
     "docs/honors_awards/workday-vibe-award-2023.md",
     "docs/experience/iadt.md",
     "docs/experience/connectd.md",
-    "docs/experience/workday.md"
+    "docs/experience/workday.md",
+    "docs/context/conversation-boundaries.md"
   ],
   "medium": [
     "docs/experience/huawei.md",
@@ -26,4 +27,3 @@
     "docs/experience/lidl.md"
   ]
 }
-
