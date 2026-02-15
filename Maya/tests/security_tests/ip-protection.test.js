@@ -291,14 +291,36 @@ describe('IP Protection - GitHub Repository Checks', () => {
         
         try {
           // Get commits that differ from base branch
+          // Use --format=%B to get full commit body, not just oneline
           const output = execSync(
-            `git log ${baseRef}..${headRef} --oneline`,
+            `git log ${baseRef}..${headRef} --format=%B`,
             { cwd: repoRoot, encoding: 'utf-8', stdio: 'pipe' }
           );
-          commits = output.trim().split('\n').filter(Boolean);
+          // Split by double newline to separate commit bodies
+          commits = output.trim().split('\n\n').filter(Boolean);
+          
+          // If no commits found (e.g., push to main where base==head), check recent commits
+          if (commits.length === 0) {
+            // For push events, check commits since the last successful workflow run
+            // Fallback: check last 3 commits (recent push)
+            const recentOutput = execSync(
+              `git log -3 --format=%B`,
+              { cwd: repoRoot, encoding: 'utf-8', stdio: 'pipe' }
+            );
+            commits = recentOutput.trim().split('\n\n').filter(Boolean);
+          }
         } catch (error) {
-          // Fallback: check last 5 commits if branch comparison fails
-          commits = getRecentCommits(5);
+          // Fallback: check last 3 commits if branch comparison fails
+          try {
+            const recentOutput = execSync(
+              `git log -3 --format=%B`,
+              { cwd: repoRoot, encoding: 'utf-8', stdio: 'pipe' }
+            );
+            commits = recentOutput.trim().split('\n\n').filter(Boolean);
+          } catch (fallbackError) {
+            // Last resort: use oneline format
+            commits = getRecentCommits(3);
+          }
         }
       } else {
         // Locally, check last 3 commits only (recent work)
