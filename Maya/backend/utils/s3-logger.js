@@ -12,6 +12,7 @@ import {
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { logInfo, logError, logWarning } from "./logger.js";
+import { withTimeout, TIMEOUTS } from "./timeout.js";
 import config from "../config/env.js";
 
 // S3 Configuration
@@ -22,19 +23,108 @@ const ENABLE_S3_LOGGING = process.env.ENABLE_S3_LOGGING === "true";
 // Initialize S3 client (only if S3 is enabled and configured)
 let s3Client = null;
 
+// Circuit breaker state for S3 operations
+let circuitBreakerState = {
+  failures: 0,
+  lastFailureTime: null,
+  isOpen: false,
+  OPEN_THRESHOLD: 5, // Open circuit after 5 consecutive failures
+  RESET_TIMEOUT: 60000, // Reset after 60 seconds
+};
+
+/**
+ * Check if circuit breaker should allow operation
+ */
+function isCircuitBreakerOpen() {
+  if (!circuitBreakerState.isOpen) {
+    return false;
+  }
+  
+  // Check if reset timeout has passed
+  if (circuitBreakerState.lastFailureTime) {
+    const timeSinceFailure = Date.now() - circuitBreakerState.lastFailureTime;
+    if (timeSinceFailure > circuitBreakerState.RESET_TIMEOUT) {
+      // Reset circuit breaker
+      circuitBreakerState.isOpen = false;
+      circuitBreakerState.failures = 0;
+      logInfo("S3 circuit breaker reset", { timeSinceFailure });
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
+ * Record successful operation (reset circuit breaker)
+ */
+function recordSuccess() {
+  if (circuitBreakerState.failures > 0) {
+    logInfo("S3 operation succeeded, resetting circuit breaker", {
+      previousFailures: circuitBreakerState.failures
+    });
+  }
+  circuitBreakerState.failures = 0;
+  circuitBreakerState.isOpen = false;
+  circuitBreakerState.lastFailureTime = null;
+}
+
+/**
+ * Record failed operation (may open circuit breaker)
+ */
+function recordFailure() {
+  circuitBreakerState.failures++;
+  circuitBreakerState.lastFailureTime = Date.now();
+  
+  if (circuitBreakerState.failures >= circuitBreakerState.OPEN_THRESHOLD) {
+    circuitBreakerState.isOpen = true;
+    logWarning("S3 circuit breaker opened", {
+      failures: circuitBreakerState.failures,
+      threshold: circuitBreakerState.OPEN_THRESHOLD,
+      resetAfter: `${circuitBreakerState.RESET_TIMEOUT / 1000}s`
+    });
+  }
+}
+
+/**
+ * Validate AWS credentials are available
+ */
+function validateAWSCredentials() {
+  const hasEnvCredentials = !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
+  const hasIAMRole = !!process.env.AWS_EXECUTION_ENV; // EC2/ECS/Lambda indicator
+  
+  if (!hasEnvCredentials && !hasIAMRole) {
+    // Check if credentials file exists (best effort check)
+    // Note: AWS SDK will handle credential chain automatically
+    logWarning("AWS credentials not found in environment", {
+      hasEnvCredentials,
+      hasIAMRole,
+      note: "AWS SDK will check credentials file and IAM roles automatically"
+    });
+  }
+  
+  return true; // AWS SDK handles credential chain, so we don't fail here
+}
+
 if (ENABLE_S3_LOGGING && AWS_S3_BUCKET) {
   try {
+    // Validate credentials (best effort)
+    validateAWSCredentials();
+    
     s3Client = new S3Client({
       region: AWS_REGION,
       // Credentials will be picked up from:
       // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
       // 2. IAM role (if running on EC2/ECS/Lambda)
       // 3. AWS credentials file (~/.aws/credentials)
+      // AWS SDK handles credential chain automatically
+      maxAttempts: 3, // SDK-level retry attempts
     });
 
     logInfo("S3 logging enabled", {
       region: AWS_REGION,
       bucket: AWS_S3_BUCKET,
+      clientConfigured: !!s3Client,
     });
   } catch (error) {
     logError("Failed to initialize S3 client", error);
@@ -53,7 +143,7 @@ if (ENABLE_S3_LOGGING && AWS_S3_BUCKET) {
  * 
  * Ensures dates are normalized to UTC/GMT regardless of server timezone
  */
-function getS3Key(date = new Date()) {
+export function getS3Key(date = new Date()) {
   // Normalize to UTC/GMT - use UTC methods to ensure consistent date regardless of server timezone
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -73,9 +163,43 @@ function getS3Key(date = new Date()) {
  * @param {Array} existingLogs - Existing logs for the day (from file system)
  * @returns {Promise<boolean>} True if upload successful
  */
+/**
+ * Sanitize error message to prevent information leakage
+ */
+function sanitizeError(error) {
+  if (!error) return error;
+  
+  // Handle Error objects and plain objects
+  const sanitized = {
+    name: error.name,
+    message: error.message,
+    code: error.code,
+    stack: error.stack,
+  };
+  
+  // Remove sensitive information from error messages
+  if (sanitized.message) {
+    // Remove AWS access keys from error messages
+    sanitized.message = sanitized.message.replace(/AKIA[0-9A-Z]{16}/g, '[REDACTED]');
+    sanitized.message = sanitized.message.replace(/aws_access_key_id[=:]\s*[^\s]+/gi, 'aws_access_key_id=[REDACTED]');
+    sanitized.message = sanitized.message.replace(/aws_secret_access_key[=:]\s*[^\s]+/gi, 'aws_secret_access_key=[REDACTED]');
+  }
+  
+  return sanitized;
+}
+
 export async function uploadLogToS3(logEntry, existingLogs = []) {
   // Skip if S3 not configured
   if (!s3Client || !AWS_S3_BUCKET) {
+    return false;
+  }
+
+  // Check circuit breaker
+  if (isCircuitBreakerOpen()) {
+    logWarning("S3 upload skipped - circuit breaker open", {
+      failures: circuitBreakerState.failures,
+      lastFailureTime: circuitBreakerState.lastFailureTime,
+    });
     return false;
   }
 
@@ -86,7 +210,7 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
     // Merge existing logs with new entry
     const allLogs = [...existingLogs, logEntry];
 
-    // Upload entire daily log file
+    // Upload entire daily log file with timeout protection
     const command = new PutObjectCommand({
       Bucket: AWS_S3_BUCKET,
       Key: s3Key,
@@ -105,7 +229,15 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
       },
     });
 
-    await s3Client.send(command);
+    // Wrap S3 operation with timeout
+    await withTimeout(
+      s3Client.send(command),
+      TIMEOUTS.S3_UPLOAD,
+      `S3 upload: ${s3Key}`
+    );
+
+    // Record success (reset circuit breaker)
+    recordSuccess();
 
     logInfo("Log uploaded to S3", {
       bucket: AWS_S3_BUCKET,
@@ -115,12 +247,18 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
 
     return true;
   } catch (error) {
-    // Log error but don't throw - S3 failure shouldn't break chat
+    // Record failure (may open circuit breaker)
+    recordFailure();
+    
+    // Sanitize error before logging
+    const sanitizedError = sanitizeError(error);
     const errorDate = new Date(logEntry.timestamp || new Date());
-    logError("Failed to upload log to S3", error, {
+    
+    // Log error but don't throw - S3 failure shouldn't break chat
+    logError("Failed to upload log to S3", sanitizedError, {
       bucket: AWS_S3_BUCKET,
       errorCode: error.code,
-      errorMessage: error.message,
+      errorMessage: sanitizedError.message || error.message,
       errorName: error.name,
       s3Key: getS3Key(errorDate),
       logEntryId: logEntry.id,
@@ -128,7 +266,9 @@ export async function uploadLogToS3(logEntry, existingLogs = []) {
       isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
       isPermissionError: error.code === 'AccessDenied',
       isNetworkError: error.code === 'NetworkingError' || error.code === 'TimeoutError',
+      isTimeoutError: error.message && error.message.includes('timed out'),
       retryable: error.code !== 'AccessDenied' && error.code !== 'InvalidAccessKeyId' && error.code !== 'NoSuchBucket',
+      circuitBreakerFailures: circuitBreakerState.failures,
     });
     return false;
   }
@@ -146,8 +286,16 @@ export async function fetchLogsFromS3(startDate, endDate) {
     return [];
   }
 
+  // Check circuit breaker
+  if (isCircuitBreakerOpen()) {
+    logWarning("S3 fetch skipped - circuit breaker open", {
+      failures: circuitBreakerState.failures,
+      lastFailureTime: circuitBreakerState.lastFailureTime,
+    });
+    return [];
+  }
+
   try {
-    const logs = [];
     // Normalize dates to UTC for consistent iteration
     const startUTC = new Date(Date.UTC(
       startDate.getUTCFullYear(),
@@ -159,51 +307,89 @@ export async function fetchLogsFromS3(startDate, endDate) {
       endDate.getUTCMonth(),
       endDate.getUTCDate()
     ));
+
+    // Build list of dates to fetch
+    const datesToFetch = [];
     const currentDate = new Date(startUTC);
-
-    // Iterate through date range (UTC)
     while (currentDate <= endUTC) {
-      const s3Key = getS3Key(currentDate);
+      datesToFetch.push(new Date(currentDate));
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    }
 
+    // Fetch logs in parallel for better performance
+    const fetchPromises = datesToFetch.map(async (date) => {
+      const s3Key = getS3Key(date);
+      
       try {
         const command = new GetObjectCommand({
           Bucket: AWS_S3_BUCKET,
           Key: s3Key,
         });
 
-        const response = await s3Client.send(command);
+        // Wrap each fetch with timeout
+        // Use minimum 5s per request, or distribute total timeout across requests
+        const perRequestTimeout = Math.max(5000, TIMEOUTS.S3_FETCH / datesToFetch.length);
+        const response = await withTimeout(
+          s3Client.send(command),
+          perRequestTimeout,
+          `S3 fetch: ${s3Key}`
+        );
+        
         const body = await response.Body.transformToString();
         const dayLogs = JSON.parse(body);
 
-        if (Array.isArray(dayLogs)) {
-          logs.push(...dayLogs);
-        }
+        return Array.isArray(dayLogs) ? dayLogs : [];
       } catch (error) {
-        // File doesn't exist for this date - skip
-        if (error.name !== "NoSuchKey") {
-          logWarning("Failed to fetch log from S3", {
-            key: s3Key,
-            error: error.message,
-          });
+        // File doesn't exist for this date - skip (not an error)
+        if (error.name === "NoSuchKey" || (error.message && error.message.includes("NoSuchKey"))) {
+          return [];
         }
+        
+        // Timeout or other error - log but don't fail entire fetch
+        const sanitizedError = sanitizeError(error);
+        logWarning("Failed to fetch log from S3", {
+          key: s3Key,
+          error: sanitizedError.message || error.message,
+          errorCode: error.code,
+          isTimeout: error.message && error.message.includes('timed out'),
+        });
+        return [];
       }
+    });
 
-      // Move to next day (UTC)
-      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-    }
+    // Wait for all fetches to complete (parallel execution)
+    const results = await Promise.all(fetchPromises);
+    
+    // Flatten results
+    const logs = results.flat();
 
     // Sort by timestamp (newest first)
     logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    // Record success if we got any logs
+    if (logs.length > 0) {
+      recordSuccess();
+    }
 
     logInfo("Fetched logs from S3", {
       startDate: startDate.toISOString().split("T")[0],
       endDate: endDate.toISOString().split("T")[0],
       logCount: logs.length,
+      datesFetched: datesToFetch.length,
     });
 
     return logs;
   } catch (error) {
-    logError("Failed to fetch logs from S3", error);
+    // Record failure
+    recordFailure();
+    
+    const sanitizedError = sanitizeError(error);
+    logError("Failed to fetch logs from S3", sanitizedError, {
+      errorCode: error.code,
+      errorMessage: sanitizedError.message || error.message,
+      isTimeout: error.message && error.message.includes('timed out'),
+      circuitBreakerFailures: circuitBreakerState.failures,
+    });
     return [];
   }
 }
@@ -214,12 +400,22 @@ export async function fetchLogsFromS3(startDate, endDate) {
  * @returns {Object} Status information
  */
 export function getS3LoggingStatus() {
+  // Check process.env at runtime (not module-level constants) for accurate status
+  // This allows tests to change env vars and see updated status
+  const runtimeEnableS3 = process.env.ENABLE_S3_LOGGING === "true";
+  const runtimeBucket = process.env.AWS_S3_BUCKET || "maya-ai-builder-prod-logs";
+  
   return {
-    enabled: ENABLE_S3_LOGGING && !!AWS_S3_BUCKET,
+    enabled: runtimeEnableS3 && !!runtimeBucket,
     configured: !!process.env.AWS_S3_BUCKET, // Only true if explicitly set in env (not default)
-    region: AWS_REGION,
-    bucket: AWS_S3_BUCKET || "not configured",
+    region: process.env.AWS_REGION || AWS_REGION,
+    bucket: runtimeBucket || "not configured",
     clientInitialized: !!s3Client,
+    circuitBreaker: {
+      isOpen: circuitBreakerState.isOpen,
+      failures: circuitBreakerState.failures,
+      lastFailureTime: circuitBreakerState.lastFailureTime,
+    },
   };
 }
 
@@ -240,12 +436,33 @@ export async function testS3Connection() {
       MaxKeys: 1,
     });
 
-    await s3Client.send(command);
+    // Wrap connection test with timeout
+    // Note: Timeout is handled by AWS SDK's maxAttempts, but we add extra protection
+    const sendPromise = s3Client.send(command);
+    await withTimeout(
+      sendPromise,
+      TIMEOUTS.S3_CONNECTION_TEST,
+      `S3 connection test: ${AWS_S3_BUCKET}`
+    );
+    
+    // Record success
+    recordSuccess();
+    
     return true;
   } catch (error) {
+    // Record failure
+    recordFailure();
+    
+    const sanitizedError = sanitizeError(error);
+    const errorMessage = sanitizedError.message || error.message || String(error);
+    const errorCode = error.code || error.name;
+    
     logError("S3 connection test failed", error, {
       bucket: AWS_S3_BUCKET,
-      errorCode: error.code,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+      isTimeout: errorMessage.includes('timed out'),
+      circuitBreakerFailures: circuitBreakerState.failures,
     });
     return false;
   }

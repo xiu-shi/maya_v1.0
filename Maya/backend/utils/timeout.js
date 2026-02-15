@@ -18,6 +18,9 @@ export const TIMEOUTS = {
   FILE_WRITE: 5000,         // 5 seconds for file write
   MODULE_IMPORT: 10000,     // 10 seconds for dynamic module import
   BULK_OPERATIONS: 60000,   // 60 seconds for bulk file operations
+  S3_UPLOAD: 30000,         // 30 seconds for S3 upload operations
+  S3_FETCH: 60000,          // 60 seconds for S3 fetch operations (date ranges)
+  S3_CONNECTION_TEST: 10000, // 10 seconds for S3 connection test
 };
 
 /**
