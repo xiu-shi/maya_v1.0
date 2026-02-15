@@ -2,7 +2,7 @@
 **Category**: expertise / teaching  
 **Priority**: high  
 **Last Updated**: February 14, 2026  
-**Target Audience**: Year 1 Non-CS Background Students  
+**Target Audience**: college and university students at all levels  
 **Curriculum Designer and Lecturer**: Janet Xiu Shi
 
 ---
