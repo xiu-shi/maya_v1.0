@@ -9,6 +9,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { logInfo, logError, logWarning } from "./logger.js";
+import { withFileLock } from "./file-lock.js";
 import config from "../config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +32,13 @@ let s3UploadMetrics = {
  * Check if an error is retryable
  */
 function isRetryableError(error) {
-  if (!error || !error.code) return true; // Default to retryable if unknown
+  if (!error || !error.code) {
+    // Check if it's a timeout error (always retryable)
+    if (error.message && error.message.includes('timed out')) {
+      return true;
+    }
+    return true; // Default to retryable if unknown
+  }
   
   // Non-retryable errors
   const nonRetryableErrors = [
@@ -51,8 +58,8 @@ function isRetryableError(error) {
 }
 
 /**
- * S3 upload function with retry logic (lazy-loaded, optional)
- * Implements exponential backoff retry strategy
+ * S3 upload function with retry logic and queue management (lazy-loaded, optional)
+ * Implements exponential backoff retry strategy and concurrent upload safety
  */
 let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
   // Default: no-op if S3 not configured
@@ -62,86 +69,98 @@ let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
   
   s3UploadMetrics.totalAttempts++;
   
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      const { uploadLogToS3 } = await import('./s3-logger.js');
-      const success = await uploadLogToS3(logEntry, existingLogs);
-      
-      if (success) {
-        s3UploadMetrics.totalSuccesses++;
-        s3UploadMetrics.lastUploadTime = new Date().toISOString();
-        s3UploadMetrics.lastUploadError = null;
-        s3UploadMetrics.consecutiveFailures = 0;
-        return true;
-      } else {
-        // uploadLogToS3 returned false (error logged internally)
+  // Get S3 key for this log entry
+  const date = new Date(logEntry.timestamp || new Date());
+  const { getS3Key } = await import('./s3-logger.js');
+  const s3Key = getS3Key(date);
+  
+  // Use queue to prevent concurrent upload conflicts
+  const { queueS3Upload } = await import('./s3-upload-queue.js');
+  
+  // Queue the upload (handles concurrency automatically)
+  return queueS3Upload(s3Key, logEntry, async (entry, logs) => {
+    // This function is called by the queue when it's safe to upload
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const { uploadLogToS3 } = await import('./s3-logger.js');
+        const success = await uploadLogToS3(entry, logs);
+        
+        if (success) {
+          s3UploadMetrics.totalSuccesses++;
+          s3UploadMetrics.lastUploadTime = new Date().toISOString();
+          s3UploadMetrics.lastUploadError = null;
+          s3UploadMetrics.consecutiveFailures = 0;
+          return true;
+        } else {
+          // uploadLogToS3 returned false (error logged internally)
+          s3UploadMetrics.totalFailures++;
+          s3UploadMetrics.consecutiveFailures++;
+          
+          if (attempt < retries - 1) {
+            // Wait before retry (exponential backoff: 1s, 2s, 4s)
+            const delay = Math.pow(2, attempt) * 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      } catch (error) {
         s3UploadMetrics.totalFailures++;
+        s3UploadMetrics.lastUploadError = {
+          code: error.code || 'UnknownError',
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        };
         s3UploadMetrics.consecutiveFailures++;
         
+        // Check if error is retryable
+        if (!isRetryableError(error)) {
+          logError('S3 upload failed (non-retryable error)', error, {
+            bucket: process.env.AWS_S3_BUCKET,
+            errorCode: error.code,
+            errorMessage: error.message,
+            errorName: error.name,
+            logEntryId: entry.id,
+            timestamp: entry.timestamp,
+            isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
+            isPermissionError: error.code === 'AccessDenied',
+            retryable: false,
+          });
+          return false;
+        }
+        
+        // Log error (will retry)
         if (attempt < retries - 1) {
+          logWarning('S3 upload failed, retrying', {
+            bucket: process.env.AWS_S3_BUCKET,
+            errorCode: error.code,
+            errorMessage: error.message,
+            attempt: attempt + 1,
+            maxRetries: retries,
+            nextRetryIn: `${Math.pow(2, attempt) * 1000}ms`,
+          });
+          
           // Wait before retry (exponential backoff: 1s, 2s, 4s)
           const delay = Math.pow(2, attempt) * 1000;
           await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          // Final attempt failed
+          logError('S3 upload failed after retries', error, {
+            bucket: process.env.AWS_S3_BUCKET,
+            errorCode: error.code,
+            errorMessage: error.message,
+            errorName: error.name,
+            logEntryId: entry.id,
+            timestamp: entry.timestamp,
+            retries: retries,
+            isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
+            isPermissionError: error.code === 'AccessDenied',
+            retryable: isRetryableError(error),
+          });
         }
       }
-    } catch (error) {
-      s3UploadMetrics.totalFailures++;
-      s3UploadMetrics.lastUploadError = {
-        code: error.code || 'UnknownError',
-        message: error.message,
-        timestamp: new Date().toISOString(),
-      };
-      s3UploadMetrics.consecutiveFailures++;
-      
-      // Check if error is retryable
-      if (!isRetryableError(error)) {
-        logError('S3 upload failed (non-retryable error)', error, {
-          bucket: process.env.AWS_S3_BUCKET,
-          errorCode: error.code,
-          errorMessage: error.message,
-          errorName: error.name,
-          logEntryId: logEntry.id,
-          timestamp: logEntry.timestamp,
-          isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
-          isPermissionError: error.code === 'AccessDenied',
-          retryable: false,
-        });
-        return false;
-      }
-      
-      // Log error (will retry)
-      if (attempt < retries - 1) {
-        logWarning('S3 upload failed, retrying', {
-          bucket: process.env.AWS_S3_BUCKET,
-          errorCode: error.code,
-          errorMessage: error.message,
-          attempt: attempt + 1,
-          maxRetries: retries,
-          nextRetryIn: `${Math.pow(2, attempt) * 1000}ms`,
-        });
-        
-        // Wait before retry (exponential backoff: 1s, 2s, 4s)
-        const delay = Math.pow(2, attempt) * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
-        // Final attempt failed
-        logError('S3 upload failed after retries', error, {
-          bucket: process.env.AWS_S3_BUCKET,
-          errorCode: error.code,
-          errorMessage: error.message,
-          errorName: error.name,
-          logEntryId: logEntry.id,
-          timestamp: logEntry.timestamp,
-          retries: retries,
-          isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
-          isPermissionError: error.code === 'AccessDenied',
-          retryable: isRetryableError(error),
-        });
-      }
     }
-  }
-  
-  return false;
+    
+    return false;
+  });
 };
 
 /**
@@ -296,26 +315,55 @@ export async function logChatAttempt({
       errorMessage: errorMessage ? errorMessage.substring(0, 500) : null, // Limit error message length
     };
 
-    // Read existing logs for today
-    let logs = [];
-    try {
-      const existingData = await fs.readFile(logFilePath, "utf-8");
-      logs = JSON.parse(existingData);
-    } catch (error) {
-      // File doesn't exist yet, start with empty array
-      if (error.code !== "ENOENT") {
-        logError("Failed to read existing logs", error);
+    // Use file locking to prevent race conditions with concurrent writes
+    // This ensures thread-safety when multiple requests from different IPs write simultaneously
+    await withFileLock(logFilePath, async () => {
+      // Read existing logs for today (inside lock to prevent race conditions)
+      let logs = [];
+      try {
+        const existingData = await fs.readFile(logFilePath, "utf-8");
+        const parsed = JSON.parse(existingData);
+        
+        // Validate logs array
+        if (Array.isArray(parsed)) {
+          logs = parsed;
+        } else {
+          logWarning("Invalid log file format, resetting", {
+            filePath: logFilePath,
+            type: typeof parsed,
+          });
+          logs = [];
+        }
+      } catch (error) {
+        // File doesn't exist yet, start with empty array
+        if (error.code !== "ENOENT") {
+          logError("Failed to read existing logs", error, {
+            filePath: logFilePath,
+            errorCode: error.code,
+          });
+        }
       }
-    }
 
-    // Append new log entry
-    logs.push(logEntry);
+      // Validate log entry before appending
+      if (!logEntry || !logEntry.id || !logEntry.timestamp) {
+        logError("Invalid log entry, skipping", null, {
+          logEntryId: logEntry?.id,
+          hasTimestamp: !!logEntry?.timestamp,
+        });
+        throw new Error("Invalid log entry: missing required fields");
+      }
 
-    // Write back to file
-    await fs.writeFile(logFilePath, JSON.stringify(logs, null, 2), "utf-8");
+      // Append new log entry
+      logs.push(logEntry);
 
-    // Upload to S3 (async, non-blocking, optional, with retry logic)
-    uploadToS3Async(logEntry, logs).catch(err => {
+      // Write back to file (atomic write within lock)
+      await fs.writeFile(logFilePath, JSON.stringify(logs, null, 2), "utf-8");
+    });
+
+    // Upload to S3 IMMEDIATELY (real-time capture, async, non-blocking)
+    // This happens outside the file lock to avoid blocking other requests
+    // Each upload is independent and handles its own concurrency via S3's queue
+    uploadToS3Async(logEntry, [logEntry]).catch(err => {
       // Error already logged in uploadToS3Async with retry logic
       // This catch is just a safety net
       logWarning('S3 upload failed (continuing with file logging)', {
