@@ -1,15 +1,16 @@
-# GitHub Actions Workflow: IP Protection Check
-# 
-# Last Updated: February 14, 2026 23:31:01 GMT
-# Changes Made:
-#   - Fixed path resolution: Changed from `tests/security_tests/` to `../tests/security_tests/`
-#     to correctly resolve paths when running from `Maya/backend` working directory
-#   - Added diagnostic logging: Enhanced error messages with current directory, repository root,
-#     expected paths, and file listings for better CI debugging
-#   - Improved error reporting: Added explicit path verification step before running tests
-# 
-# Purpose: Automatically check IP protection compliance on push, PR, and daily schedule
-# Tests: IP protection rules, file tracking, commit messages, .gitignore compliance
+# GitHub Actions: IP Protection Check
+#
+# Purpose: Enforce IP protection compliance on push, PR, and daily schedule.
+# Created: Jan 30, 2026 | Reintroduced: Feb 2026
+#
+# Path Resolution (CRITICAL):
+#   - Workflow runs with working-directory: Maya/backend
+#   - Test files live at Maya/tests/security_tests/ (sibling of Maya/backend)
+#   - Use ../tests/security_tests/ when running from Maya/backend
+#   - Wrong path (tests/security_tests/) would look in Maya/backend/tests/ → 404
+#
+# Tests: ip-protection.test.js, ip-protection-cicd.test.js
+#   - Tracked files, .gitignore compliance, commit messages, file content patterns
 
 name: IP Protection Check
 
@@ -19,81 +20,42 @@ on:
   pull_request:
     branches: [ main, master ]
   schedule:
-    # Run daily at 2 AM UTC to catch any issues
     - cron: '0 2 * * *'
 
 jobs:
   ip-protection-check:
     name: Check IP Protection
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history for branch comparison
+          fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: Maya/backend/package-lock.json
-      
+
       - name: Install dependencies
         working-directory: Maya/backend
         run: npm ci
-      
-      - name: Verify test files exist
+
+      - name: Verify test paths
         working-directory: Maya/backend
         run: |
-          echo "Verifying test files exist..."
-          echo "Current directory: $(pwd)"
-          echo "Repository root: $(cd ../.. && pwd)"
-          echo "Checking for test files..."
-          
-          # Check from backend directory
-          if [ ! -f "../tests/security_tests/ip-protection.test.js" ]; then
-            echo "::error::Test file not found: ip-protection.test.js"
-            echo "Expected path: $(pwd)/../tests/security_tests/ip-protection.test.js"
-            echo "Files in ../tests/:"
-            ls -la ../tests/ || echo "Directory does not exist"
-            echo "Files in ../tests/security_tests/:"
-            ls -la ../tests/security_tests/ || echo "Directory does not exist"
+          if [ ! -f "../tests/security_tests/ip-protection.test.js" ] || [ ! -f "../tests/security_tests/ip-protection-cicd.test.js" ]; then
+            echo "::error::IP protection test files not found"
+            ls -la ../tests/security_tests/ 2>/dev/null || echo "Directory does not exist"
             exit 1
           fi
-          
-          if [ ! -f "../tests/security_tests/ip-protection-cicd.test.js" ]; then
-            echo "::error::Test file not found: ip-protection-cicd.test.js"
-            echo "Expected path: $(pwd)/../tests/security_tests/ip-protection-cicd.test.js"
-            echo "Files in ../tests/security_tests/:"
-            ls -la ../tests/security_tests/ || echo "Directory does not exist"
-            exit 1
-          fi
-          
-          echo "✅ All test files found"
-          echo "Test file 1: $(ls -la ../tests/security_tests/ip-protection.test.js)"
-          echo "Test file 2: $(ls -la ../tests/security_tests/ip-protection-cicd.test.js)"
-      
+
       - name: Run IP Protection Tests
         working-directory: Maya/backend
-        run: |
-          echo "Running IP protection tests..."
-          echo "Working directory: $(pwd)"
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Checking test file paths..."
-          ls -la ../tests/security_tests/ || echo "Directory listing failed"
-          echo "Running tests with explicit paths..."
-          # Use relative paths from backend directory
-          npm test -- ../tests/security_tests/ip-protection.test.js ../tests/security_tests/ip-protection-cicd.test.js
-        continue-on-error: false
-      
-      - name: Report Results
-        if: failure()
-        run: |
-          echo "::error::IP Protection check failed!"
-          echo "::error::Please review the test output above for details."
-          echo "::error::Do not commit IP-protected files, test files, or unauthorized documentation."
-          exit 1
+        env:
+          CI: true
+        run: npm test -- ../tests/security_tests/ip-protection.test.js ../tests/security_tests/ip-protection-cicd.test.js
