@@ -9,8 +9,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import config from './config/env.js';
 import { logError, logInfo, logWarning } from './utils/logger.js';
-import { loadKBContext } from './utils/kb-loader.js';
-// Optional modules - gracefully handle if they don't exist
+// kb-loader is dynamically imported - may be excluded in production
 
 // ES modules don't have __dirname by default, so we create it
 const __filename = fileURLToPath(import.meta.url);
@@ -197,9 +196,18 @@ async function ensureKBContext() {
       logInfo('Cache module not available, loading KB directly');
     }
     
-    // Fallback: Load KB directly
-    const context = await loadKBContext();
-    return context || '';
+    // Fallback: Load KB directly (dynamic import - kb-loader may be gitignored in production)
+    try {
+      const { loadKBContext } = await import('./utils/kb-loader.js');
+      const context = await loadKBContext();
+      return context || '';
+    } catch (kbLoaderError) {
+      logInfo('KB loader not available (may be excluded in production), using empty context', {
+        code: kbLoaderError?.code,
+        message: kbLoaderError?.message?.substring?.(0, 100)
+      });
+      return '';
+    }
   } catch (error) {
     logError('Failed to get KB context', error);
     return '';
@@ -235,9 +243,18 @@ export async function refreshKBContext() {
       logInfo('Cache module not available, refreshing KB directly');
     }
     
-    // Fallback: Load KB directly
-    const context = await loadKBContext();
-    return context || '';
+    // Fallback: Load KB directly (dynamic import - kb-loader may be gitignored in production)
+    try {
+      const { loadKBContext } = await import('./utils/kb-loader.js');
+      const context = await loadKBContext();
+      return context || '';
+    } catch (kbLoaderError) {
+      logInfo('KB loader not available (may be excluded in production), using empty context', {
+        code: kbLoaderError?.code,
+        message: kbLoaderError?.message?.substring?.(0, 100)
+      });
+      return '';
+    }
   } catch (error) {
     logError('Failed to refresh KB context', error);
     return '';
