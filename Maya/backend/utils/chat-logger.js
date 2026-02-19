@@ -451,8 +451,6 @@ export async function logChatMessage({
  */
 export async function getChatLogs(startDate, endDate) {
   try {
-    await ensureLogsDirectory();
-
     const logs = [];
     
     // Normalize dates to UTC for consistent processing
@@ -467,21 +465,21 @@ export async function getChatLogs(startDate, endDate) {
       endDate.getUTCDate()
     ));
     
-    // Try to fetch from S3 first (if enabled)
+    // Fetch from S3 first when enabled (production logs live in S3; avoids dependency on local dir)
     if (process.env.ENABLE_S3_LOGGING === 'true' && process.env.AWS_S3_BUCKET) {
       try {
         const { fetchLogsFromS3 } = await import('./s3-logger.js');
         const s3Logs = await fetchLogsFromS3(startUTC, endUTC);
         logs.push(...s3Logs);
       } catch (error) {
-        // S3 fetch failed - continue with file-based logs
         logWarning('Failed to fetch logs from S3, using file logs only', {
           error: error.message
         });
       }
     }
 
-    // Also fetch from local files (merge with S3 logs)
+    // Also fetch from local files if directory is available (merge with S3 logs)
+    await ensureLogsDirectory();
     const currentDate = new Date(startUTC);
 
     while (currentDate <= endUTC) {
@@ -492,7 +490,6 @@ export async function getChatLogs(startDate, endDate) {
         const dayLogs = JSON.parse(fileData);
         logs.push(...dayLogs);
       } catch (error) {
-        // File doesn't exist for this date, skip
         if (error.code !== "ENOENT") {
           logError(
             `Failed to read log file for ${currentDate.toISOString().split("T")[0]}`,
@@ -501,7 +498,6 @@ export async function getChatLogs(startDate, endDate) {
         }
       }
 
-      // Move to next day (UTC)
       currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
@@ -577,10 +573,30 @@ export async function getChatLogsByConversation(startDate, endDate) {
  * @returns {Promise<Object>} Storage stats
  */
 export async function getStorageStats() {
+  const emptyStats = () => ({
+    totalFiles: 0,
+    totalSize: 0,
+    totalSizeMB: "0.00",
+    totalMessages: 0,
+    totalConversations: 0,
+    averageMessagesPerConversation: 0,
+    averageSizePerMessage: 0,
+    files: [],
+  });
+
   try {
     await ensureLogsDirectory();
 
-    const files = await fs.readdir(LOGS_DIR);
+    let files = [];
+    try {
+      files = await fs.readdir(LOGS_DIR);
+    } catch (err) {
+      if (err.code === "ENOENT" && process.env.ENABLE_S3_LOGGING === "true") {
+        return emptyStats();
+      }
+      throw err;
+    }
+
     const jsonFiles = files.filter((f) => f.endsWith(".json"));
 
     let totalSize = 0;
@@ -626,6 +642,9 @@ export async function getStorageStats() {
     };
   } catch (error) {
     logError("Failed to get storage stats", error);
+    if (process.env.ENABLE_S3_LOGGING === "true") {
+      return emptyStats();
+    }
     throw error;
   }
 }

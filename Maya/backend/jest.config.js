@@ -14,6 +14,9 @@ export default {
   testMatch: [
     '**/tests/**/*.test.js'
   ],
+  testPathIgnorePatterns: [
+    'post-deployment-verification\\.test\\.js$'  // Run via run-post-deployment-tests.sh after deploy
+  ],
   rootDir: '..',
   collectCoverageFrom: [
     'backend/**/*.js',

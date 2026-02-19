@@ -404,6 +404,7 @@
             <button id="loadLogsBtn" class="btn-filter">Load Logs</button>
           </div>
         </div>
+        <p class="filter-hint" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted, #666);">Max range 31 days. Use 3–7 days if loading is slow.</p>
       </div>
 
       <!-- Loading State -->
@@ -572,7 +573,13 @@
           } catch {
             errorData = { message: errorText || `HTTP ${response.status}: ${response.statusText}` };
           }
-          throw new Error(errorData.message || errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+          let msg = errorData.message || errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+          if (response.status === 400 && errorData.message) {
+            msg = errorData.message;
+          } else if (response.status === 502 || response.status === 503 || (msg && (msg.includes('502') || msg.includes('503') || msg.trim().startsWith('<!')))) {
+            msg = 'Request timed out or service unavailable. Try a shorter date range (e.g. 3–7 days) and click Load Logs again.';
+          }
+          throw new Error(msg);
         }
         
         const data = await response.json();
@@ -793,7 +800,21 @@
 
     // Event listeners
     document.getElementById('loadLogsBtn').addEventListener('click', loadLogs);
-    
+
+    // If server injected logs (server-side fetch), render them immediately
+    const serverLogsEl = document.getElementById('server-logs-data');
+    if (serverLogsEl) {
+      try {
+        const d = JSON.parse(serverLogsEl.textContent);
+        if (d.success && d.logs) {
+          if (document.getElementById('startDate')) document.getElementById('startDate').value = d.startDateISO ? d.startDateISO.split('T')[0] : '';
+          if (document.getElementById('endDate')) document.getElementById('endDate').value = d.endDateISO ? d.endDateISO.split('T')[0] : '';
+          if (document.getElementById('groupBy')) document.getElementById('groupBy').value = d.groupBy || 'none';
+          renderLogs(d.logs, d.groupBy || 'none');
+        }
+      } catch (e) { console.warn('Server logs init failed', e); }
+    }
+
     // Load stats on page load
     loadStats();
   </script>

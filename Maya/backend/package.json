@@ -14,6 +14,7 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --coverageReporters=json --coverageReporters=text",
     "test:security": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/security_tests",
     "test:s3-capture": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/s3-chat-logs-capture-requirements.test.js",
+    "test:logging": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=\"s3|chat-log|logging\" --runInBand --forceExit",
     "test:performance": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/performance_tests",
     "test:integrity": "node --experimental-vm-modules node_modules/jest/bin/jest.js markdown-reference-integrity.test.js",
     "test:validate-counts": "node scripts/validate-test-counts.js",

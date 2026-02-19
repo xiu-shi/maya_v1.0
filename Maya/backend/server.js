@@ -95,6 +95,64 @@ app.use((req, res, next) => {
   next();
 });
 
+// Chat logs page with server-side fetch: server fetches from S3 and injects logs into HTML
+app.get(
+  "/chat_logs.html",
+  asyncHandler(async (req, res) => {
+    const { promises: fs } = await import("fs");
+    const defaultStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const defaultEnd = new Date();
+    const startDate = req.query.startDate
+      ? new Date(req.query.startDate)
+      : defaultStart;
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : defaultEnd;
+    const groupBy = req.query.groupBy || "none";
+    const rangeDays = Math.ceil(
+      (endDate - startDate) / (24 * 60 * 60 * 1000)
+    );
+    if (rangeDays > CHAT_LOGS_MAX_DAYS) {
+      return res.redirect(
+        `/chat_logs.html?startDate=${defaultStart.toISOString().split("T")[0]}&endDate=${defaultEnd.toISOString().split("T")[0]}&groupBy=none`
+      );
+    }
+    let logs;
+    try {
+      const logsPromise =
+        groupBy === "conversation"
+          ? getChatLogsByConversation(startDate, endDate)
+          : getChatLogs(startDate, endDate);
+      logs = await withTimeout(
+        logsPromise,
+        CHAT_LOGS_REQUEST_MS,
+        "Chat logs request timed out."
+      );
+    } catch (err) {
+      logs = groupBy === "conversation" ? {} : [];
+    }
+    const htmlPath = join(frontendPath, "chat_logs.html");
+    let html = await fs.readFile(htmlPath, "utf-8");
+    const payload = {
+      success: true,
+      logs,
+      startDateISO: startDate.toISOString(),
+      endDateISO: endDate.toISOString(),
+      groupBy,
+    };
+    let jsonStr = JSON.stringify(payload);
+    jsonStr = jsonStr.replace(/<\/script/gi, "<\\/script");
+    const inject =
+      '<script type="application/json" id="server-logs-data">' +
+      jsonStr +
+      "</script>\n</body>";
+    if (!html.includes("</body>")) {
+      return res.status(500).send("Invalid chat_logs.html template");
+    }
+    html = html.replace("</body>", inject);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(html);
+  })
+);
+
 // Serve static files (index: false prevents serving index.html automatically)
 app.use(
   express.static(frontendPath, {
@@ -499,6 +557,19 @@ app.post(
   }),
 );
 
+// Max date range and request timeout for chat-logs (avoid proxy 502 on slow S3 fetches)
+const CHAT_LOGS_MAX_DAYS = 31;
+const CHAT_LOGS_REQUEST_MS = 45000; // Respond before typical proxy timeout (~60s)
+
+function withTimeout(promise, ms, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(message)), ms)
+    ),
+  ]);
+}
+
 // Admin endpoints for chat logs (before rate limiting - admin endpoints should have different limits)
 app.get(
   "/api/admin/chat-logs",
@@ -513,6 +584,16 @@ app.get(
     const endDate = req.query.endDate
       ? new Date(req.query.endDate) // Parse as UTC if ISO format
       : new Date(); // Current time (will be normalized to UTC in logging functions)
+
+    const rangeDays = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000));
+    if (rangeDays > CHAT_LOGS_MAX_DAYS) {
+      return res.status(400).json({
+        success: false,
+        error: "Date range too large",
+        message: `Maximum date range is ${CHAT_LOGS_MAX_DAYS} days. Please choose a shorter range.`,
+        maxDays: CHAT_LOGS_MAX_DAYS,
+      });
+    }
     
     // Ensure dates are normalized to UTC for consistent processing
     // Dates are already in UTC when parsed from ISO strings or created with Date.now()
@@ -523,12 +604,16 @@ app.get(
 
     try {
       let logs;
+      const logsPromise =
+        groupBy === "conversation"
+          ? getChatLogsByConversation(startDate, endDate)
+          : getChatLogs(startDate, endDate);
 
-      if (groupBy === "conversation") {
-        logs = await getChatLogsByConversation(startDate, endDate);
-      } else {
-        logs = await getChatLogs(startDate, endDate);
-      }
+      logs = await withTimeout(
+        logsPromise,
+        CHAT_LOGS_REQUEST_MS,
+        "Chat logs request timed out. Try a shorter date range (e.g. 3–7 days)."
+      );
 
       // If includeRemote is true, fetch and merge remote logs
       if (includeRemote && !config.isProduction) {
@@ -595,9 +680,10 @@ app.get(
       });
     } catch (error) {
       logError("Failed to retrieve chat logs", error);
-      res.status(500).json({
+      const isTimeout = error.message && error.message.includes("timed out");
+      res.status(isTimeout ? 503 : 500).json({
         success: false,
-        error: "Failed to retrieve chat logs",
+        error: isTimeout ? "Request timed out" : "Failed to retrieve chat logs",
         message: error.message,
       });
     }
