@@ -2,7 +2,7 @@
 
 **Category**: experience  
 **Priority**: high  
-**Last Updated**: 2025-01-06  
+**Last Updated**: 2026-02-21  
 **Date**: September 2025 – Present  
 **Location**: Dún Laoghaire-Rathdown, Ireland · On-site
 
