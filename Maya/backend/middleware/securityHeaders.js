@@ -16,13 +16,15 @@ export const securityHeaders = helmet({
       defaultSrc: ["'self'"],
       styleSrc: [
         "'self'", 
-        "'unsafe-inline'", // Allow inline styles
-        "https://fonts.googleapis.com" // Google Fonts
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://cdn.jsdelivr.net"
       ],
       scriptSrc: [
         "'self'", 
-        "'unsafe-inline'", // Allow inline scripts (needed for chat functionality)
-        "https://www.googletagmanager.com" // Google Tag Manager
+        "'unsafe-inline'",
+        "https://www.googletagmanager.com",
+        "https://cdn.jsdelivr.net"
       ],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: [

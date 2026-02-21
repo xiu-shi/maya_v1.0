@@ -481,14 +481,6 @@
       }
     }
 
-    .maya-message-content p {
-      margin-bottom: var(--spacing-sm);
-    }
-
-    .maya-message-content p:last-child {
-      margin-bottom: 0;
-    }
-
     .maya-message-content code {
       background: var(--bg-tertiary);
       padding: 2px 6px;
@@ -497,8 +489,110 @@
       font-family: 'Courier New', monospace;
     }
 
+    .maya-message-content pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 12px 0;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .maya-message-content pre code {
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.85em;
+      color: inherit;
+      white-space: pre;
+      display: block;
+    }
+
+    .maya-message-content pre .code-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #cdd6f4;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .maya-message-content pre:hover .code-copy-btn {
+      opacity: 1;
+    }
+
+    .maya-message-content pre .code-copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .maya-message-content ol,
+    .maya-message-content ul {
+      padding-left: 1.5em;
+      margin: 8px 0;
+    }
+
+    .maya-message-content li {
+      margin-bottom: 4px;
+    }
+
+    .maya-message-content h1,
+    .maya-message-content h2,
+    .maya-message-content h3 {
+      margin: 12px 0 8px;
+      font-weight: 600;
+    }
+
+    .maya-message-content h1 { font-size: 1.2em; }
+    .maya-message-content h2 { font-size: 1.1em; }
+    .maya-message-content h3 { font-size: 1.0em; }
+
+    .maya-message-content blockquote {
+      border-left: 3px solid var(--accent-color);
+      padding-left: 12px;
+      margin: 8px 0;
+      opacity: 0.85;
+    }
+
+    .maya-message-content table {
+      border-collapse: collapse;
+      margin: 8px 0;
+      width: 100%;
+    }
+
+    .maya-message-content th,
+    .maya-message-content td {
+      border: 1px solid var(--bg-tertiary);
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    .maya-message-content th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+    }
+
+    .maya-message-content p {
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .maya-message-content p:last-child {
+      margin-bottom: 0;
+    }
+
     .maya-message.user .maya-message-content code {
       background: rgba(255, 255, 255, 0.2);
+    }
+
+    .maya-message.user .maya-message-content pre {
+      background: rgba(0, 0, 0, 0.3);
     }
 
     /* Typing Indicator */
@@ -657,6 +751,8 @@
       }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 </head>
 
 <body>
@@ -1876,9 +1972,35 @@
       }, 2000);
     }
 
-    // Format message (simple markdown-like formatting)
     function formatMessage(text) {
+      if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+        const raw = marked.parse(text);
+        const clean = DOMPurify.sanitize(raw, {
+          ADD_TAGS: ['pre', 'code'],
+          ADD_ATTR: ['class']
+        });
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = clean;
+        wrapper.querySelectorAll('pre').forEach(function(pre) {
+          const btn = document.createElement('button');
+          btn.className = 'code-copy-btn';
+          btn.textContent = 'Copy';
+          btn.onclick = function(e) {
+            e.stopPropagation();
+            const codeEl = pre.querySelector('code');
+            const codeText = codeEl ? codeEl.textContent : pre.textContent;
+            navigator.clipboard.writeText(codeText).then(function() {
+              btn.textContent = 'Copied!';
+              setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+            });
+          };
+          pre.appendChild(btn);
+        });
+        return wrapper.innerHTML;
+      }
       return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
