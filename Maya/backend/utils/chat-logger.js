@@ -6,6 +6,7 @@
  */
 
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { logInfo, logError, logWarning } from "./logger.js";
@@ -262,6 +263,7 @@ function generateConversationId() {
  * @param {number} data.statusCode - HTTP status code (optional)
  * @param {string} data.errorType - Error type/category (optional)
  * @param {string} data.errorMessage - Error message (optional, sanitized)
+ * @param {string} data.requestHost - Request Host header for production detection (optional)
  */
 export async function logChatAttempt({
   userMessage,
@@ -277,6 +279,7 @@ export async function logChatAttempt({
   statusCode = 200,
   errorType = null,
   errorMessage = null,
+  requestHost = null,
 }) {
   try {
     await ensureLogsDirectory();
@@ -292,6 +295,15 @@ export async function logChatAttempt({
     // Sanitize user message (limit length, handle null/undefined)
     const sanitizedMessage = userMessage ? userMessage.substring(0, 5000) : '';
     
+    const resolvedHost = requestHost
+      || process.env.SERVER_HOST
+      || os.hostname()
+      || "unknown";
+
+    const isProductionHost = resolvedHost.includes("ai-builders.space")
+      || resolvedHost.includes("janetxiushi.me");
+    const resolvedEnv = isProductionHost ? "production" : config.nodeEnv;
+
     // Create log entry with status information
     const logEntry = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -299,8 +311,8 @@ export async function logChatAttempt({
       timestamp: now.toISOString(),
       status: status, // 'success', 'rate_limited', 'validation_error', 'cors_error', 'timeout', 'config_error', 'api_error', 'unknown_error'
       statusCode: statusCode,
-      environment: config.nodeEnv,
-      serverHost: process.env.SERVER_HOST || "localhost",
+      environment: resolvedEnv,
+      serverHost: resolvedHost,
       userMessage: sanitizedMessage,
       assistantResponse: assistantResponse ? assistantResponse.substring(0, 5000) : null,
       historyLength: history ? history.length : 0,
@@ -425,6 +437,7 @@ export async function logChatMessage({
   warnings = [],
   responseTime,
   conversationId,
+  requestHost = null,
 }) {
   return logChatAttempt({
     userMessage,
@@ -438,6 +451,7 @@ export async function logChatMessage({
     conversationId,
     status: 'success',
     statusCode: 200,
+    requestHost,
   });
 }
 

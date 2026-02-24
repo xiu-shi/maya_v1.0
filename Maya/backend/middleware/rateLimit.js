@@ -33,6 +33,7 @@ export const apiLimiter = rateLimit({
         statusCode: 429,
         errorType: 'rate_limit_exceeded',
         errorMessage: `Rate limit exceeded. Maximum ${config.rateLimitMaxRequests} requests per ${config.rateLimitWindowMs / 1000} seconds.`,
+        requestHost: req.get('host') || req.hostname || null,
       }).catch(err => {
         logWarning('Failed to log rate-limited attempt', { error: err.message });
       });

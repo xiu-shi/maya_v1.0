@@ -72,6 +72,10 @@ echo -e "${BLUE}3. Deployment API Validation${NC}"
 run_test_suite "../tests/deployment_tests/deployment-api.test.js" \
                "Deployment API"
 
+echo -e "${BLUE}4. API Client Initialization${NC}"
+run_test_suite "tests/api-client-init.test.js" \
+               "API Client Init (prevents 503)"
+
 # Summary
 echo ""
 echo -e "${BLUE}========================================${NC}"

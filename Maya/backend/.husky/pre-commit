@@ -7,6 +7,16 @@
 
 echo "🔒 Checking for sensitive files..."
 
+# CRITICAL: Block API keys and credentials from being committed
+CRED_FILES=$(git diff --cached --name-only | grep -E '^\.env$|^\.env\.|/\.env$|/\.env\.' | grep -v '\.example$' || true)
+if [ -n "$CRED_FILES" ]; then
+    echo "❌ BLOCKED: Attempting to commit API keys or credentials!"
+    echo "   Never commit .env, API keys, tokens, or secrets."
+    echo "   Files blocked:"
+    echo "$CRED_FILES" | sed 's/^/     - /'
+    exit 1
+fi
+
 # CRITICAL: Block chat logs with PII from being committed
 CHAT_LOGS=$(git diff --cached --name-only | grep -E "chat-logs.*\.json|data/.*\.json")
 if [ -n "$CHAT_LOGS" ]; then

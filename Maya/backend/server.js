@@ -1000,6 +1000,7 @@ app.post(
         statusCode: 503,
         errorType: 'missing_token',
         errorMessage: 'AI_BUILDER_TOKEN environment variable is not set',
+        requestHost: req.get("host") || req.hostname || null,
       }).catch((err) => {
         logError("Failed to log config error attempt", err);
       });
@@ -1032,6 +1033,7 @@ app.post(
         statusCode: 503,
         errorType: 'api_client_init_failed',
         errorMessage: 'Unable to initialize AI service client',
+        requestHost: req.get("host") || req.hostname || null,
       }).catch((err) => {
         logError("Failed to log API client init error attempt", err);
       });
@@ -1063,6 +1065,7 @@ app.post(
           statusCode: 503,
           errorType: 'chat_method_unavailable',
           errorMessage: 'API client chat method not available',
+          requestHost: req.get("host") || req.hostname || null,
         }).catch((err) => {
           logError("Failed to log API method error attempt", err);
         });
@@ -1106,6 +1109,7 @@ app.post(
           statusCode: 500,
           errorType: 'invalid_api_response',
           errorMessage: 'Invalid response structure from AI service',
+          requestHost: req.get("host") || req.hostname || null,
         }).catch((err) => {
           logError("Failed to log API response error attempt", err);
         });
@@ -1137,6 +1141,7 @@ app.post(
           statusCode: 500,
           errorType: 'empty_api_response',
           errorMessage: 'Empty or invalid content in API response',
+          requestHost: req.get("host") || req.hostname || null,
         }).catch((err) => {
           logError("Failed to log empty response error attempt", err);
         });
@@ -1147,23 +1152,46 @@ app.post(
         });
       }
 
-      // Log chat message (async, non-blocking)
       const requestStartTime = req.startTime || Date.now();
       const responseTime = Date.now() - requestStartTime;
+      const requestHost = req.get("host") || req.hostname || null;
 
-      logChatMessage({
-        userMessage: message,
-        assistantResponse: content,
-        history: history,
-        ip: req.ip,
-        userAgent: req.get("user-agent"),
-        warnings: warnings || [],
-        responseTime: responseTime,
-        conversationId: req.body.conversationId, // Optional: frontend can send conversationId
-      }).catch((err) => {
-        // Log error but don't fail the request
-        logError("Failed to log chat message", err);
-      });
+      // Detect API-client error returned as content (error swallowed by api-client catch block)
+      const isApiClientError = !!(result.error || result.errorType);
+
+      if (isApiClientError) {
+        logChatAttempt({
+          userMessage: message,
+          assistantResponse: content,
+          history: history,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          warnings: warnings || [],
+          responseTime: responseTime,
+          conversationId: req.body.conversationId,
+          status: 'api_error',
+          statusCode: result.statusCode || 502,
+          errorType: result.errorType || 'upstream_api_error',
+          errorMessage: result.error || 'Upstream API returned error as content',
+          requestHost: requestHost,
+        }).catch((err) => {
+          logError("Failed to log API client error attempt", err);
+        });
+      } else {
+        logChatMessage({
+          userMessage: message,
+          assistantResponse: content,
+          history: history,
+          ip: req.ip,
+          userAgent: req.get("user-agent"),
+          warnings: warnings || [],
+          responseTime: responseTime,
+          conversationId: req.body.conversationId,
+          requestHost: requestHost,
+        }).catch((err) => {
+          logError("Failed to log chat message", err);
+        });
+      }
 
       // Return response
       res.json({
@@ -1192,6 +1220,7 @@ app.post(
           statusCode: 504,
           errorType: 'request_timeout',
           errorMessage: `Request timeout after ${chatTimeout}ms`,
+          requestHost: req.get("host") || req.hostname || null,
         }).catch((err) => {
           logError("Failed to log timeout error attempt", err);
         });
@@ -1230,6 +1259,7 @@ app.post(
         statusCode: statusCode,
         errorType: error.name || 'unknown',
         errorMessage: error.message ? error.message.substring(0, 500) : 'Unknown error occurred',
+        requestHost: req.get("host") || req.hostname || null,
       }).catch((err) => {
         logError("Failed to log error attempt", err);
       });

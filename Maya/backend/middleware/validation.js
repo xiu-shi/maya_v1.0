@@ -45,7 +45,8 @@ export function validateChatRequest(req, res, next) {
           status: 'validation_error',
           statusCode: 400,
           errorType: 'validation_failed',
-          errorMessage: sanitized.errors.join('; ').substring(0, 500), // Limit error message length
+          errorMessage: sanitized.errors.join('; ').substring(0, 500),
+          requestHost: req.get('host') || req.hostname || null,
         }).catch(err => {
           logWarning('Failed to log validation error', { error: err.message });
         });

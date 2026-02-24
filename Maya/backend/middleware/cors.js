@@ -101,6 +101,7 @@ export function corsErrorHandler(err, req, res, next) {
         statusCode: 403,
         errorType: 'cors_policy_violation',
         errorMessage: `CORS policy violation: ${err.message.substring(0, 200)}`,
+        requestHost: req.get('host') || req.hostname || null,
       }).catch(logErr => {
         logWarning('Failed to log CORS error', { error: logErr.message });
       });
