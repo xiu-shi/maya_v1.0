@@ -1285,16 +1285,22 @@ app.use(notFoundHandler);
 app.use(corsErrorHandler);
 app.use(errorHandler);
 
-// Graceful shutdown
+// Graceful shutdown — finalize all active conversation sessions before exiting
 process.on("SIGTERM", async () => {
   logInfo("SIGTERM received, shutting down gracefully...");
-  // API client uses direct HTTP calls, no connection to close
+  try {
+    const { finalizeAllSessions } = await import("./utils/conversation-session.js");
+    await finalizeAllSessions();
+  } catch { /* best effort */ }
   process.exit(0);
 });
 
 process.on("SIGINT", async () => {
   logInfo("SIGINT received, shutting down gracefully...");
-  // API client uses direct HTTP calls, no connection to close
+  try {
+    const { finalizeAllSessions } = await import("./utils/conversation-session.js");
+    await finalizeAllSessions();
+  } catch { /* best effort */ }
   process.exit(0);
 });
 

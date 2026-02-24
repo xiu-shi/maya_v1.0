@@ -11,6 +11,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { logInfo, logError, logWarning } from "./logger.js";
 import { withFileLock } from "./file-lock.js";
+import {
+  trackConversationMessage,
+  setConversationEndHandler,
+} from "./conversation-session.js";
 import config from "../config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,6 +22,29 @@ const __dirname = path.dirname(__filename);
 
 // Storage directory: Maya/backend/data/chat-logs/
 const LOGS_DIR = path.join(__dirname, "..", "data", "chat-logs");
+
+// Register the S3 finalization handler for conversation end (5-min inactivity).
+// When a conversation goes inactive, this writes conversationStatus: "completed" to S3.
+setConversationEndHandler(async (conversationId, session) => {
+  if (process.env.ENABLE_S3_LOGGING !== 'true' || !process.env.AWS_S3_BUCKET) return;
+
+  try {
+    const { getS3KeyForConversation, finalizeConversationInS3 } =
+      await import('./s3-logger.js');
+    const s3Key = getS3KeyForConversation(conversationId);
+    await finalizeConversationInS3(s3Key, {
+      endedAt: session.endedAt,
+      endReason: 'inactivity_timeout',
+      finalMessageCount: session.messageCount,
+      durationMs: session.durationMs,
+    });
+  } catch (error) {
+    logWarning('Failed to finalize conversation in S3', {
+      conversationId,
+      error: error.message,
+    });
+  }
+});
 
 // S3 upload metrics tracking
 let s3UploadMetrics = {
@@ -62,27 +89,24 @@ function isRetryableError(error) {
  * S3 upload function with retry logic and queue management (lazy-loaded, optional)
  * Implements exponential backoff retry strategy and concurrent upload safety
  */
-let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
-  // Default: no-op if S3 not configured
+let uploadToS3Async = async (logEntry, retries = 3) => {
   if (process.env.ENABLE_S3_LOGGING !== 'true' || !process.env.AWS_S3_BUCKET) {
     return false;
   }
-  
+
   s3UploadMetrics.totalAttempts++;
-  
-  // Unique key per message (timestamp + IP + id) so we never overwrite previous messages
-  const { getS3KeyForEntry } = await import('./s3-logger.js');
-  const s3Key = getS3KeyForEntry(logEntry);
+
+  const { getS3KeyForConversation } = await import('./s3-logger.js');
+  const s3Key = getS3KeyForConversation(logEntry.conversationId);
 
   const { queueS3Upload } = await import('./s3-upload-queue.js');
 
-  return queueS3Upload(s3Key, logEntry, async (entry, logs) => {
-    // This function is called by the queue when it's safe to upload
+  return queueS3Upload(s3Key, logEntry, async (newEntries) => {
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        const { uploadLogToS3 } = await import('./s3-logger.js');
-        const success = await uploadLogToS3(entry, logs);
-        
+        const { uploadConversationToS3 } = await import('./s3-logger.js');
+        const success = await uploadConversationToS3(s3Key, newEntries);
+
         if (success) {
           s3UploadMetrics.totalSuccesses++;
           s3UploadMetrics.lastUploadTime = new Date().toISOString();
@@ -90,12 +114,10 @@ let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
           s3UploadMetrics.consecutiveFailures = 0;
           return true;
         } else {
-          // uploadLogToS3 returned false (error logged internally)
           s3UploadMetrics.totalFailures++;
           s3UploadMetrics.consecutiveFailures++;
-          
+
           if (attempt < retries - 1) {
-            // Wait before retry (exponential backoff: 1s, 2s, 4s)
             const delay = Math.pow(2, attempt) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
           }
@@ -108,55 +130,38 @@ let uploadToS3Async = async (logEntry, existingLogs, retries = 3) => {
           timestamp: new Date().toISOString(),
         };
         s3UploadMetrics.consecutiveFailures++;
-        
-        // Check if error is retryable
+
         if (!isRetryableError(error)) {
-          logError('S3 upload failed (non-retryable error)', error, {
+          logError('S3 conversation upload failed (non-retryable)', error, {
             bucket: process.env.AWS_S3_BUCKET,
             errorCode: error.code,
-            errorMessage: error.message,
-            errorName: error.name,
-            logEntryId: entry.id,
-            timestamp: entry.timestamp,
-            isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
-            isPermissionError: error.code === 'AccessDenied',
+            conversationId: logEntry.conversationId,
             retryable: false,
           });
           return false;
         }
-        
-        // Log error (will retry)
+
         if (attempt < retries - 1) {
-          logWarning('S3 upload failed, retrying', {
+          logWarning('S3 conversation upload failed, retrying', {
             bucket: process.env.AWS_S3_BUCKET,
             errorCode: error.code,
-            errorMessage: error.message,
             attempt: attempt + 1,
             maxRetries: retries,
             nextRetryIn: `${Math.pow(2, attempt) * 1000}ms`,
           });
-          
-          // Wait before retry (exponential backoff: 1s, 2s, 4s)
           const delay = Math.pow(2, attempt) * 1000;
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
-          // Final attempt failed
-          logError('S3 upload failed after retries', error, {
+          logError('S3 conversation upload failed after retries', error, {
             bucket: process.env.AWS_S3_BUCKET,
             errorCode: error.code,
-            errorMessage: error.message,
-            errorName: error.name,
-            logEntryId: entry.id,
-            timestamp: entry.timestamp,
-            retries: retries,
-            isCredentialsError: error.code === 'CredentialsError' || error.code === 'InvalidAccessKeyId',
-            isPermissionError: error.code === 'AccessDenied',
-            retryable: isRetryableError(error),
+            conversationId: logEntry.conversationId,
+            retries,
           });
         }
       }
     }
-    
+
     return false;
   });
 };
@@ -372,16 +377,22 @@ export async function logChatAttempt({
       await fs.writeFile(logFilePath, JSON.stringify(logs, null, 2), "utf-8");
     });
 
-    // Upload to S3 IMMEDIATELY (real-time capture, async, non-blocking)
-    // This happens outside the file lock to avoid blocking other requests
-    // Each upload is independent and handles its own concurrency via S3's queue
-    uploadToS3Async(logEntry, [logEntry]).catch(err => {
-      // Error already logged in uploadToS3Async with retry logic
-      // This catch is just a safety net
-      logWarning('S3 upload failed (continuing with file logging)', {
+    // Upload to S3 as conversation document (async, non-blocking)
+    // The queue serializes by conversationId so messages accumulate in one S3 object
+    uploadToS3Async(logEntry).catch(err => {
+      logWarning('S3 conversation upload failed (continuing with file logging)', {
         error: err.message,
         logEntryId: logEntry.id,
+        conversationId: convId,
       });
+    });
+
+    // Track conversation session for inactivity-based finalization.
+    // After 5 minutes of no messages, the session manager marks the
+    // conversation as "completed" in S3 with duration and end timestamp.
+    trackConversationMessage(convId, {
+      ip: logEntry.ip,
+      userAgent: logEntry.userAgent,
     });
 
     logInfo("Chat attempt logged", {
