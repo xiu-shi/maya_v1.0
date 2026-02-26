@@ -14,6 +14,7 @@ import { logInfo, logWarning } from './logger.js';
 
 const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 const activeSessions = new Map();
+const finalizedSessions = new Map(); // conversationId → true (tracks ended conversations)
 
 let _onConversationEnd = null;
 
@@ -26,6 +27,27 @@ let _onConversationEnd = null;
  */
 export function setConversationEndHandler(handler) {
   _onConversationEnd = handler;
+}
+
+/**
+ * Check if a conversationId was previously finalized (5-min inactivity).
+ * If so, the caller should create a new conversation segment.
+ *
+ * @param {string} conversationId
+ * @returns {boolean}
+ */
+export function wasConversationFinalized(conversationId) {
+  return finalizedSessions.has(conversationId);
+}
+
+/**
+ * Generate a new segment ID for a conversation that was finalized.
+ * Format: conv_<timestamp>_<random>  (completely new ID for S3 isolation)
+ *
+ * @returns {string} New conversation ID
+ */
+export function generateSegmentId() {
+  return `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
@@ -70,6 +92,7 @@ async function onConversationInactive(conversationId) {
   if (!session) return;
 
   activeSessions.delete(conversationId);
+  finalizedSessions.set(conversationId, true);
 
   const endedAt = new Date().toISOString();
   const durationMs = Date.now() - new Date(session.startedAt).getTime();
@@ -139,6 +162,7 @@ export function clearAllSessions() {
     if (session.timer) clearTimeout(session.timer);
   }
   activeSessions.clear();
+  finalizedSessions.clear();
 }
 
 export { INACTIVITY_TIMEOUT_MS };

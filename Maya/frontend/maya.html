@@ -1057,8 +1057,13 @@
 
     // Chat state
     let currentChatId = null;
+    let conversationId = null;
     let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
+
+    function generateConversationId() {
+      return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
     
     // Global function for sample question clicks (accessible from onclick attribute)
     // This ensures clicks work even if event listeners fail
@@ -1547,9 +1552,11 @@
     // Create new chat
     function createNewChat() {
       currentChatId = Date.now().toString();
+      conversationId = generateConversationId();
       messageHistory = [];
       chats.unshift({
         id: currentChatId,
+        conversationId: conversationId,
         title: 'New Chat',
         createdAt: Date.now(),
         messages: []
@@ -1651,6 +1658,7 @@
       if (!chat) return;
 
       currentChatId = chatId;
+      conversationId = chat.conversationId || generateConversationId();
       messageHistory = chat.messages || [];
       renderMessages();
       renderChatHistory();
@@ -1753,7 +1761,8 @@
           },
           body: JSON.stringify({
             message,
-            history: messageHistory
+            history: messageHistory,
+            conversationId: conversationId
           }),
           signal: controller.signal
         }).catch(fetchError => {
@@ -1809,6 +1818,16 @@
           error.status = response.status;
           error.data = data;
           throw error;
+        }
+
+        // If backend assigned a new conversationId (e.g., after 5-min inactivity gap),
+        // update the frontend state so subsequent messages use the new segment ID.
+        if (data.conversationId && data.conversationId !== conversationId) {
+          console.log('🔄 Backend assigned new conversation segment:', data.conversationId);
+          conversationId = data.conversationId;
+          const chat = chats.find(c => c.id === currentChatId);
+          if (chat) chat.conversationId = conversationId;
+          saveChats();
         }
 
         // Add Maya's response

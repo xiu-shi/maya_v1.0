@@ -10,6 +10,24 @@ Concurrent conversations from different users are fully isolated — each conver
 
 ## Changelog
 
+### 2026-02-26 — Critical Bug Fixes: S3 Logging Pipeline
+
+**Root Cause Analysis**: S3 logging on production was completely non-functional after Feb 24th. Three bugs identified and fixed:
+
+1. **Deployment script missing AWS env vars** — `DEPLOY_WITH_ENV_VAR.sh` only sent `SYSTEM_INSTRUCTION` to the container. `ENABLE_S3_LOGGING`, `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_REGION` were never deployed. Fixed by loading AWS vars from `Maya/backend/.env` and including them in the deployment payload.
+
+2. **Frontend never sent `conversationId`** — `maya.html` sent `{ message, history }` without a `conversationId`, so the backend generated a new random ID for every single message. This meant each message was stored as a separate 1-message S3 document instead of accumulating into a conversation. Fixed by generating `conversationId` on the frontend per chat session and sending it with each request.
+
+3. **No conversation segmentation after 5-min gap** — If a user resumes chatting after 5 minutes of inactivity (within the same browser session), the system now treats it as a brand new conversation with a fresh `conversationId`. Backend tracks finalized conversations and generates a new segment ID when a finalized conversation receives a new message. The new `conversationId` is sent back to the frontend in the response.
+
+**Files Changed**:
+- `Maya/frontend/maya.html` — generate and send `conversationId`, accept new segment IDs from backend
+- `Maya/backend/utils/conversation-session.js` — added `wasConversationFinalized()`, `generateSegmentId()`, finalized session tracking
+- `Maya/backend/server.js` — resolve conversation segmentation before logging/responding, import session manager
+- `DEPLOY_WITH_ENV_VAR.sh` — load and send all AWS env vars to deployment API
+- `Maya/backend/tests/conversation-session.test.js` — 8 new tests for segmentation tracking and segment ID generation (35 total)
+- Updated 9 test files to mock the two new exports
+
 ### 2026-02-15 — Conversation Lifecycle & Session Manager
 
 **New: Conversation Session Manager** (`utils/conversation-session.js`)
@@ -103,15 +121,26 @@ chat-logs/
 ### Conversation Lifecycle
 
 ```
-User sends message → logChatAttempt()
-  ├─ Write to local file (data/chat-logs/YYYY-MM-DD.json)
-  ├─ Upload to S3 (conversation document, status: "active")
-  └─ trackConversationMessage() — reset 5-min timer
+Frontend generates conversationId per chat session (stored in browser)
+  └─ Sent with every POST /api/chat request
+
+Backend receives message:
+  1. server.js checks wasConversationFinalized(conversationId)
+     ├─ If finalized (5-min gap) → generate new segment ID, return in response
+     └─ If active or new → use original conversationId
+  2. logChatAttempt() with resolved conversationId
+     ├─ Write to local file (data/chat-logs/YYYY-MM-DD.json)
+     ├─ Upload to S3 (conversation document, status: "active")
+     └─ trackConversationMessage() — reset 5-min timer
+  3. Response includes conversationId (frontend updates if changed)
 
 ... 5 minutes of silence ...
 
 Timer fires → onConversationInactive()
-  └─ finalizeConversationInS3() — set status: "completed", endedAt, durationMs
+  ├─ finalizeConversationInS3() — set status: "completed", endedAt, durationMs
+  └─ Mark conversationId as finalized (for segmentation)
+
+User resumes after 5-min gap → new conversationId segment (new S3 document)
 
 Server shutdown (SIGTERM/SIGINT):
   └─ finalizeAllSessions() — finalize all active conversations

@@ -72,130 +72,70 @@ function getQueue(s3Key) {
 }
 
 /**
- * Process the upload queue for an S3 key
+ * Process the upload queue for an S3 key (conversation-based).
+ * Collects all pending entries and passes the batch to uploadFunction.
+ * The uploadFunction handles GET-append-PUT for the conversation.
  */
 async function processQueue(s3Key, uploadFunction) {
   const queue = getQueue(s3Key);
 
   if (queue.processing) {
-    return; // Already processing, will be handled by existing process
+    return;
   }
 
   if (queue.queue.length === 0 && queue.pendingLogs.length === 0) {
-    return; // Nothing to process
+    return;
   }
 
   queue.processing = true;
 
   while (queue.queue.length > 0 || queue.pendingLogs.length > 0) {
-    // Collect all pending logs and queued operations
-    const logsToUpload = [...queue.pendingLogs];
+    const newEntries = [...queue.pendingLogs];
     const queuedOps = [];
     queue.pendingLogs = [];
 
-    // Process queued operations (save resolve/reject callbacks)
     while (queue.queue.length > 0) {
-      const queuedOp = queue.queue.shift();
-      logsToUpload.push(queuedOp.logEntry);
-      queuedOps.push(queuedOp);
+      const op = queue.queue.shift();
+      newEntries.push(op.logEntry);
+      queuedOps.push(op);
     }
 
-    if (logsToUpload.length > 0) {
+    const seen = new Set();
+    const uniqueEntries = newEntries.filter(e => {
+      if (!e || !e.id) return false;
+      if (seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
+
+    if (uniqueEntries.length > 0) {
       try {
-        const latestLog = logsToUpload[logsToUpload.length - 1];
-
-        // Unique-key format: one object per message; no fetch/merge (avoids overwrite on fetch failure)
-        const { isLegacyDayKey } = await import('./s3-logger.js');
-        let existingLogs = [];
-        if (isLegacyDayKey(s3Key)) {
-          try {
-            const { fetchLogsFromS3 } = await import('./s3-logger.js');
-            const date = new Date(latestLog.timestamp || new Date());
-            const startDate = new Date(Date.UTC(
-              date.getUTCFullYear(),
-              date.getUTCMonth(),
-              date.getUTCDate()
-            ));
-            const endDate = new Date(Date.UTC(
-              date.getUTCFullYear(),
-              date.getUTCMonth(),
-              date.getUTCDate()
-            ));
-            existingLogs = await withTimeout(
-              fetchLogsFromS3(startDate, endDate),
-              TIMEOUTS.S3_FETCH,
-              `S3 fetch for merge: ${s3Key}`
-            );
-            if (!Array.isArray(existingLogs)) existingLogs = [];
-          } catch (error) {
-            logWarning('Failed to fetch existing logs from S3 for merge', {
-              error: error.message,
-              s3Key,
-            });
-          }
-        }
-
-        // Merge existing logs with new logs (deduplicate by ID)
-        // Validate all logs have required fields
-        const validExistingLogs = existingLogs.filter(log => 
-          log && typeof log === 'object' && log.id && log.timestamp
-        );
-        const validNewLogs = logsToUpload.filter(log => 
-          log && typeof log === 'object' && log.id && log.timestamp
-        );
-        
-        const existingIds = new Set(validExistingLogs.map(log => log.id));
-        const newLogs = validNewLogs.filter(log => !existingIds.has(log.id));
-        const allLogs = [...validExistingLogs, ...newLogs];
-        
-        // Log warning if any logs were filtered out
-        if (validExistingLogs.length !== existingLogs.length) {
-          logWarning('Filtered invalid logs from existing logs', {
-            s3Key,
-            originalCount: existingLogs.length,
-            validCount: validExistingLogs.length,
-          });
-        }
-        if (validNewLogs.length !== logsToUpload.length) {
-          logWarning('Filtered invalid logs from new logs', {
-            s3Key,
-            originalCount: logsToUpload.length,
-            validCount: validNewLogs.length,
-          });
-        }
-
-        // Upload merged logs with timeout protection
         const success = await withTimeout(
-          uploadFunction(latestLog, allLogs),
+          uploadFunction(uniqueEntries),
           TIMEOUTS.S3_UPLOAD,
-          `S3 upload queue: ${s3Key}`
+          `S3 conversation queue: ${s3Key}`
         );
 
         if (success) {
           queue.lastUpload = new Date().toISOString();
-          logInfo('S3 upload queue processed', {
+          logInfo('S3 conversation queue processed', {
             s3Key,
-            logsUploaded: logsToUpload.length,
-            totalLogs: allLogs.length,
-            concurrentRequests: logsToUpload.length,
+            entriesUploaded: uniqueEntries.length,
           });
         }
 
-        // Resolve all queued operations (all logs uploaded together)
-        // Note: We resolve all with the same success status since they're batched
-        for (const queuedOp of queuedOps) {
-          queuedOp.resolve(success);
+        for (const op of queuedOps) {
+          op.resolve(success);
         }
       } catch (error) {
-        logWarning('S3 upload queue processing failed', {
+        logWarning('S3 conversation queue processing failed', {
           s3Key,
           error: error.message,
-          logsCount: logsToUpload.length,
+          entriesCount: uniqueEntries.length,
         });
 
-        // Reject all queued operations
-        for (const queuedOp of queuedOps) {
-          queuedOp.reject(error);
+        for (const op of queuedOps) {
+          op.reject(error);
         }
       }
     }

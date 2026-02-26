@@ -38,6 +38,10 @@ import {
   getStorageStats,
   getS3UploadMetrics,
 } from "./utils/chat-logger.js";
+import {
+  wasConversationFinalized,
+  generateSegmentId,
+} from "./utils/conversation-session.js";
 import { exec } from "child_process";
 import { promisify } from "util";
 const execAsync = promisify(exec);
@@ -1156,6 +1160,14 @@ app.post(
       const responseTime = Date.now() - requestStartTime;
       const requestHost = req.get("host") || req.hostname || null;
 
+      // Resolve conversationId: if the original was finalized (5-min gap), create a new segment
+      let resolvedConversationId = req.body.conversationId || null;
+      let conversationSegmented = false;
+      if (resolvedConversationId && wasConversationFinalized(resolvedConversationId)) {
+        resolvedConversationId = generateSegmentId();
+        conversationSegmented = true;
+      }
+
       // Detect API-client error returned as content (error swallowed by api-client catch block)
       const isApiClientError = !!(result.error || result.errorType);
 
@@ -1168,7 +1180,7 @@ app.post(
           userAgent: req.get("user-agent"),
           warnings: warnings || [],
           responseTime: responseTime,
-          conversationId: req.body.conversationId,
+          conversationId: resolvedConversationId,
           status: 'api_error',
           statusCode: result.statusCode || 502,
           errorType: result.errorType || 'upstream_api_error',
@@ -1186,18 +1198,21 @@ app.post(
           userAgent: req.get("user-agent"),
           warnings: warnings || [],
           responseTime: responseTime,
-          conversationId: req.body.conversationId,
+          conversationId: resolvedConversationId,
           requestHost: requestHost,
         }).catch((err) => {
           logError("Failed to log chat message", err);
         });
       }
 
-      // Return response
-      res.json({
+      const responsePayload = {
         response: content,
         warnings: warnings || [],
-      });
+      };
+      if (resolvedConversationId) {
+        responsePayload.conversationId = resolvedConversationId;
+      }
+      res.json(responsePayload);
     } catch (error) {
       // Handle timeout specifically
       if (error.message === "Chat request timeout") {

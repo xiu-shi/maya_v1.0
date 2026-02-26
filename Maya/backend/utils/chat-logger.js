@@ -294,7 +294,6 @@ export async function logChatAttempt({
     // Timestamp is already in ISO format (UTC) when stored, but ensure date path uses UTC
     const logFilePath = getLogFilePath(now);
 
-    // Generate conversation ID if not provided
     const convId = conversationId || generateConversationId();
 
     // Sanitize user message (limit length, handle null/undefined)
