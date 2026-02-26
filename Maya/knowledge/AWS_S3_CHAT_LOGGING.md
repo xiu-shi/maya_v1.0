@@ -77,6 +77,159 @@ Concurrent conversations from different users are fully isolated — each conver
 
 ## Architecture
 
+### Full System Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         FRONTEND (maya.html)                           │
+│                                                                        │
+│  Page Load                                                             │
+│  ├─ Most recent chat from previous day? → Auto-create NEW CHAT         │
+│  └─ Today's chat? → Load normally                                      │
+│                                                                        │
+│  User Sends Message                                                    │
+│  ├─ Previous-day chat? → BLOCK  "Start a NEW CHAT"                     │
+│  └─ Today's chat? → POST /api/chat                                     │
+│       body: { message, history, conversationId }                       │
+│                                     │                                  │
+│  Response from Backend              │                                  │
+│  ├─ Same conversationId? → Continue │                                  │
+│  └─ NEW conversationId?  → Update local state (5-min gap detected)     │
+└─────────────────────────────┬───────────────────────────────────────────┘
+                              │
+                    POST /api/chat
+                              │
+┌─────────────────────────────▼───────────────────────────────────────────┐
+│                       BACKEND (server.js)                              │
+│                                                                        │
+│  1. RESOLVE CONVERSATION ID                                            │
+│     ├─ wasConversationFinalized(id)?  → generateSegmentId() (new!)     │
+│     ├─ Cross-day timestamp in id?     → generateSegmentId() (new!)     │
+│     └─ Otherwise                      → use original id               │
+│                                                                        │
+│  2. CALL AI API → get Maya's response                                  │
+│                                                                        │
+│  3. LOG (async, non-blocking — does NOT delay the response)            │
+│     │                                                                  │
+│     ▼                                                                  │
+│  ┌──────────────────────────────────────────────────┐                  │
+│  │           chat-logger.js                         │                  │
+│  │                                                  │                  │
+│  │  ├─ Write to local file (data/chat-logs/*.json)  │                  │
+│  │  │                                               │                  │
+│  │  ├─ Upload to S3 (REAL-TIME) ──────────┐         │                  │
+│  │  │                                     │         │                  │
+│  │  └─ trackConversationMessage() ────┐   │         │                  │
+│  └────────────────────────────────────┼───┼─────────┘                  │
+│                                       │   │                            │
+│  4. RETURN RESPONSE                   │   │                            │
+│     { response, conversationId }      │   │                            │
+└───────────────────────────────────────┼───┼────────────────────────────┘
+                                        │   │
+           ┌────────────────────────────┘   │
+           │                                │
+           ▼                                ▼
+┌─────────────────────────┐   ┌──────────────────────────────────────────┐
+│ conversation-session.js │   │         s3-upload-queue.js               │
+│                         │   │                                          │
+│ In-memory session map:  │   │  Per-key upload queue (mutex):           │
+│ { convId → {            │   │  ┌─────────────┐                        │
+│     ip, userAgent,      │   │  │ conv_abc.json│──▶ serialize writes    │
+│     startedAt,          │   │  ├─────────────┤                        │
+│     lastActivity,       │   │  │ conv_xyz.json│──▶ serialize writes    │
+│     messageCount,       │   │  └─────────────┘                        │
+│     timer (5 min)       │   │         │                                │
+│   }                     │   │         ▼                                │
+│ }                       │   │  ┌──────────────────────────────────┐    │
+│                         │   │  │      s3-logger.js                │    │
+│ Timer fires after       │   │  │                                  │    │
+│ 5 min inactivity:       │   │  │  uploadConversationToS3()        │    │
+│ ┌─────────────────────┐ │   │  │  ├─ GET existing doc from S3    │    │
+│ │ onConversationEnd() │ │   │  │  ├─ Append new message          │    │
+│ │ → finalize in S3    │─┼───┼──│  ├─ PUT updated doc to S3       │    │
+│ │ → mark finalized    │ │   │  │  └─ Deduplicate by msg ID       │    │
+│ │   (for segmentation)│ │   │  │                                  │    │
+│ └─────────────────────┘ │   │  │  finalizeConversationInS3()      │    │
+│                         │   │  │  ├─ status: "active"→"completed" │    │
+│ Graceful shutdown:      │   │  │  ├─ endedAt, durationMs          │    │
+│ finalizeAllSessions()   │   │  │  └─ endReason: inactivity_timeout│    │
+└─────────────────────────┘   │  └──────────────────────────────────┘    │
+                              └───────────────────┬──────────────────────┘
+                                                  │
+                                    REAL-TIME PUT  │
+                                                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          AWS S3 BUCKET                                 │
+│                    maya-ai-builder-prod-logs                            │
+│                       (eu-west-1)                                      │
+│                                                                        │
+│  chat-logs/                                                            │
+│    conversations/                                                      │
+│      2026/                                                             │
+│        02/                                                             │
+│          26/                                                           │
+│            conv_1740000000_abc.json  ← ACTIVE (3 messages so far)      │
+│            conv_1740000500_def.json  ← COMPLETED (5 min timeout)       │
+│          24/                                                           │
+│            conv_1739900000_ghi.json  ← COMPLETED (from Feb 24)         │
+│                                                                        │
+│  Each .json document:                                                  │
+│  ┌────────────────────────────────────────┐                            │
+│  │ {                                      │                            │
+│  │   conversationId: "conv_..._abc",      │                            │
+│  │   conversationStatus: "active",        │  ← or "completed"         │
+│  │   startedAt: "2026-02-26T09:00:00Z",   │                            │
+│  │   lastMessageAt: "2026-02-26T09:04Z",  │                            │
+│  │   endedAt: null,                       │  ← set on finalize        │
+│  │   durationMs: null,                    │  ← set on finalize        │
+│  │   messageCount: 3,                     │                            │
+│  │   messageCap: 30,                      │                            │
+│  │   ip: "203.0.113.1",                   │                            │
+│  │   messages: [                          │                            │
+│  │     { userMessage, assistantResponse,  │                            │
+│  │       timestamp, responseTime, ... },  │                            │
+│  │     ...                                │                            │
+│  │   ]                                    │                            │
+│  │ }                                      │                            │
+│  └────────────────────────────────────────┘                            │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Conversation Lifecycle Timeline
+
+```
+ Time ──────────────────────────────────────────────────────────────▶
+
+ 09:00   09:01   09:03              09:08 (5min gap)    09:15
+   │       │       │                    │                  │
+   ▼       ▼       ▼                    ▼                  ▼
+  msg1    msg2    msg3            FINALIZE            msg4 (NEW conv!)
+   │       │       │             status→completed        │
+   └───────┴───────┘             endedAt set             └──▶ new S3 doc
+   conv_aaa (active)             conv_aaa (completed)    conv_bbb (active)
+   S3: 1 msg → 2 → 3            S3: final write         S3: 1 msg
+
+ ─────── same day ──────────────────────────────────────────────────
+
+ NEXT DAY (Feb 27):
+   User opens Maya → sees yesterday's chat in sidebar
+   Clicks on it → READ-ONLY view + "Start a NEW CHAT" prompt
+   Clicks "New Chat" → fresh conversationId, new S3 document
+```
+
+### Real-Time Upload Behavior
+
+Each message triggers an **immediate** S3 PUT within the same request cycle (fired
+async so it does not delay the API response to the user). Messages are never batched
+or delayed. The upload queue serializes writes per conversation key so concurrent
+requests for the same conversation do not overwrite each other.
+
+The only **delayed** write is the finalization — 5 minutes after the last message, the
+session manager updates the S3 document from `"active"` to `"completed"` with
+`endedAt` and `durationMs`.
+
+---
+
 ### S3 Key Structure
 
 ```
@@ -126,7 +279,7 @@ chat-logs/
 }
 ```
 
-### Conversation Lifecycle
+### Conversation Lifecycle (Flow Detail)
 
 ```
 Frontend generates conversationId per chat session (stored in browser)
@@ -135,10 +288,11 @@ Frontend generates conversationId per chat session (stored in browser)
 Backend receives message:
   1. server.js checks wasConversationFinalized(conversationId)
      ├─ If finalized (5-min gap) → generate new segment ID, return in response
-     └─ If active or new → use original conversationId
+     ├─ If cross-day timestamp   → generate new segment ID, return in response
+     └─ If active or new         → use original conversationId
   2. logChatAttempt() with resolved conversationId
      ├─ Write to local file (data/chat-logs/YYYY-MM-DD.json)
-     ├─ Upload to S3 (conversation document, status: "active")
+     ├─ Upload to S3 IMMEDIATELY (conversation document, status: "active")
      └─ trackConversationMessage() — reset 5-min timer
   3. Response includes conversationId (frontend updates if changed)
 
@@ -148,7 +302,8 @@ Timer fires → onConversationInactive()
   ├─ finalizeConversationInS3() — set status: "completed", endedAt, durationMs
   └─ Mark conversationId as finalized (for segmentation)
 
-User resumes after 5-min gap → new conversationId segment (new S3 document)
+User resumes after 5-min gap (same day) → new conversationId (new S3 document)
+User resumes next day → frontend blocks input, prompts "Start a NEW CHAT"
 
 Server shutdown (SIGTERM/SIGINT):
   └─ finalizeAllSessions() — finalize all active conversations
@@ -170,17 +325,18 @@ Server shutdown (SIGTERM/SIGINT):
 
 | File | Purpose |
 |------|---------|
-| `utils/conversation-session.js` | Session manager — tracks active conversations, inactivity timers |
+| `utils/conversation-session.js` | Session manager — tracks active conversations, inactivity timers, finalization tracking |
 | `utils/s3-logger.js` | S3 operations — upload, finalize, fetch conversations |
 | `utils/s3-upload-queue.js` | Per-key upload queue with deduplication |
 | `utils/chat-logger.js` | Entry point — local file + S3 logging + session tracking |
-| `server.js` | Graceful shutdown integration |
+| `server.js` | Conversation ID resolution, cross-day check, graceful shutdown |
+| `frontend/maya.html` | Generates conversationId, cross-day blocking, "Start a NEW CHAT" prompt |
 
 ## Test Coverage
 
 | Test File | What it covers |
 |-----------|----------------|
-| `conversation-session.test.js` | Session tracking, timer reset, inactivity finalization, concurrency, shutdown |
+| `conversation-session.test.js` | Session tracking, timer reset, inactivity finalization, concurrency, shutdown, segmentation tracking, segment ID generation (35 tests) |
 | `s3-logger.test.js` | Upload, finalize, fetch, circuit breaker, timeout, backward compat |
 | `s3-upload-queue.test.js` | Queue serialization, batching, deduplication |
 | `s3-chat-logs-capture-requirements.test.js` | Key format, document schema, lifecycle fields |
