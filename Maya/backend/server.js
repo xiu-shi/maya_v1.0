@@ -1160,12 +1160,31 @@ app.post(
       const responseTime = Date.now() - requestStartTime;
       const requestHost = req.get("host") || req.hostname || null;
 
-      // Resolve conversationId: if the original was finalized (5-min gap), create a new segment
+      // Resolve conversationId:
+      // 1. If finalized (5-min inactivity gap within same day) → new segment
+      // 2. If from a different UTC day → new segment (cross-day defense-in-depth)
       let resolvedConversationId = req.body.conversationId || null;
       let conversationSegmented = false;
-      if (resolvedConversationId && wasConversationFinalized(resolvedConversationId)) {
-        resolvedConversationId = generateSegmentId();
-        conversationSegmented = true;
+      if (resolvedConversationId) {
+        let needsNewSegment = wasConversationFinalized(resolvedConversationId);
+
+        if (!needsNewSegment) {
+          const parts = resolvedConversationId.split('_');
+          if (parts.length >= 2 && !isNaN(parseInt(parts[1], 10))) {
+            const convDate = new Date(parseInt(parts[1], 10));
+            const now = new Date();
+            if (convDate.getUTCFullYear() !== now.getUTCFullYear() ||
+                convDate.getUTCMonth() !== now.getUTCMonth() ||
+                convDate.getUTCDate() !== now.getUTCDate()) {
+              needsNewSegment = true;
+            }
+          }
+        }
+
+        if (needsNewSegment) {
+          resolvedConversationId = generateSegmentId();
+          conversationSegmented = true;
+        }
       }
 
       // Detect API-client error returned as content (error swallowed by api-client catch block)

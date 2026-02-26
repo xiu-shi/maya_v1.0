@@ -1064,6 +1064,34 @@
     function generateConversationId() {
       return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
+
+    function isChatFromPreviousDay(chat) {
+      if (!chat) return false;
+      const lastActivity = chat.updatedAt || chat.createdAt;
+      if (!lastActivity) return false;
+      const chatDate = new Date(lastActivity);
+      const now = new Date();
+      return chatDate.getUTCFullYear() !== now.getUTCFullYear() ||
+             chatDate.getUTCMonth() !== now.getUTCMonth() ||
+             chatDate.getUTCDate() !== now.getUTCDate();
+    }
+
+    function showExpiredChatPrompt() {
+      chatInput.disabled = true;
+      submitBtn.disabled = true;
+      chatInput.placeholder = 'This conversation has ended. Please start a new chat.';
+      const promptMsg = document.createElement('div');
+      promptMsg.className = 'maya-expired-chat-prompt';
+      promptMsg.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px;margin:16px auto;max-width:400px;background:var(--bg-secondary);border-radius:12px;text-align:center;border:1px solid var(--border-color);';
+      promptMsg.innerHTML = `
+        <div style="font-size:24px;">📅</div>
+        <div style="font-size:var(--font-size-base);color:var(--text-primary);font-weight:600;">This conversation is from a previous day</div>
+        <div style="font-size:var(--font-size-sm);color:var(--text-secondary);line-height:1.5;">Previous conversations are read-only. Start a fresh conversation to continue chatting with Maya.</div>
+        <button onclick="document.getElementById('newChatBtn').click()" style="padding:10px 24px;background:var(--accent-primary);color:white;border:none;border-radius:8px;font-size:var(--font-size-base);font-weight:600;cursor:pointer;transition:all 0.2s;">Start a NEW CHAT</button>
+      `;
+      chatMessages.appendChild(promptMsg);
+      scrollToBottom(true);
+    }
     
     // Global function for sample question clicks (accessible from onclick attribute)
     // This ensures clicks work even if event listeners fail
@@ -1166,9 +1194,13 @@
     function init() {
       renderChatHistory();
       if (chats.length > 0) {
-        loadChat(chats[0].id);
+        const mostRecent = chats[0];
+        if (isChatFromPreviousDay(mostRecent) && (mostRecent.messages || []).length > 0) {
+          createNewChat();
+        } else {
+          loadChat(mostRecent.id);
+        }
       } else {
-        // No chats exist - show empty state with sample questions
         showEmptyState();
       }
     }
@@ -1662,7 +1694,17 @@
       messageHistory = chat.messages || [];
       renderMessages();
       renderChatHistory();
-      // Hide empty state if there are messages, show if empty
+
+      if (isChatFromPreviousDay(chat) && messageHistory.length > 0) {
+        if (emptyState) emptyState.style.display = 'none';
+        showExpiredChatPrompt();
+        return;
+      }
+
+      chatInput.disabled = false;
+      submitBtn.disabled = false;
+      chatInput.placeholder = 'Type your message here... (支持中文输入)';
+
       if (messageHistory.length === 0) {
         showEmptyState();
       } else if (emptyState) {
@@ -1683,6 +1725,13 @@
       }
       const message = chatInput.value.trim();
       if (!message) return;
+
+      // Block messages in chats from a previous day
+      const currentChat = chats.find(c => c.id === currentChatId);
+      if (currentChat && isChatFromPreviousDay(currentChat) && messageHistory.length > 0) {
+        showExpiredChatPrompt();
+        return;
+      }
 
       // Check chat limit: 30 messages total (15 user inputs + 15 responses)
       const userMessageCount = messageHistory.filter(msg => msg.role === 'user').length;

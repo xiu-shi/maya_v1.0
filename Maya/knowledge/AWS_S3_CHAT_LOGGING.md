@@ -20,10 +20,18 @@ Concurrent conversations from different users are fully isolated — each conver
 
 3. **No conversation segmentation after 5-min gap** — If a user resumes chatting after 5 minutes of inactivity (within the same browser session), the system now treats it as a brand new conversation with a fresh `conversationId`. Backend tracks finalized conversations and generates a new segment ID when a finalized conversation receives a new message. The new `conversationId` is sent back to the frontend in the response.
 
+4. **Cross-day conversation blocking** — If a user tries to continue a conversation from a previous day, the frontend blocks input and prompts "Start a NEW CHAT". The backend also checks the conversationId's embedded timestamp against today's date as defense-in-depth. On page load, if the most recent chat is from a previous day, a new chat is auto-created.
+
+**Conversation Lifecycle Rules**:
+- New session start → logged with unique date/time as the conversation starting point
+- 5-min inactivity → conversation automatically finalized in S3 (status: "completed")
+- Same-day resume after 5-min gap → logged as a NEW conversation (new conversationId + new S3 document)
+- Cross-day resume → frontend prompts "Start a NEW CHAT" (input disabled, read-only history)
+
 **Files Changed**:
-- `Maya/frontend/maya.html` — generate and send `conversationId`, accept new segment IDs from backend
+- `Maya/frontend/maya.html` — generate and send `conversationId`, accept new segment IDs from backend, cross-day chat blocking with "Start a NEW CHAT" prompt
 - `Maya/backend/utils/conversation-session.js` — added `wasConversationFinalized()`, `generateSegmentId()`, finalized session tracking
-- `Maya/backend/server.js` — resolve conversation segmentation before logging/responding, import session manager
+- `Maya/backend/server.js` — resolve conversation segmentation (5-min gap + cross-day) before logging/responding
 - `DEPLOY_WITH_ENV_VAR.sh` — load and send all AWS env vars to deployment API
 - `Maya/backend/tests/conversation-session.test.js` — 8 new tests for segmentation tracking and segment ID generation (35 total)
 - Updated 9 test files to mock the two new exports
