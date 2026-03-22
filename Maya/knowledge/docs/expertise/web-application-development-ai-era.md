@@ -265,8 +265,81 @@ This course represents a paradigm shift in web development education. By integra
 
 ---
 
+---
+
+## Part 7: The CSS Philosophy: Legacy Literacy and the AI-Era Stack
+
+This section captures Janet's pedagogical position on CSS frameworks, taught in Weeks 11-12 of the course. It is her direct response to the student belief that "AI will write all the CSS, so why learn it?"
+
+### The Creator vs Consumer Distinction
+
+Janet's core argument: AI can generate CSS. It cannot judge whether that CSS is correct, maintainable, semantically sound, or appropriate for the context it is being deployed in. A developer who cannot read and critique CSS output is not a developer who uses AI. They are a developer who is used by AI. The goal of this module is to produce creators: people who direct AI tools with precision, catch errors, and know why a piece of code works or fails.
+
+This is not an anti-AI position. It is a pro-skill position. The more powerful AI tooling becomes, the more valuable the human who can evaluate its output becomes.
+
+### Why Both Frameworks Are Taught
+
+Janet teaches Bootstrap (the legacy web) and Tailwind CSS (the AI-era web) in the same module. This is a deliberate choice grounded in professional reality.
+
+**Bootstrap represents the legacy web.** As of March 2026, Bootstrap holds 74.7% market share among CSS frameworks (W3Techs), with 2.5 million weekly npm downloads and the top position in junior developer job listings. The majority of corporate dashboards, internal tools, and client sites that students will encounter in their first jobs were built with Bootstrap. A developer who cannot navigate a Bootstrap codebase is illiterate in the professional environment they are entering.
+
+**Tailwind CSS represents the AI-era web.** Released in 2019, Tailwind's utility-first approach, where styles are applied directly as atomic classes in HTML rather than in separate stylesheets, aligns naturally with how AI UI generators work. Tools like Vercel's v0.dev and Cursor output Tailwind by default. Tailwind v4 (2025) introduced a pure CSS-first engine, cementing its position as the modern standard. 31.1 million weekly npm downloads and 37% active developer adoption (State of CSS Survey) reflect where the industry is moving.
+
+The concluding principle Janet teaches: **Learn Bootstrap to read yesterday's code. Learn Tailwind to guide AI-built UIs.**
+
+### The Historical Arc: From Dark Ages to AI Era
+
+Janet teaches CSS framework history before students touch any framework code. Understanding why a tool was created is what allows a developer to use it with intention rather than cargo-culting its patterns.
+
+The arc she maps:
+
+**Pre-2011 (The Dark Ages):** No shared grid system. Every developer wrote complex float-based math from scratch for basic layouts. Browser inconsistencies (Internet Explorer vs Firefox vs Chrome) meant the same CSS could produce different results across browsers. Every project reinvented the same solutions.
+
+**2011: Bootstrap 1.0:** Built internally at Twitter by Mark Otto and Jacob Thornton to enforce UI consistency across internal tools. Open-sourced and became the most starred project on GitHub within months. It solved the #1 developer pain point of 2011: browser inconsistency. Write once, trust it looks the same everywhere.
+
+**The Bootstrap Era (2011-2019):** The standardised 12-column grid and pre-built component library (buttons, navbars, modals, cards) democratised interface design. A developer with no design skills could produce a professional-looking interface. The unintended consequence: millions of sites looked identical. "The Bootstrap Look" became a cliché. Overriding Bootstrap's defaults to create a custom design became a heavy burden. Developers were fighting the framework.
+
+**2015: Flexbox lands in browsers.** 2017: CSS Grid standardised. The platform itself was catching up, reducing Bootstrap's layout advantage.
+
+**2019: Tailwind CSS 1.0:** Adam Wathan rejected the entire premise of Bootstrap. Instead of pre-built semantic components (`.card`, `.btn`), Tailwind gives developers atomic utility classes (`bg-white`, `p-6`, `rounded-lg`). Style is applied directly in HTML. No more fighting the framework. Build exactly what the designer drew, without overrides. Tailwind is a 1-to-1 mapping of CSS properties: `bg-white` = `background-color: white`, so it reinforces CSS knowledge rather than abstracting it away.
+
+**2021: Bootstrap 5 drops jQuery.** 2025: Tailwind v4 with CSS-first engine. Now powering GitHub, Shopify, Vercel, Netflix, and NASA.
+
+### The Modern CSS Stack (Four Layers)
+
+Janet teaches the full ecosystem as a layered model so students understand where each tool sits and why:
+
+| Layer | Role | Examples |
+|---|---|---|
+| Layer 4: AI UI Generators | The Output: tools that write the code for you | v0.dev, Cursor |
+| Layer 3: Copy-Paste Components | The Design: pre-built UI blocks | DaisyUI, shadcn/ui |
+| Layer 2: Headless Accessibility | The Behaviour: unstyled keyboard nav, focus, screen readers | Radix, Headless UI |
+| Layer 1: The Styling Engine | The Foundation: utility classes that power everything above | Tailwind CSS |
+
+Understanding this stack means a student can look at any modern web project and know what each dependency is doing and why. It also means they can evaluate AI-generated code against this architecture and identify when something is missing or misplaced.
+
+### The Dual-Framework Lab
+
+The Weeks 11-12 lab puts students in two real professional scenarios back to back:
+
+**Lab 1: Bootstrap Assembly:** Students are a junior developer joining a corporate team that already uses Bootstrap. The layout is already built. Their job is to navigate the existing component system, replace placeholder content, and change button styles using their cheat sheet, without breaking the grid. The goal is reading and navigating legacy code, not writing from scratch. This mirrors what most first jobs actually involve.
+
+**Lab 2: Tailwind Theming:** Students are launching a new startup. They have a basic landing page and need to apply their brand using Tailwind utility classes. Every class change is a direct CSS property change. The goal is experiencing how utility-first CSS allows precise, no-override design control, which is the same control that AI UI generators leverage.
+
+Labs conclude with a structured peer review: students swap screens, identify which Tailwind classes produced a specific visual element on their peer's page, check their guess against the code, and then reflect on three questions: what was easier in Tailwind, what was harder, and which framework they would choose for their own startup.
+
+### Usage Guidelines for This Section
+
+- Use the creator vs consumer framing when a user or student argues that AI makes CSS fundamentals irrelevant
+- Reference the Bootstrap market share data (74.7%, March 2026) when discussing why legacy literacy matters professionally
+- Use the four-layer stack diagram when someone asks how modern CSS tooling fits together
+- Cite the historical arc when explaining why Tailwind was designed the way it was
+- Reference the dual-framework lab design when discussing Janet's hands-on teaching approach
+
+---
+
 ## Related Documents
-- `docs/experience/iadt.md` - IADT teaching experience (Cloud Computing and GenAI)
+- `docs/experience/iadt.md` - Full IADT teaching experience across all three modules
 - `docs/expertise/ai-security.md` - AI security expertise
 - `docs/expertise/digital-transformation.md` - Digital transformation expertise
 
@@ -274,4 +347,5 @@ This course represents a paradigm shift in web development education. By integra
 - Reference when discussing Janet's teaching expertise and curriculum design
 - Mention when users ask about web development education or AI-first pedagogy
 - Highlight the dual-audience approach (humans and AI agents)
-- Emphasize the integration of AI-first thinking throughout the curriculum
+- Emphasise the integration of AI-first thinking throughout the curriculum
+- Use Part 7 specifically when the conversation is about CSS, frameworks, legacy code, or the "why learn fundamentals" question
