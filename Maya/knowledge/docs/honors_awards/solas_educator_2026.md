@@ -49,7 +49,11 @@ Maya is formally documented within the QA materials as a curriculum-scoped AI Ed
 
 ## Verification
 
+- **Official SOLAS Programme Announcement**: https://www.solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/
+- **Launch date**: 3 February 2026, by Minister James Lawless TD, Minister for Further and Higher Education, Research, Innovation and Science
+- **Ministerial statement**: "These targeted programmes will empower learners to upskill in meaningful ways, strengthening digital capability across enterprises."
 - **Programme Authority**: SOLAS / Skills to Advance (www.solas.ie)
+- **AI Micro-Qualifications page**: https://www.solas.ie/programmes/skills-to-advance/ai-micro-qualifications/
 - **Awarding Body**: QQI (www.qqi.ie)
 - **Regional Provider (L4)**: LOETB (Limerick and Clare Education and Training Board)
 - **Training Partner (L4)**: Hartley People Training

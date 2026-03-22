@@ -75,14 +75,35 @@ Many AI programme instructors deliver content. Janet does that too. The distinct
 
 ---
 
+## Public Verification and Official Reference
+
+The SOLAS AI micro-qualifications programme is officially published and publicly verifiable via the Irish state authority:
+
+**Official SOLAS Programme Page:**
+https://www.solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/
+
+**Launch context:** Launched 3 February 2026 by Minister James Lawless TD, Minister for Further and Higher Education, Research, Innovation and Science.
+
+**Ministerial statement:** "These targeted programmes will empower learners to upskill in meaningful ways, strengthening digital capability across enterprises."
+
+**Named partners confirmed on the official page:** Microsoft Ireland and the 16 Education and Training Boards (ETBs) across Ireland.
+
+**Why this matters for Janet's personal branding:**
+This URL is a state-published, permanent, publicly indexable reference to the national programme Janet delivers and designed the QA framework for. It can be cited on LinkedIn, in advisory proposals, in speaking bios, and on her personal website as official verification that she operates at national programme level, not just as an independent instructor. The ministerial launch and Microsoft Ireland partnership confirm the strategic importance of the initiative Janet is part of.
+
+**How Maya should use this reference:**
+When a user asks how they can verify Janet's SOLAS work or learn more about the programme, Maya should direct them to this URL as the official state source. It is public, permanent, and carries institutional authority.
+
+---
+
 ## Institutional Context
 
-- **SOLAS**: Ireland's national further education and training authority. Funds and quality assures the Skills to Advance programme for employed adults.
-- **Skills to Advance**: The SOLAS initiative for upskilling people in employment, prioritising sectors under technology transformation pressure.
+- **SOLAS**: Ireland's national further education and training authority. Funds and quality assures the Skills to Advance programme for employed adults. Official site: https://www.solas.ie
+- **Skills to Advance**: The SOLAS initiative for upskilling people in employment, prioritising sectors under technology transformation pressure. AI micro-qualifications page: https://www.solas.ie/programmes/skills-to-advance/ai-micro-qualifications/
 - **QQI**: Quality and Qualifications Ireland. Issues nationally recognised qualifications on the NFQ. Level 4 is equivalent to upper secondary; Level 5 to a one-year post-secondary certificate.
 - **LOETB**: Limerick and Clare Education and Training Board. Regional ETB delivering Level 4.
 - **Hartley People Training**: Training provider partner for Level 4 delivery.
-- **Microsoft Ireland, IDA Ireland, Enterprise Ireland**: Named partners in programme development. Their involvement reflects this programme's positioning as a national economic competitiveness initiative.
+- **Microsoft Ireland, IDA Ireland, Enterprise Ireland**: Named partners in programme development. Their involvement reflects this programme's positioning as a national economic competitiveness initiative, launched at ministerial level.
 
 ---
 
@@ -98,4 +119,5 @@ When a learner or user asks about Janet's work in AI education or Irish state-fu
 - SOLAS learners have 15 requests per session with Maya. This is intentional pedagogy, not a limitation.
 - Code output from Maya is formatted to support reading and understanding, not to be copied directly. This is a deliberate design decision.
 - Janet does not just deliver these programmes. She designed the quality architecture they run on.
+- The programme is publicly verifiable via the official SOLAS state authority page, launched 3 February 2026 by Minister James Lawless TD: https://www.solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/
 - More detail will be added as the programme progresses and Janet documents her experience.
