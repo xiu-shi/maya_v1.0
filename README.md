@@ -1,4 +1,4 @@
-# Maya - Janet's Digital Champion 🤖
+# Maya by Janet Xiu Shi™ - AI Educator & Digital Twin 🤖
 
 **"Turning Complexity into Your Lasting Advantage"**
 
@@ -6,33 +6,36 @@
 
 ## 💼 About Janet Xiu Shi (https://janetxiushi.me)
 
-**Business Technologist | Enterprise AI Strategist | Educator**
+**Strategic AI & Cloud Advisor | AI Evals and Quality | AI Educator**
 
-Janet blends **human psychology with AI fluency** to solve real business problems. She works directly with founders and senior leaders to map operations, uncover hidden risks, and rapidly prototype AI-powered workflows—with responsible governance embedded from day one.
+Janet works at the intersection of AI governance, cloud strategy, quality and evaluation, cybersecurity, and digital transformation. She brings enterprise-grade discipline together with startup agility and creative problem-solving. She works directly with founders and senior leaders to map operations, uncover hidden risks, and build AI-powered workflows with responsible governance embedded from day one.
 
 **Professional Experience:**
-- **Connectd**: Current role as business technologist and strategic advisor
+- **Connectd**: Strategic AI and business technology advisor
+- **SOLAS / Skills to Advance**: Programme Instructor and QA Framework Architect for two national, state-funded QQI-accredited AI workforce programmes — QQI Level 4 (Introduction to Artificial Intelligence) and QQI Level 5 (Enhancing Productivity with AI) — developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
+- **IADT (Dún Laoghaire Institute of Art, Design + Technology)**: Industry Expert Lecturer preparing future digital leaders through:
+  - **Enterprise Cloud** — Strategic cloud adoption and architecture for AI-powered organisations
+  - **Generative AI** — AI transformation, responsible AI adoption, and the agentic era
+  - **Web Application Development in the AI Era** — AI-first web development with dual-audience thinking (humans and AI agents) for non-CS background students in business
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
-- **Huawei**: Contributed to strategic telecommunications and broadband deployments with EU compliance focus
-- **Education**: Industry Expert Lecturer at IADT (Dún Laoghaire Institute of Art, Design + Technology), preparing future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset through:
-  - **Enterprise Cloud** - Strategic cloud adoption and architecture for AI-powered organizations
-  - **Generative AI** - AI transformation, responsible AI adoption, and understanding the agentic era
-  - **Web Application Development in the AI Era** - AI-first web development with dual-audience thinking (humans and AI agents) for non-CS background students in business major
+- **Huawei**: Strategic telecommunications and broadband deployments with EU compliance focus
 
-**Credentials & Recognition:**
-- **Generative AI Leader** (Google, Jan 2026) - Knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
-- **Samsara Framework 2.0** (FilmEU - European University, Jan 2026) - Pedagogy and Project-Based Learning certification
-- **Harvard Professional Educator Certificate** (Jul 2025) - Preparing leaders for digital transformation
-- **Lakera GenAI Security Report Contributor** (Nov 2025) - Recognized for AI governance and prompt-injection testing insights
-- **Workday VIBE Global Impact Award** (Oct 2023) - First-ever Product & Technology VIBE Award for leadership and cultural impact
-- **AWS Certified Cloud Practitioner** & **Google Cloud Gemini for Security Engineers**
-- **Google Developers Group Chapter Lead** - Organizing community events and developer education
+**Credentials and Recognition:**
+- **SOLAS / Skills to Advance Appointed Instructor and QA Framework Architect** (Mar 2026) — National AI workforce programme; designed MIPLO framework, ALE evidence scale, and Bloom's Taxonomy mapping across both QQI levels
+- **Generative AI Leader** (Google, Jan 2026) — Generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
+- **Samsara Framework 2.0** (FilmEU — European University, Jan 2026) — Pedagogy and Project-Based Learning certification
+- **Harvard Professional Educator Certificate** (Jul 2025) — Preparing leaders for digital transformation
+- **Lakera GenAI Security Report Contributor** (Nov 2025) — Named contributor recognised for AI governance and prompt-injection testing insights
+- **Workday VIBE Global Impact Award** (Oct 2023) — First-ever Product and Technology VIBE Award for leadership and cultural impact
+- **AWS Certified Cloud Practitioner** and **Google Cloud Gemini for Security Engineers**
+- **Google Developers Group Chapter Lead** — Organising community events and developer education
+- **Data Analytics in Business, QQI Level 8** — Completed
 
 **How Janet Helps:**
-- **For Founders & Leaders**: Aligning AI and cloud strategy with business goals, turning technical complexity into competitive advantage
-- **For Educators & Institutions**: Designing future-ready AI learning that prepares digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
-- **For Organizations**: AI security consulting, governance frameworks, and digital transformation strategy
-- **For Students**: Building AI-native capabilities through Enterprise Cloud, Generative AI, and Web Application Development—equipping future digital leaders to thrive in the agentic era with practical, industry-relevant skills and real-world case studies
+- **For Founders and Leaders**: Aligning AI and cloud strategy with business goals, turning technical complexity into competitive advantage
+- **For Educators and Institutions**: Designing future-ready AI learning that prepares digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
+- **For Organisations**: AI security consulting, governance frameworks, AI evaluation and quality assurance, and digital transformation strategy
+- **For Students**: Building AI-native capabilities through Enterprise Cloud, Generative AI, and Web Application Development — equipping future digital leaders with practical, industry-relevant skills and real-world case studies
 
 ---
 
@@ -40,7 +43,7 @@ Janet blends **human psychology with AI fluency** to solve real business problem
 
 **The Reality of Being a Solo Practitioner:**
 
-As a business technologist working with multiple clients, teaching, and speaking at conferences, I face a constant challenge:
+As a strategic advisor working across multiple clients, teaching, building curriculum, and creating content, I face a constant challenge:
 
 > **I can't be everywhere at once.**
 
@@ -48,22 +51,14 @@ As a business technologist working with multiple clients, teaching, and speaking
 - Potential clients reach out while I'm in meetings or teaching
 - Students have questions outside of contact hours
 - Partners want to know about collaboration opportunities
-- Conference organizers need information about speaking topics
-- **Everyone waits hours or days for email responses**
+- Conference organisers need information about speaking topics
+- **Everyone waits hours or days for responses**
 
 **The Cost:**
 - Lost opportunities because responses aren't immediate
 - Repetitive explanations of the same expertise and background
 - Inability to provide 24/7 support across different time zones
 - Missed connections with people who need quick context
-
-**The Personal Frustration:**
-
-I realized I was spending more time **explaining what I do** than **actually doing the work**. Every new inquiry required:
-- Explaining my background (Workday, Huawei, Connectd, teaching)
-- Describing my approach to AI governance and cloud strategy
-- Clarifying which types of projects I take on
-- Sharing case studies, certifications, and teaching philosophy
 
 **There had to be a better way.**
 
@@ -74,31 +69,41 @@ I realized I was spending more time **explaining what I do** than **actually doi
 **What if there was a version of me that could:**
 - ✅ Answer questions about my expertise 24/7
 - ✅ Provide accurate information about my background and services
-- ✅ Maintain my professional tone and approach
+- ✅ Maintain my professional tone and Socratic approach
 - ✅ Give people immediate context without waiting for me
+- ✅ Support learners enrolled in my programmes between sessions
 
-**That's Maya - my digital champion.**
+**That's Maya — my AI Digital Twin.**
 
 ### What Maya Does
 
-Maya is a ChatGPT-like AI agent that represents me when I'm unavailable. Think of it as:
+Maya is an AI agent that represents me when I'm unavailable, and serves as a formal AI Educator in my national workforce programmes. Think of it as:
 
 > **The conversation you'd have with me... without waiting for me to be free.**
 
-**Maya provides instant answers to:**
+**Maya provides informed responses to:**
 - "What's Janet's experience with AI governance?" *(Lakera contributor, AI security certified)*
-- "How can Janet help with our cloud strategy?" *(AWS & Google Cloud certified, enterprise experience)*
-- "What's her teaching approach for enterprise AI?" *(Harvard-certified educator, practitioner background)*
+- "How can Janet help with our cloud strategy?" *(AWS and Google Cloud certified, enterprise experience)*
+- "What's her teaching approach?" *(Harvard-certified educator, Socratic method, foundations-first philosophy)*
 - "What courses does Janet teach?" *(Enterprise Cloud, Generative AI, Web Application Development in the AI Era)*
-- "Can she speak at our event about digital transformation?" *(GDG Chapter Lead, conference experience)*
-- "Tell me about the web development course curriculum" *(AI and agentic ready modern web application development course for non-CS background students in business major)*
+- "Tell me about the SOLAS AI programmes Janet designed" *(QQI L4 and L5, national workforce upskilling, QA framework architect)*
+- "Can she speak at our event?" *(GDG Chapter Lead, conference experience, AI governance and education)*
+
+### Maya as a Formal AI Educator
+
+Beyond availability, Maya is formally documented as a **curriculum-scoped AI Educator** in the QA materials for the SOLAS / Skills to Advance national AI workforce programmes. She is believed to be the first AI agent formally deployed as a teaching resource in an Irish state-funded AI programme.
+
+In this context, Maya operates with:
+- A **Socratic approach**: she guides learners to reason and discover, she does not hand out answers
+- **Curriculum boundary awareness**: calibrated to QQI Level 4 or Level 5 scope as appropriate
+- **Prompt discipline design**: learners work within a constrained session to build intentional prompting habits
+- **Pedagogical code formatting**: technical examples are formatted for reading and understanding, not direct copy-paste
 
 ### Why This Matters
 
 **For People Reaching Out:**
 - Get immediate context about my expertise and credentials
 - Understand if I'm the right fit for their needs
-- Learn about my availability and approach
 - Make informed decisions without waiting
 
 **For Me:**
@@ -114,35 +119,35 @@ Maya is a ChatGPT-like AI agent that represents me when I'm unavailable. Think o
 ```
 User Question
     ↓
-Maya (AI Agent)
+Maya (AI Digital Twin)
     ↓
-Knowledge Base ──→ My verified background, certifications, projects
+Knowledge Base ──→ Verified background, credentials, experience, programme content
     ↓
-Natural Response ──→ Accurate, conversational answer
+Socratic Response ──→ Accurate, conversational, guides thinking rather than replacing it
 ```
 
-**Simple Architecture:**
-- **Frontend**: Clean chat interface (like ChatGPT)
-- **Backend**: Secure API with rate limiting and validation
-- **Knowledge Base**: Structured information from LinkedIn, certifications, public portfolio
-- **AI Engine**: Conversational responses grounded in factual data
+**Architecture:**
+- **Frontend**: Clean chat interface
+- **Backend**: Secure Node.js API with rate limiting and validation
+- **Knowledge Base**: Structured markdown covering expertise, education, experience, and honours
+- **AI Engine**: Conversational responses grounded in factual, verified knowledge
 
 **Key Features:**
 - 24/7 availability
 - Accurate responses based on verified credentials and experience
-- Context-aware conversations
+- Socratic questioning approach — builds understanding, does not shortcut it
 - Professional tone matching my communication style
 - Privacy-focused (no personal data collection)
 - Security-first design with comprehensive protection measures
-- Comprehensive Knowledge Base covering expertise, teaching, and professional background
 
 **Knowledge Base Scope:**
 Maya's knowledge base includes:
-- **Expertise Areas**: AI Security, Digital Transformation, Web Application Development (AI Era)
-- **Teaching Philosophy**: Preparing future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset through Enterprise Cloud, Generative AI, and Web Application Development curricula
-- **Professional Experience**: Workday, Huawei, Connectd, IADT
-- **Certifications & Education**: Harvard, AWS, Google Cloud, Lakera, Samsara Framework
-- **Honors & Awards**: Workday VIBE Award, Lakera GenAI Report Contributor
+- **Expertise Areas**: AI Security, AI Governance and Quality, Digital Transformation, Web Application Development (AI Era), AI Evaluation
+- **Teaching Philosophy**: Foundations-first, Socratic, experience-before-tools pedagogy; AI-native skills, agentic-era awareness, prompt discipline
+- **Programme Design**: SOLAS QQI Level 4 and Level 5 national AI workforce programmes, MIPLO framework, ALE evidence scale, AI-ARM framework (Accuracy, Relevance, Meaning)
+- **Professional Experience**: Workday, Huawei, Connectd, IADT, SOLAS / Skills to Advance
+- **Certifications and Education**: Harvard, AWS, Google Cloud, Lakera, Samsara Framework, QQI Level 8
+- **Honours and Awards**: SOLAS national programme appointment, Workday VIBE Award, Lakera GenAI Security Report contributor
 
 ---
 
@@ -152,30 +157,32 @@ Maya's knowledge base includes:
 maya_v1.0/
 ├── Maya/
 │   ├── backend/              # Node.js API server
-│   │   ├── server.js        # Main application
-│   │   ├── middleware/      # Security, validation
-│   │   └── tests/           # Test suite
+│   │   ├── server.js         # Main application
+│   │   ├── middleware/       # Security, validation
+│   │   └── utils/            # Helper functions
 │   │
-│   ├── frontend/            # Chat interface
-│   │   └── maya.html        # User interface
+│   ├── frontend/             # Chat interface
+│   │   └── maya.html         # User interface
 │   │
-│   └── knowledge/           # My professional information
+│   └── knowledge/            # Janet's professional knowledge base
 │       └── docs/
-│           ├── bio/         # Background
-│           ├── experience/  # Workday, Huawei, Connectd, IADT
-│           ├── expertise/   # AI security, digital transformation, web development (AI era)
-│           ├── cert_educ/   # Harvard, AWS, Google, Lakera
-│           └── honors_awards/ # VIBE Award, Lakera recognition
+│           ├── bio/              # Background and profile
+│           ├── experience/       # Workday, Huawei, Connectd, IADT, SOLAS
+│           ├── expertise/        # AI security, governance, digital transformation
+│           ├── cert_educ/        # Harvard, AWS, Google, Lakera, QQI L8
+│           └── honors_awards/    # SOLAS appointment, VIBE Award, Lakera recognition
 │
-├── Dockerfile               # Deployment configuration
-└── SECURITY.md             # Security policies
+├── tests/                    # Deployment and security tests
+├── Dockerfile                # Koyeb deployment configuration
+├── README.md
+└── SECURITY.md
 ```
 
 ---
 
-## 🛡️ Built with Security & Quality
+## 🛡️ Built with Security and Quality
 
-This isn't just a prototype - it's production-ready:
+This is production-ready:
 
 - ✅ **Security-first**: Rate limiting, input validation, prompt injection protection
 - ✅ **Test-driven**: Comprehensive test suite for reliability and security
@@ -183,62 +190,71 @@ This isn't just a prototype - it's production-ready:
 - ✅ **Production-ready**: Comprehensive logging, monitoring, and error handling
 - ✅ **IP Protection**: Automated checks to prevent sensitive information leakage
 
-**Technology:** Node.js, Express, Docker, AI Builders API
+**Technology:** Node.js, Express, Docker, Koyeb (deployed via GitHub Actions)
 
 ---
 
 ## 🎓 What This Project Demonstrates
 
 **Problem-Solving:**
-- Identified a personal pain point (can't be everywhere at once)
-- Designed a scalable solution (AI-powered digital representation)
-- Implemented with production-quality standards
+- Identified a real professional pain point and designed a scalable solution
+- Evolved the agent from a 24/7 availability tool into a formally deployed AI Educator in accredited national programmes
+- Implemented with production-quality standards from day one
 
 **Technical Capabilities:**
-- Full-stack development (frontend + backend + deployment)
-- AI integration with knowledge grounding
-- Security best practices from enterprise experience
-- Production deployment with monitoring
+- Full-stack development (frontend + backend + deployment pipeline)
+- AI integration with structured knowledge grounding
+- Security best practices drawn from enterprise experience
+- Production deployment with monitoring via Koyeb
 
-**Practical Impact:**
-- Improved availability for potential clients and students
-- Reduced time spent on repetitive explanations
-- Consistent, professional representation
-- Measurable time savings
+**Practical and Recognised Impact:**
+- First AI agent formally documented as a teaching resource in an Irish state-funded AI workforce programme
+- Supports learners enrolled in QQI Level 4 and Level 5 SOLAS programmes
+- Consistent professional representation across time zones and contexts
 
 ---
 
 ## 🌟 Use Cases
 
-**For Potential Clients:**  
-"What's Janet's experience with AI governance?" → Get detailed answer about Lakera contributions, AI security certification, and enterprise governance work
+**For Potential Clients:**
+"What's Janet's approach to AI governance?" → Accurate answer drawing on Lakera, enterprise background, and SOLAS QA framework design experience
 
-**For Educators:**  
-"How does Janet teach Enterprise Cloud?" → Learn about Harvard-certified educator approach and real-world case study methodology  
-"What's the Web Application Development course curriculum?" → Get details about the AI and agentic ready modern web application development course, dual audience approach, and semantic HTML focus
+**For Educators and Curriculum Designers:**
+"What courses does Janet teach and how?" → Details on Enterprise Cloud, Generative AI, and Web Application Development in the AI Era; teaching philosophy and methodology
 
-**For Partners:**  
-"Can Janet speak at our AI security conference?" → Understand speaking topics based on GDG leadership and Lakera recognition
+**For SOLAS Programme Learners:**
+"Can you help me understand this concept before our next session?" → Socratic support calibrated to QQI Level 4 or Level 5 curriculum scope; session-limited by design to build prompt discipline
 
-**For Students:**  
-"What certifications should I pursue for AI/cloud careers?" → Get insights from Janet's AWS, Google Cloud, and Harvard educator credentials
+**For Partners:**
+"Can Janet speak at our AI event?" → Speaking topics grounded in GDG leadership, Lakera recognition, and SOLAS programme expertise
 
-**For Educators & Curriculum Designers:**  
-"What courses does Janet teach?" → Discover how Enterprise Cloud, Generative AI, and Web Application Development in the AI Era courses prepare future digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
+**For Students:**
+"What certifications should I pursue for AI careers?" → Insights from Janet's AWS, Google Cloud, Harvard, and QQI credentials
+
+---
+
+## 🤖 Agent Boutique by Janet™
+
+Maya is one of three AI agents Janet has built. The full Agent Boutique lives at [agents.janetxiushi.me](https://agents.janetxiushi.me):
+
+- **Maya** — AI Educator and Digital Twin (you are here)
+- **Ming** — Coming soon
+- **Maggie** — Coming soon
 
 ---
 
 ## 📞 Connect with Janet
 
 **Direct Contact:**
-- 🌐 **Website**: [https://janetxiushi.me](https://janetxiushi.me)
+- 🌐 **Website**: [janetxiushi.me](https://janetxiushi.me)
 - 💼 **LinkedIn**: [linkedin.com/in/janetxiushi](https://www.linkedin.com/in/janetxiushi/)
+- ✍️ **Medium**: [medium.com/@janetxiushi](https://medium.com/@janetxiushi)
 - 📧 **Email**: info@janetxiushi.me
 
-**Or chat with Maya for instant answers**: [Live Demo - Coming Soon]
+**Or chat with Maya directly**: [maya-agent.ai-builders.space/maya.html](https://maya-agent.ai-builders.space/maya.html)
 
-> **Ready to turn complexity into your competitive advantage?**  
-> DM me with your industry and the outcome you're aiming for: AI adoption, cloud strategy, governance, or educational curriculum design.
+> **Ready to turn complexity into your competitive advantage?**
+> Connect with Janet about AI adoption, cloud strategy, governance, educational curriculum design, or speaking opportunities.
 
 ---
 
@@ -246,21 +262,20 @@ This isn't just a prototype - it's production-ready:
 
 让战略落地，让智能生效。
 
-我为企业提供可执行的智能转型方案，为教育机构设计面向未来的教学范式。  
+我为企业提供可执行的智能转型方案，为教育机构设计面向未来的教学范式。
 我的使命是将技术愿景转化为您的增长现实与竞争优势。
 
 ---
 
 ## 📄 License
 
-© 2026 Janet Xiu Shi. All rights reserved.
+© 2026 Janet Xiu Shi. All rights reserved. Maya by Janet Xiu Shi™
 
-This repository is a portfolio/showcase project demonstrating technical implementation and problem-solving capability. The Knowledge Base contains publicly available professional information sourced from [LinkedIn](https://www.linkedin.com/in/janetxiushi/) and verified credentials.
+This repository is a portfolio and showcase project demonstrating technical implementation, AI educator design, and knowledge architecture. The Knowledge Base contains professionally verified information sourced from Janet's credentials, published work, and documented programme materials.
 
 ---
 
 <p align="center">
-  <strong>A personal solution to a professional challenge</strong><br>
-  Because being unavailable shouldn't mean missing opportunities
+  <strong>From personal solution to national programme infrastructure</strong><br>
+  Because being unavailable shouldn't mean missing opportunities — and because AI education deserves an AI educator
 </p>
-
