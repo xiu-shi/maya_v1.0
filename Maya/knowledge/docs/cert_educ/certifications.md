@@ -1,27 +1,40 @@
 # Certifications
 
-**Category**: cert_educ  
-**Priority**: high  
-**Last Updated**: 2025-01-06  
+**Category**: cert_educ
+**Priority**: high
+**Last Updated**: 2026-03-22
 **Source**: Professional certifications
 
 ## Summary
-Janet holds multiple certifications in cloud computing, AI, security, data analytics, and professional development from leading organizations including Google Cloud, AWS, Harvard University, Connectd, and Lakera.
+
+Janet holds multiple certifications in AI education, cloud computing, AI security, data analytics, pedagogy, and professional development from leading organisations including SOLAS/QQI, Google Cloud, AWS, Harvard University, FilmEU, Connectd, and Lakera. She maintains continuous learning across all her practice areas.
 
 ## Key Certifications
 
 ### 2026
-- **Google Cloud Generative AI Leader**
+
+- **SOLAS / Skills to Advance: Appointed Programme Instructor and QA Framework Architect** (March 2026)
+  - Two national QQI-accredited AI workforce programmes: Level 4 (Introduction to Artificial Intelligence) and Level 5 (Enhancing Productivity with AI)
+  - Developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland
+  - Designed MIPLO framework, ALE evidence scale, and Bloom's Taxonomy mapping across both levels
+
+- **Google Cloud Generative AI Leader** (January 2026)
+  - Knowledge of generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
+
+- **Samsara Framework 2.0** (January 2026)
+  - Issued by FilmEU (European University)
+  - Pedagogy and Project-Based Learning certification
 
 ### 2025
-- **Connectd Certified Fractional Professional** (Dec 2025)
+
+- **Connectd Certified Fractional Professional** (December 2025)
   - Certification secured in blockchain for verification
   - Link: https://certified.connectd.co/fractionalexecutive-janet-xiu-shi-227510/
-  
-- **Google Cloud Gemini for Security Engineers** (Sep 2025)
 
-- **Harvard University Division of Continuing Education - Professional Educator Certification** (July 2025)
-  - Awarded from 2022 to 2025
+- **Google Cloud Gemini for Security Engineers** (September 2025)
+
+- **Harvard University Division of Continuing Education: Professional Educator Certification** (July 2025)
+  - Awarded across 2022 to 2025 programme period
 
 - **Amazon Cloud Practitioner AWS Certified** (June 2025)
 
@@ -29,31 +42,35 @@ Janet holds multiple certifications in cloud computing, AI, security, data analy
 
 - **Cloud Engineer Academy** (2025)
 
-- **CCT College Dublin - Higher Diploma in Science in Data Analytics for Business** (2025)
+- **CCT College Dublin: Higher Diploma in Science in Data Analytics for Business** (2025)
   - QQI Level 8
+  - Status: Completed
 
 ### 2024
-- **Connectd Certified Board Advisor** (Dec 2024)
+
+- **Connectd Certified Board Advisor** (December 2024)
   - Certification secured in blockchain for verification
   - Link: https://certified.connectd.co/en/boardadvisor-janet-xiu-shi-227510/
   - Certificate issued by Connectd LinkExec Academy
   - Training covers full journey from investigating to excelling in board advisor roles
-  - Equips graduates with knowledge, resilience and understanding required to support growing businesses
-  - Intensive self-directed learning rooted in evidence-driven career coaching and human development techniques
+  - Equips graduates with knowledge, resilience, and understanding required to support growing businesses
 
-- **CCT College Dublin - Diploma in Data Analytics in Business** (2024)
+- **CCT College Dublin: Diploma in Data Analytics in Business** (2024)
   - QQI Level 7 Qualification
 
-- **Lakera Cybersecurity Company - AI Security for Product Teams Certificate** (2024)
+- **Lakera Cybersecurity Company: AI Security for Product Teams Certificate** (2024)
 
 ## Usage Guidelines
-- Mention certifications when relevant to user's questions about qualifications
-- Highlight blockchain-verified certifications (Connectd) as proof of credentials
-- Emphasize recent certifications (2024-2026) showing continuous learning
-- Reference specific institutions (Google Cloud, AWS, Harvard, Connectd, Lakera) when appropriate
+
+- Mention certifications when relevant to questions about Janet's qualifications
+- Lead with SOLAS appointment (March 2026) when discussing AI education credentials
+- Highlight Samsara Framework 2.0 (FilmEU) when discussing pedagogy or teaching methodology credentials
+- Reference blockchain-verified Connectd certifications as proof of advisory credentials
+- Confirm QQI Level 8 Data Analytics in Business as completed when asked about formal qualifications
+- Emphasise continuous learning across 2024-2026 certifications
 
 ## Related Documents
+
 - docs/cert_educ/education.md
 - docs/cert_educ/personal-projects.md
-
-
+- docs/honors_awards/solas_educator_2026.md
