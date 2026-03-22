@@ -12,30 +12,30 @@ Janet works at the intersection of AI governance, cloud strategy, quality and ev
 
 **Professional Experience:**
 - **Connectd**: Strategic AI and business technology advisor
-- **SOLAS / Skills to Advance**: Programme Instructor and QA Framework Architect for two national, state-funded QQI-accredited AI workforce programmes — QQI Level 4 (Introduction to Artificial Intelligence) and QQI Level 5 (Enhancing Productivity with AI) — developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
+- **SOLAS / Skills to Advance**: Programme Instructor and QA Framework Architect for two national, state-funded QQI-accredited AI workforce programmes, covering QQI Level 4 (Introduction to Artificial Intelligence) and QQI Level 5 (Enhancing Productivity with AI), developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
 - **IADT (Dún Laoghaire Institute of Art, Design + Technology)**: Industry Expert Lecturer preparing future digital leaders through:
-  - **Enterprise Cloud** — Strategic cloud adoption and architecture for AI-powered organisations
-  - **Generative AI** — AI transformation, responsible AI adoption, and the agentic era
-  - **Web Application Development in the AI Era** — AI-first web development with dual-audience thinking (humans and AI agents) for non-CS background students in business
+  - **Enterprise Cloud**: Strategic cloud adoption and architecture for AI-powered organisations
+  - **Generative AI**: AI transformation, responsible AI adoption, and the agentic era
+  - **Web Application Development in the AI Era**: AI-first web development with dual-audience thinking (humans and AI agents) for non-CS background students in business
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
 - **Huawei**: Strategic telecommunications and broadband deployments with EU compliance focus
 
 **Credentials and Recognition:**
-- **SOLAS / Skills to Advance Appointed Instructor and QA Framework Architect** (Mar 2026) — National AI workforce programme; designed MIPLO framework, ALE evidence scale, and Bloom's Taxonomy mapping across both QQI levels
-- **Generative AI Leader** (Google, Jan 2026) — Generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
-- **Samsara Framework 2.0** (FilmEU — European University, Jan 2026) — Pedagogy and Project-Based Learning certification
-- **Harvard Professional Educator Certificate** (Jul 2025) — Preparing leaders for digital transformation
-- **Lakera GenAI Security Report Contributor** (Nov 2025) — Named contributor recognised for AI governance and prompt-injection testing insights
-- **Workday VIBE Global Impact Award** (Oct 2023) — First-ever Product and Technology VIBE Award for leadership and cultural impact
+- **SOLAS / Skills to Advance Appointed Instructor and QA Framework Architect** (Mar 2026): National AI workforce programme; designed MIPLO framework, ALE evidence scale, and Bloom's Taxonomy mapping across both QQI levels
+- **Generative AI Leader** (Google, Jan 2026): Generative AI transformation, Google Cloud gen AI offerings, and responsible AI adoption
+- **Samsara Framework 2.0** (FilmEU / European University, Jan 2026): Pedagogy and Project-Based Learning certification
+- **Harvard Professional Educator Certificate** (Jul 2025): Preparing leaders for digital transformation
+- **Lakera GenAI Security Report Contributor** (Nov 2025): Named contributor recognised for AI governance and prompt-injection testing insights
+- **Workday VIBE Global Impact Award** (Oct 2023): First-ever Product and Technology VIBE Award for leadership and cultural impact
 - **AWS Certified Cloud Practitioner** and **Google Cloud Gemini for Security Engineers**
-- **Google Developers Group Chapter Lead** — Organising community events and developer education
-- **Data Analytics in Business, QQI Level 8** — Completed
+- **Google Developers Group Chapter Lead**: Organising community events and developer education
+- **Data Analytics in Business, QQI Level 8**: Completed
 
 **How Janet Helps:**
 - **For Founders and Leaders**: Aligning AI and cloud strategy with business goals, turning technical complexity into competitive advantage
 - **For Educators and Institutions**: Designing future-ready AI learning that prepares digital leaders with AI-native skills, agentic-era awareness, and AI token economic mindset
 - **For Organisations**: AI security consulting, governance frameworks, AI evaluation and quality assurance, and digital transformation strategy
-- **For Students**: Building AI-native capabilities through Enterprise Cloud, Generative AI, and Web Application Development — equipping future digital leaders with practical, industry-relevant skills and real-world case studies
+- **For Students**: Building AI-native capabilities through Enterprise Cloud, Generative AI, and Web Application Development, equipping future digital leaders with practical, industry-relevant skills and real-world case studies
 
 ---
 
@@ -73,7 +73,7 @@ As a strategic advisor working across multiple clients, teaching, building curri
 - ✅ Give people immediate context without waiting for me
 - ✅ Support learners enrolled in my programmes between sessions
 
-**That's Maya — my AI Digital Twin.**
+**That's Maya, my AI Digital Twin.**
 
 ### What Maya Does
 
@@ -135,7 +135,7 @@ Socratic Response ──→ Accurate, conversational, guides thinking rather tha
 **Key Features:**
 - 24/7 availability
 - Accurate responses based on verified credentials and experience
-- Socratic questioning approach — builds understanding, does not shortcut it
+- Socratic questioning approach, building understanding rather than shortcutting it
 - Professional tone matching my communication style
 - Privacy-focused (no personal data collection)
 - Security-first design with comprehensive protection measures
@@ -237,9 +237,9 @@ This is production-ready:
 
 Maya is one of three AI agents Janet has built. The full Agent Boutique lives at [agents.janetxiushi.me](https://agents.janetxiushi.me):
 
-- **Maya** — AI Educator and Digital Twin (you are here)
-- **Ming** — Coming soon
-- **Maggie** — Coming soon
+- **Maya**: AI Educator and Digital Twin (you are here)
+- **Ming**: Coming soon
+- **Maggie**: Coming soon
 
 ---
 
@@ -277,5 +277,5 @@ This repository is a portfolio and showcase project demonstrating technical impl
 
 <p align="center">
   <strong>From personal solution to national programme infrastructure</strong><br>
-  Because being unavailable shouldn't mean missing opportunities — and because AI education deserves an AI educator
+  Because being unavailable shouldn't mean missing opportunities, and because AI education deserves an AI educator
 </p>
