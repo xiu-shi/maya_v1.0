@@ -341,3 +341,30 @@ Server shutdown (SIGTERM/SIGINT):
 | `s3-upload-queue.test.js` | Queue serialization, batching, deduplication |
 | `s3-chat-logs-capture-requirements.test.js` | Key format, document schema, lifecycle fields |
 | `chat-logger-s3-integration.test.js` | Dual storage (local + S3) integration |
+
+---
+
+## Who Gets Logged to S3? (Not Just “Local”)
+
+**Short answer:** The backend does **not** filter by IP or “local” vs “remote”. Every chat request that reaches the handler and triggers `logChatAttempt` (success or error) is written to the local log file and queued for S3. There is no code that restricts S3 logging to your own traffic.
+
+**If you only see your own chat history in S3** while Google Analytics shows more traffic and interactions, it’s usually because of one or more of the following:
+
+| Cause | Explanation |
+|-------|-------------|
+| **GA measures client-side, S3 measures server-side** | GA counts page views, clicks, and client-side events (e.g. “chat_message_sent” when the user clicks Send). S3 only gets an entry when the server receives a `POST /api/chat` and runs the logging code. If the request never reaches the server (see below), there is no S3 log. |
+| **Requests never reach the server** | User’s browser may block the request (ad blocker, privacy extension), the request may fail (network error, timeout, CORS in some edge cases), or the user may close the tab before the request completes. In all these cases GA may still record an “interaction” but no log is written. |
+| **Clicks without a completed send** | “Interactions” in GA can be “opened page”, “clicked a sample question”, or “started typing”. Only when a message is actually sent and the server responds do we log. So high GA engagement can still mean few completed chat round-trips. |
+| **Chat rate limit (chatLimiter)** | Requests that are blocked by **chatLimiter** (stricter limit for `/api/chat`) do **not** trigger any logging — there is no custom handler on that middleware. So users who hit the chat rate limit never appear in S3. (Requests blocked by the general **apiLimiter** are logged via its custom handler.) |
+| **Single user / date range** | If only one person has sent messages in the date range you’re looking at, or you’re looking at a single day/folder, you will only see that user’s conversations. |
+
+**How to verify:**
+
+1. **Check IP diversity in S3**  
+   Open a few conversation JSON objects in S3 and look at the `ip` field. If you see multiple different IPs, other users’ chats are being captured. If you only see your own IP, then in practice only your requests are reaching the server and being logged.
+
+2. **Compare GA “chat” events with server volume**  
+   If you have a GA event that fires only when a chat message is actually sent (e.g. after a successful response), compare that count to the number of conversations/messages in S3. If they’re close, logging is working for all traffic that reaches the server.
+
+3. **Optionally log chat rate-limited requests**  
+   If you want to count users who hit the chat rate limit, add a custom handler to `chatLimiter` (in `middleware/rateLimit.js`) that calls `logChatAttempt` with `status: 'rate_limited'`, similar to `apiLimiter`. Then those attempts will also appear in S3 (and in local logs).
