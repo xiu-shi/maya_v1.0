@@ -299,9 +299,9 @@ This is production-ready:
 
 Maya is one of three AI agents Janet has built. The full Agent Boutique lives at [agents.janetxiushi.me](https://agents.janetxiushi.me):
 
-- **Maya**: AI Educator and Digital Twin (you are here)
-- **Ming**: Coming soon
-- **Maggie**: Coming soon
+- **Maya**: AI Educator and Digital Twin (live: external user facing)
+- **Ming**: Already contributing in the background
+- **Maggie**: Already contributing in the background
 
 ---
 
