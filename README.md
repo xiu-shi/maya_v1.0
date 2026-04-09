@@ -77,7 +77,7 @@ These programmes are accredited by Quality and Qualifications Ireland (QQI) and 
 **Duration:** 24 hours classroom + 26 hours independent learning
 **Audience:** Employed professionals applying AI tools in their own work context
 
-### QQI Level 6 - AI Strategic Planning and Legal Review *(Coming 2026)*
+### QQI Level 6 - AI Strategic Planning and Legal Review *(In development, not yet launched)*
 
 Two micro-qualifications in development:
 - **AI Legal and Ethical Considerations**
@@ -311,7 +311,7 @@ Maya is one of three AI agents Janet has built. The full Agent Boutique lives at
 
 - **Website**: [janetxiushi.me](https://janetxiushi.me)
 - **LinkedIn**: [linkedin.com/in/janetxiushi](https://linkedin.com/in/janetxiushi)
-- **Medium**: [medium.com/@eupirate](https://medium.com/@eupirate)
+- **Medium**: [medium.com/@janetxiushi](https://medium.com/@janetxiushi)
 - **Email**: info@janetxiushi.me
 
 **Or chat with Maya directly**: [maya-agent.ai-builders.space/maya.html](https://maya-agent.ai-builders.space/maya.html)
