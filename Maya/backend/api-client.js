@@ -35,10 +35,10 @@ function cleanResponse(content) {
     /I'll polish this/gi,
   ];
 
-  // Replace em dashes (—) with hyphens (-)
-  // This ensures no em dashes appear in responses
-  content = content.replace(/—/g, '-');
-  content = content.replace(/–/g, '-'); // Also replace en dashes for consistency
+  // Replace em dashes (Unicode U+2014) with hyphens.
+  // Ensures no em dashes appear in responses (regex source uses Unicode escape so this file itself stays em-dash-free).
+  content = content.replace(/\u2014/g, '-');
+  content = content.replace(/\u2013/g, '-'); // Also replace en dashes for consistency
 
   // Check if content contains reasoning markers
   const hasReasoning = reasoningMarkers.some(marker => marker.test(content));
@@ -487,50 +487,38 @@ export class MayaAPIClient {
         content = 'I apologize, but I encountered an error processing your request.';
       }
       
-      // Strip KB tag annotations (e.g. "(KB: workday)" fragments) before any
-      // further processing. This runs before history append, user response
-      // delivery, and S3 logging - all of which happen downstream.
+      // BUG-04 fix (10 May 2026): single dynamic import for the whole guardrail
+      // pipeline instead of three separate imports. The module is loaded once
+      // per request, then strip / voice / validate run as a coherent sequence.
+      // The dynamic form is intentional: if response-guardrails.js is absent
+      // from a build, the request must still succeed (production resilience).
       try {
-        const { stripKbTags } = await import('./utils/response-guardrails.js');
-        const { cleaned, strippedCount } = stripKbTags(content);
+        const guardrails = await import('./utils/response-guardrails.js');
+
+        const { cleaned, strippedCount } = guardrails.stripKbTags(content);
         if (strippedCount > 0) {
           content = cleaned;
         }
-      } catch (stripError) {
-        logInfo('KB tag strip not available, skipping');
-      }
 
-      // Phase 1 voice quality check - non-blocking telemetry (9 May 2026)
-      // Detects forbidden brand voice patterns. Does not modify the response.
-      // Logs maya.voice_check.failed events for observability and prompt drift detection.
-      try {
-        const { checkVoiceQuality } = await import('./utils/response-guardrails.js');
-        const voiceCheck = checkVoiceQuality(content);
+        const voiceCheck = guardrails.checkVoiceQuality(content);
         if (!voiceCheck.passed) {
           logInfo('Voice quality check flagged issues', {
             violationCount: voiceCheck.violations.length,
-            types: voiceCheck.violations.map(v => v.type),
+            types: voiceCheck.violations.map((v) => v.type),
           });
         }
-      } catch (voiceCheckError) {
-        logInfo('Voice quality check not available, skipping');
-      }
 
-      // Apply response validation (if available)
-      try {
-        const { validateResponse } = await import('./utils/response-guardrails.js');
-        const validation = validateResponse(content);
+        const validation = guardrails.validateResponse(content);
         if (!validation.isValid) {
           logWarning('Response sanitized due to information leakage', {
             warnings: validation.warnings,
             originalLength: content.length,
-            sanitizedLength: validation.sanitized.length
+            sanitizedLength: validation.sanitized.length,
           });
           content = validation.sanitized;
         }
       } catch (guardrailsError) {
-        // Validation module not available - skip validation
-        logInfo('Response validation not available, skipping');
+        logInfo('Response guardrails not available, skipping all checks');
       }
       
       // Check if we should add KB update disclaimer (after 3+ consecutive questions about Janet)
