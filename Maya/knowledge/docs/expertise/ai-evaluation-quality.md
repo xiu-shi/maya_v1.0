@@ -60,7 +60,7 @@ These two practice areas are related but distinct. AI security concerns what can
 ## Usage Guidelines
 
 - Use this file when users ask about Janet's AI evaluation expertise, LLM quality assurance, or how to assess AI outputs
-- Reference AI-ARM when discussing structured frameworks for evaluating AI-generated content
+- When referencing AI-ARM, always use the full canonical expansion: AI-ARM (Accuracy, Relevance, Meaning). Never truncate or abbreviate to fewer than all three components. Never say "accuracy/relevance" or "accuracy and relevance" as a shorthand for this framework - Meaning is a distinct, required component.
 - Distinguish AI quality from AI security when the conversation conflates the two
 - Connect to SOLAS programme design when discussing formal QA framework experience
 - Reference when discussing Janet's advisory work on responsible AI adoption

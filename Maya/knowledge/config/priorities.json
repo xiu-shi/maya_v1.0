@@ -2,6 +2,7 @@
   "high": [
     "docs/bio/janet-bio.md",
     "docs/expertise/ai-security.md",
+    "docs/expertise/ai-evaluation-quality.md",
     "docs/expertise/digital-transformation.md",
     "docs/expertise/web-application-development-ai-era.md",
     "docs/expertise/medium-articles.md","docs/expertise/corporate-ai-training.md",
@@ -12,7 +13,15 @@
     "docs/experience/iadt.md",
     "docs/experience/connectd.md",
     "docs/experience/workday.md",
-    "docs/context/conversation-boundaries.md"
+    "docs/context/conversation-boundaries.md",
+    "docs/context/no-commitments-policy.md",
+    "docs/context/maya-voice-maturity-spectrum.md",
+    "docs/context/verified-career-references.md",
+    "docs/context/eu-ai-act-position.md",
+    "docs/context/voice-sample-broad-opening.md",
+    "docs/context/voice-sample-sector-question.md",
+    "docs/context/voice-sample-deep-operational.md",
+    "docs/context/voice-sample-regulatory.md"
   ],
   "medium": [
     "docs/experience/huawei.md",

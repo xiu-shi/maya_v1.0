@@ -1341,6 +1341,35 @@ process.on("SIGINT", async () => {
 // Start server (skip in test environment to allow tests to control server)
 if (process.env.NODE_ENV !== "test" && !process.env.SKIP_SERVER_START) {
   logInfo("About to start server...");
+
+  // BUG-C1 fix (9 May 2026): Validate KB config at startup so missing files
+  // are surfaced as prominent errors before the first request is served,
+  // rather than silently discovered per-request in the logs.
+  import("./utils/kb-loader.js")
+    .then(({ validateKBConfig }) => validateKBConfig())
+    .then((validation) => {
+      if (!validation.valid) {
+        logError(
+          "STARTUP WARNING: KB config validation failed - server will start but LLM context is incomplete",
+          new Error("Missing high-priority KB files"),
+          {
+            missingFiles: validation.missing.map((m) => `[${m.tier}] ${m.key}`),
+            action: "Add missing files to the repository and redeploy",
+          }
+        );
+      } else if (validation.missing.length > 0) {
+        logInfo("KB config: non-critical files missing (medium/low priority)", {
+          missingCount: validation.missing.length,
+          missingFiles: validation.missing.map((m) => `[${m.tier}] ${m.key}`),
+        });
+      } else {
+        logInfo("KB config validation passed", {
+          presentCount: validation.present.length,
+        });
+      }
+    })
+    .catch((err) => logError("KB config validation threw unexpectedly", err));
+
   const PORT = config.port;
   logInfo(`Calling app.listen on port ${PORT}...`);
   // Bind to 0.0.0.0 to accept connections from all interfaces (required for Docker/containers)

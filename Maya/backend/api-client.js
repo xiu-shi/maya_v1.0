@@ -487,6 +487,35 @@ export class MayaAPIClient {
         content = 'I apologize, but I encountered an error processing your request.';
       }
       
+      // Strip KB tag annotations (e.g. "(KB: workday)" fragments) before any
+      // further processing. This runs before history append, user response
+      // delivery, and S3 logging - all of which happen downstream.
+      try {
+        const { stripKbTags } = await import('./utils/response-guardrails.js');
+        const { cleaned, strippedCount } = stripKbTags(content);
+        if (strippedCount > 0) {
+          content = cleaned;
+        }
+      } catch (stripError) {
+        logInfo('KB tag strip not available, skipping');
+      }
+
+      // Phase 1 voice quality check - non-blocking telemetry (9 May 2026)
+      // Detects forbidden brand voice patterns. Does not modify the response.
+      // Logs maya.voice_check.failed events for observability and prompt drift detection.
+      try {
+        const { checkVoiceQuality } = await import('./utils/response-guardrails.js');
+        const voiceCheck = checkVoiceQuality(content);
+        if (!voiceCheck.passed) {
+          logInfo('Voice quality check flagged issues', {
+            violationCount: voiceCheck.violations.length,
+            types: voiceCheck.violations.map(v => v.type),
+          });
+        }
+      } catch (voiceCheckError) {
+        logInfo('Voice quality check not available, skipping');
+      }
+
       // Apply response validation (if available)
       try {
         const { validateResponse } = await import('./utils/response-guardrails.js');

@@ -365,10 +365,8 @@ jobs:
 
 ## Related Documentation
 
-- **[Deployment Guide](../../../DEPLOYMENT_WITH_ENV_VARS_GUIDE.md)** - How to deploy
-- **[Deployment Record](../../../DEPLOYMENT_RECORD_JAN_25_2026.md)** - Latest deployment details
-- **[API Method Summary](../../../DEPLOYMENT_API_METHOD_SUMMARY.md)** - API deployment method
-- **[Quick Reference](../../../DEPLOYMENT_QUICK_REFERENCE.md)** - Quick deployment commands
+- **[Deployment Guide](../../DEPLOYMENT.md)** - How to deploy Maya
+- **[Deploy Script](../../../DEPLOY_WITH_ENV_VAR.sh)** - Deployment shell script
 
 ---
 
