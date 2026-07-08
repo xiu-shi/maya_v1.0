@@ -25,6 +25,7 @@ import {
   asyncHandler,
 } from "./middleware/errorHandler.js";
 import { auditLog } from "./middleware/audit.js";
+import { requireAdminAuth } from "./middleware/adminAuth.js";
 import { logInfo, logError } from "./utils/logger.js";
 import {
   sanitizeTestOutput,
@@ -261,9 +262,10 @@ app.get("/health", async (req, res) => {
   });
 });
 
-// KB Status endpoint (includes cache information)
+// KB Status endpoint (includes cache information - admin only)
 app.get(
   "/api/kb/status",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
     const client = await getAPIClient();
     if (!client || typeof client.getKBStatus !== "function") {
@@ -342,6 +344,7 @@ function generateCacheRecommendations(cache) {
 // Run E2E Tests endpoint (admin - before rate limiting)
 app.post(
   "/api/admin/run-tests",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
     logInfo("E2E test run requested via API");
 
@@ -537,9 +540,10 @@ app.post(
   }),
 );
 
-// KB Refresh endpoint (admin - no auth for now, add in production)
+// KB Refresh endpoint (admin)
 app.post(
   "/api/admin/kb-refresh",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
     const client = await getAPIClient();
     if (!client || typeof client.refreshKBContext !== "function") {
@@ -577,9 +581,8 @@ function withTimeout(promise, ms, message) {
 // Admin endpoints for chat logs (before rate limiting - admin endpoints should have different limits)
 app.get(
   "/api/admin/chat-logs",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
-    // TODO: Add authentication/authorization check here
-    // For now, this endpoint is accessible - consider adding API key or IP whitelist
 
     // Normalize dates to UTC/GMT - ensure consistent timezone handling
     const startDate = req.query.startDate
@@ -616,7 +619,7 @@ app.get(
       logs = await withTimeout(
         logsPromise,
         CHAT_LOGS_REQUEST_MS,
-        "Chat logs request timed out. Try a shorter date range (e.g. 3–7 days)."
+        "Chat logs request timed out. Try a shorter date range (e.g. 3-7 days)."
       );
 
       // If includeRemote is true, fetch and merge remote logs
@@ -697,6 +700,7 @@ app.get(
 // Logging health endpoint - comprehensive health check
 app.get(
   "/api/admin/logging-health",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
     const { promises: fs } = await import("fs");
     const pathModule = await import("path");
@@ -830,6 +834,7 @@ app.get(
 // Logging status endpoint - check if logging is working properly
 app.get(
   "/api/admin/logging-status",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
     const { promises: fs } = await import("fs");
     const pathModule = await import("path");
@@ -924,8 +929,8 @@ app.get(
 // Storage statistics endpoint
 app.get(
   "/api/admin/chat-logs/stats",
+  requireAdminAuth,
   asyncHandler(async (req, res) => {
-    // TODO: Add authentication/authorization check here
 
     const includeRemote = req.query.includeRemote === "true";
     const remoteServer =
@@ -1319,7 +1324,7 @@ app.use(notFoundHandler);
 app.use(corsErrorHandler);
 app.use(errorHandler);
 
-// Graceful shutdown — finalize all active conversation sessions before exiting
+// Graceful shutdown - finalize all active conversation sessions before exiting
 process.on("SIGTERM", async () => {
   logInfo("SIGTERM received, shutting down gracefully...");
   try {

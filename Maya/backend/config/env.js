@@ -149,6 +149,9 @@ const config = {
   enableHttpsRedirect: getEnv("ENABLE_HTTPS_REDIRECT", "false") === "true",
   trustProxy: getEnv("TRUST_PROXY", "false") === "true",
 
+  // Admin authentication
+  adminToken: getEnv("ADMIN_TOKEN", null),
+
   // S3 Logging (optional)
   s3Logging: {
     enabled: getEnv("ENABLE_S3_LOGGING", "false") === "true",
@@ -196,6 +199,9 @@ console.log(
 console.log(`   Max Message Length: ${config.maxMessageLength} characters`);
 console.log(
   `   AI_BUILDER_TOKEN: ${config.aiBuilderToken ? "✅ Set" : "❌ Missing"}`,
+);
+console.log(
+  `   ADMIN_TOKEN: ${config.adminToken ? "✅ Set" : "⚠️  Not set (admin endpoints will be unavailable)"}`,
 );
 
 export default config;
