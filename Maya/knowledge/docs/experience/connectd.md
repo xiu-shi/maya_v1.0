@@ -2,23 +2,29 @@
 
 **Category**: experience  
 **Priority**: high  
-**Last Updated**: 2025-01-06  
-**Date**: April 2025 – Present  
-**Location**: London Area, United Kingdom · Remote
+**Last Updated**: 2026-07-08  
+**Date**: April 2025 to Present (total tenure)  
+**Location**: London Area, United Kingdom · Remote · Contract
 
 ## Summary
-Technology Advisor through Connectd advisory platform, partnering with early-stage SaaS and growth companies to turn AI complexity into competitive advantage. Aligning technology strategy with business objectives, embedding responsible AI governance, and accelerating cloud AI-native product adoption and data-driven scaling in line with GDPR and emerging EU AI Act expectations.
+Technology Advisor through the Connectd advisory platform, partnering with early-stage SaaS and growth companies to turn AI complexity into competitive advantage. Aligning technology strategy with business objectives, embedding responsible AI governance, and accelerating cloud AI-native product adoption and data-driven scaling in line with GDPR and emerging EU AI Act expectations. Connectd certified as both a Board Advisor and a Fractional Professional.
+
+## Role Progression
+- **Technology Advisor, Strategic AI and Cloud** (January 2026 to Present): Advising early-stage and growth companies on AI adoption, product-market fit validation, AI solution design, vendor selection, LLM evaluation, workflow automation, and ROI impact.
+- **Technology Advisor** (April 2025 to December 2025): Connectd certified Board Advisor and Fractional Professional, advising founders and leadership teams on cloud adoption, data architecture, cybersecurity, responsible AI governance, and technology procurement.
 
 ## Key Points
-- Advises founders and leadership teams on cloud adoption, data architecture, cybersecurity, AI risk & compliance, and technology procurement
+- Advises founders and leadership teams on cloud adoption, data architecture, cybersecurity, AI risk and compliance, and technology procurement
+- Advises on AI adoption, product-market fit validation, AI solution design, vendor selection, LLM evaluation, workflow automation, and ROI impact
 - Translates complex technical concepts into clear decision frameworks for non-technical executives and boards
 - Focus on responsible AI governance and GDPR/EU AI Act compliance
 - Cloud architecture and vendor selection reducing costs by up to 30%
+- Connectd certified: Board Advisor (December 2024) and Fractional Professional (December 2025)
 
 ## Key Deliverables & Outcomes
 
 ### Strategy & Roadmaps
-- Integrated business–tech roadmaps combining competitive analysis, AI readiness, risk appetite, and KPI frameworks
+- Integrated business and technology roadmaps combining competitive analysis, AI readiness, risk appetite, and KPI frameworks
 - Aligns growth and governance priorities
 
 ### Cloud & Vendor Design

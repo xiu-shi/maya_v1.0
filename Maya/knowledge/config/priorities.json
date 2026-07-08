@@ -10,6 +10,7 @@
     "docs/cert_educ/education.md",
     "docs/honors_awards/lakera-genai-report-2025.md",
     "docs/honors_awards/workday-vibe-award-2023.md",
+    "docs/experience/avencia.md",
     "docs/experience/iadt.md",
     "docs/experience/connectd.md",
     "docs/experience/workday.md",
@@ -24,6 +25,8 @@
     "docs/context/voice-sample-regulatory.md"
   ],
   "medium": [
+    "docs/expertise/thought-leadership-2026.md",
+    "docs/cert_educ/teaching-research-footprint.md",
     "docs/experience/huawei.md",
     "docs/experience/woodies.md",
     "docs/cert_educ/personal-projects.md",

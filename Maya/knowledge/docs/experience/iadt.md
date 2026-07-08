@@ -1,10 +1,10 @@
-# Industry Expert Lecturer (Cloud, GenAI, Web Development in the AI Era) - IADT
+# Industry Expert Lecturer (Enterprise Cloud + GenAI) - IADT
 
 **Category**: experience
 **Priority**: high
-**Last Updated**: 2026-03-22
-**Date**: September 2025 – Present
-**Location**: Dún Laoghaire-Rathdown, Ireland · On-site
+**Last Updated**: 2026-07-08
+**Date**: September 2025 to Present
+**Location**: Dún Laoghaire-Rathdown, Ireland · On-site · Part-time
 
 ## Summary
 

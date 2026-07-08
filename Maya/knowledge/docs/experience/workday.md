@@ -2,8 +2,8 @@
 
 **Category**: experience  
 **Priority**: high  
-**Last Updated**: 2026-01-06  
-**Date**: October 2017 – March 2025  
+**Last Updated**: 2026-07-08  
+**Date**: October 2017 to March 2025  
 **Location**: County Dublin, Ireland · Hybrid
 
 ## About Workday
@@ -18,7 +18,7 @@ Workday is a cloud-based software company that provides Human Capital Management
 - AI Integration: Built with AI to elevate people, supercharge work, and improve business operations
 
 ## Summary
-Senior Software Quality Assurance Engineer, Product Security Champion, and Scrum Master at Workday. Led end-to-end quality strategy across Financials, Supply Chain, Procure to Pay, Vendor Management, and Expenses. Delivered 32% development cycle time reduction and achieved zero SLA breaches during final 8 months. Founded and scaled Employee Belonging Council globally to 16 locations with 30% YoY growth.
+Senior Software Quality Assurance Engineer, Product Security Champion, and Scrum Master at Workday. Led end-to-end quality strategy across Financials, Supply Chain, Procure to Pay, Vendor Management, and Expenses. Delivered 32% development cycle time reduction and achieved zero SLA breaches during final 8 months. Founded and scaled Employee Belonging Council globally to 17 locations with 30% YoY growth.
 
 ## Role Timeline
 **Primary Roles:** Senior Software Quality Assurance Engineer, Application Product Security Champion, Data Explorer, Scrum Master
@@ -31,8 +31,8 @@ Senior Software Quality Assurance Engineer, Product Security Champion, and Scrum
 - Product Domains: Financials, Supply Chain, Procure to Pay, Vendor Management, Expenses
 - 32% development cycle time reduction
 - Zero SLA breaches during final 8 months
-- Application Security Champion (FY24–FY26)
-- Founded and scaled Employee Belonging Council globally to 16 locations
+- Application Security Champion (FY24 to FY26)
+- Founded and scaled Employee Belonging Council globally to 17 locations
 - 30% YoY membership growth until 2025
 - Product & Tech VIBE Global Impact Award (first-ever global recognition)
 - Official Workday Ireland photographer for high-profile events
@@ -178,9 +178,9 @@ Senior Software Quality Assurance Engineer, Product Security Champion, and Scrum
 
 ## Community Leadership & Global Impact
 - Founded and scaled Workday's Employee Belonging Council from Dublin site during COVID
-- Global membership spanned to 16 locations
+- Global membership spanned to 17 locations
 - Demonstrated influence without authority, building inclusive culture across international teams
-- Product & Tech VIBE Global Impact Award (Workday VIBE Index™) - first-ever global recognition
+- Product & Tech VIBE Global Impact Award (Workday VIBE Index) - first-ever global recognition
 
 ## Creative Leadership & Brand Representation
 - Official Workday Ireland photographer for high-profile events
@@ -188,10 +188,10 @@ Senior Software Quality Assurance Engineer, Product Security Champion, and Scrum
 - Creative brand representation featured in major media distributions and social media channels
 
 ## Key Achievements
-- Product & Tech VIBE Global Impact Award (Workday VIBE Index™) - first-ever global recognition for community building and cultural impact
+- Product & Tech VIBE Global Impact Award (Workday VIBE Index) - first-ever global recognition for community building and cultural impact
 - 32% improvement in development cycle time and 0 SLA breaches through process excellence
 - Company Value Icon Award for innovation and collaboration
-- Application Security Champion (FY24–FY26) driving enterprise-wide security initiatives
+- Application Security Champion (FY24 to FY26) driving enterprise-wide security initiatives
 
 ## Skills
 Leadership, Strategy, Communication, Integrity, Accountability, Critical Thinking, Problem Solving, Business Acumen, Presentations, Stakeholder Management, Business Case Development, Relationship Development, Influencing Without Authority, Root Cause Analysis, Quality Assurance, Project Management, Product Requirements, Requirements Analysis, Social Impact, Culture Change, Cloud Computing, AWS, GCP, Adobe Creative Cloud, SDLC, Generative AI, AI Literacy, Machine Learning, Visualization, Statistics, Data Preparation, Virtualization, SQL, Linux, GDPR, Product Launch, Social Perceptiveness, GitHub, Containerization, GPT, AI Agents, Cybersecurity, Procurement, HTTP
@@ -212,5 +212,3 @@ Leadership, Strategy, Communication, Integrity, Accountability, Critical Thinkin
 - docs/honors_awards/workday-vibe-award-2023.md
 - docs/expertise/ai-security.md
 - docs/bio/janet-bio.md
-
-

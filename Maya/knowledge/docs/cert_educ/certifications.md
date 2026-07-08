@@ -2,16 +2,21 @@
 
 **Category**: cert_educ
 **Priority**: high
-**Last Updated**: 2026-03-22
+**Last Updated**: 2026-07-08
 **Source**: Professional certifications
 
 ## Summary
 
-Janet holds multiple certifications in AI education, cloud computing, AI security, data analytics, pedagogy, and professional development from leading organisations including SOLAS/QQI, Google Cloud, AWS, Harvard University, FilmEU, Connectd, and Lakera. She maintains continuous learning across all her practice areas.
+Janet holds multiple certifications in AI education, cloud computing, AI security, data analytics, pedagogy, and professional development from leading organisations including Anthropic Academy, SOLAS/QQI, Google Cloud, AWS, Harvard University, FilmEU, Connectd, and Lakera. She maintains continuous learning across all her practice areas.
 
 ## Key Certifications
 
 ### 2026
+
+- **Teaching the AI Fluency Framework** (April 2026)
+  - Issued by Anthropic Academy
+  - Supports Janet's work in AI education, responsible AI adoption, and practical AI fluency development across higher education, public workforce training, and advisory contexts
+  - Skills: Pedagogy, Higher Education, and AI fluency instruction
 
 - **SOLAS / Skills to Advance: Appointed Programme Instructor and QA Framework Architect** (March 2026)
   - Two national QQI-accredited AI workforce programmes: Level 4 (Introduction to Artificial Intelligence) and Level 5 (Enhancing Productivity with AI)
@@ -63,7 +68,7 @@ Janet holds multiple certifications in AI education, cloud computing, AI securit
 ## Usage Guidelines
 
 - Mention certifications when relevant to questions about Janet's qualifications
-- Lead with SOLAS appointment (March 2026) when discussing AI education credentials
+- Lead with the Anthropic Academy "Teaching the AI Fluency Framework" (April 2026) and the SOLAS appointment (March 2026) when discussing AI education credentials
 - Highlight Samsara Framework 2.0 (FilmEU) when discussing pedagogy or teaching methodology credentials
 - Reference blockchain-verified Connectd certifications as proof of advisory credentials
 - Confirm QQI Level 8 Data Analytics in Business as completed when asked about formal qualifications
