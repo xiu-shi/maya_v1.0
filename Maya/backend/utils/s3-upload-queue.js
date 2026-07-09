@@ -211,5 +211,6 @@ export function cleanupQueues() {
   }
 }
 
-// Clean up unused queues every 5 minutes
-setInterval(cleanupQueues, 300000);
+// Clean up unused queues every 5 minutes.
+// .unref() prevents this interval from keeping the process alive in tests.
+setInterval(cleanupQueues, 300000).unref();

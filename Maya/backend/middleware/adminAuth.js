@@ -8,7 +8,7 @@
  * Buffer) to prevent timing-based enumeration attacks.
  *
  * Configuration:
- *   Set ADMIN_TOKEN in .env (local) or as a platform environment variable.
+ *   Set ADMIN_TOKEN in .env locally or as a platform environment variable.
  *   If ADMIN_TOKEN is absent the middleware returns 503 on every request.
  *
  * Exports:

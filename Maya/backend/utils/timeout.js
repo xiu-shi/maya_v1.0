@@ -24,20 +24,6 @@ export const TIMEOUTS = {
 };
 
 /**
- * Create a timeout promise that rejects after specified milliseconds
- * @param {number} ms - Milliseconds to wait before timeout
- * @param {string} operation - Operation name for error message
- * @returns {Promise<never>} Promise that rejects with timeout error
- */
-function createTimeoutPromise(ms, operation) {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error(`${operation} timed out after ${ms}ms`));
-    }, ms);
-  });
-}
-
-/**
  * Wrap an async operation with a timeout
  * @param {Promise<T>} promise - The async operation to wrap
  * @param {number} timeoutMs - Timeout in milliseconds
@@ -45,12 +31,19 @@ function createTimeoutPromise(ms, operation) {
  * @returns {Promise<T>} Promise that resolves/rejects with timeout handling
  */
 export async function withTimeout(promise, timeoutMs, operationName = 'Operation') {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`${operationName} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+
   try {
-    return await Promise.race([
-      promise,
-      createTimeoutPromise(timeoutMs, operationName)
-    ]);
+    const result = await Promise.race([promise, timeoutPromise]);
+    clearTimeout(timeoutId);
+    return result;
   } catch (error) {
+    clearTimeout(timeoutId);
     if (error.message.includes('timed out')) {
       logError(`${operationName} timed out`, error, { timeoutMs });
       throw new Error(`${operationName} timed out after ${timeoutMs}ms. This may indicate a blocking operation or system issue.`);
@@ -142,7 +135,7 @@ export async function retryWithTimeout(operation, maxRetries = 3, timeoutMs = TI
       if (attempt < maxRetries - 1) {
         const delay = initialDelayMs * Math.pow(2, attempt);
         logWarning(`Operation failed, retrying in ${delay}ms`, { attempt: attempt + 1, maxRetries, error: error.message });
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(resolve => { const t = setTimeout(resolve, delay); if (t.unref) t.unref(); });
       }
     }
   }
