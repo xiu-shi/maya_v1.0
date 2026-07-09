@@ -13,8 +13,12 @@
 import { logInfo, logWarning } from './logger.js';
 
 const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+// TTL for the finalizedSessions dedup window. Late messages for a finalized conversation
+// are impossible after 24 h, so entries older than this are stale and can be pruned.
+// This bounds the Map to O(conversations_per_day) rather than O(conversations_ever).
+const FINALIZED_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const activeSessions = new Map();
-const finalizedSessions = new Map(); // conversationId → true (tracks ended conversations)
+const finalizedSessions = new Map(); // conversationId → finalizedAt (ms timestamp)
 
 let _onConversationEnd = null;
 
@@ -37,7 +41,13 @@ export function setConversationEndHandler(handler) {
  * @returns {boolean}
  */
 export function wasConversationFinalized(conversationId) {
-  return finalizedSessions.has(conversationId);
+  const finalizedAt = finalizedSessions.get(conversationId);
+  if (finalizedAt === undefined) return false;
+  if (Date.now() - finalizedAt > FINALIZED_TTL_MS) {
+    finalizedSessions.delete(conversationId); // lazy eviction on lookup
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -92,7 +102,14 @@ async function onConversationInactive(conversationId) {
   if (!session) return;
 
   activeSessions.delete(conversationId);
-  finalizedSessions.set(conversationId, true);
+  finalizedSessions.set(conversationId, Date.now()); // store finalisation timestamp
+
+  // Prune entries older than FINALIZED_TTL_MS on every write.
+  // Keeps the Map bounded to O(conversations within the last 24 h).
+  const cutoff = Date.now() - FINALIZED_TTL_MS;
+  for (const [id, ts] of finalizedSessions) {
+    if (ts < cutoff) finalizedSessions.delete(id);
+  }
 
   const endedAt = new Date().toISOString();
   const durationMs = Date.now() - new Date(session.startedAt).getTime();
@@ -125,6 +142,15 @@ async function onConversationInactive(conversationId) {
  */
 export function getActiveSessionCount() {
   return activeSessions.size;
+}
+
+/**
+ * Get the number of entries in the finalizedSessions TTL window.
+ * Should stay bounded to recent conversations (within FINALIZED_TTL_MS).
+ * Exposed for monitoring and tests (MAYA-ARCH-001-06).
+ */
+export function getFinalizedSessionCount() {
+  return finalizedSessions.size;
 }
 
 /**
@@ -165,4 +191,4 @@ export function clearAllSessions() {
   finalizedSessions.clear();
 }
 
-export { INACTIVITY_TIMEOUT_MS };
+export { INACTIVITY_TIMEOUT_MS, FINALIZED_TTL_MS };

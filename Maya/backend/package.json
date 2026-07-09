@@ -21,7 +21,11 @@
     "test:connection": "bash test-connection.sh",
     "test:api": "node test-api-endpoint.js",
     "test:models": "node test-models.js",
-    "setup": "cp .env.example .env && echo '⚠️  Please edit .env and add your AI_BUILDER_TOKEN'"
+    "setup": "cp .env.example .env && echo '⚠️  Please edit .env and add your AI_BUILDER_TOKEN'",
+    "docs:push": "node scripts/project-docs.js push",
+    "docs:pull": "node scripts/project-docs.js pull",
+    "docs:list": "node scripts/project-docs.js list",
+    "docs:status": "node scripts/project-docs.js status"
   },
   "keywords": [
     "ai",

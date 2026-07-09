@@ -857,6 +857,88 @@
         height: calc(100vh - 270px);
       }
     }
+
+    /* Consent overlay */
+    .consent-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 9999;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 0 var(--spacing-xl) 0;
+    }
+    .consent-overlay.visible {
+      display: flex;
+    }
+    .consent-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-xl);
+      max-width: 520px;
+      width: calc(100% - var(--spacing-2xl));
+    }
+    .consent-box h3 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+    .consent-box p {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 var(--spacing-lg) 0;
+    }
+    .consent-box a {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+    .consent-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      align-items: center;
+    }
+    .consent-accept-btn {
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 6px;
+      padding: var(--spacing-sm) var(--spacing-lg);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .consent-accept-btn:hover {
+      background: var(--accent-hover);
+    }
+    .consent-decline-btn {
+      background: none;
+      border: none;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      font-family: var(--font-family);
+      cursor: pointer;
+      text-decoration: underline;
+      padding: var(--spacing-sm);
+    }
+    .consent-decline-btn:hover { color: var(--text-primary); }
+    /* Withdraw consent link in input area */
+    .consent-withdraw-link {
+      display: none;
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+      text-decoration: none;
+      text-align: center;
+      padding: var(--spacing-xs) 0 0 0;
+      cursor: pointer;
+    }
+    .consent-withdraw-link:hover { color: var(--text-secondary); }
+    .consent-withdraw-link.visible { display: block; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
@@ -1005,8 +1087,31 @@
             ></textarea>
             <button id="submitBtn" type="button" class="maya-submit-btn">Send</button>
           </div>
+          <span id="consentWithdrawLink" class="consent-withdraw-link" role="button" tabindex="0"
+            title="Withdraw consent - stops logging for this session">
+            Logging enabled &middot; withdraw consent
+          </span>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- GDPR consent overlay (MAYA-GDPR-001-01) -->
+  <div id="consentOverlay" class="consent-overlay" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+    <div class="consent-box">
+      <h3 id="consentTitle">Before you chat with Maya</h3>
+      <p>
+        Maya logs your conversation to improve the service. This includes your messages,
+        IP address, and browser information. No account needed.
+        Logs are automatically deleted after 90 days.
+        <br /><br />
+        <a href="/privacy.html" target="_blank" rel="noopener">Read the full Privacy Notice</a>
+        to see exactly what is collected and how to request deletion.
+      </p>
+      <div class="consent-actions">
+        <button id="consentAcceptBtn" class="consent-accept-btn">Accept and continue</button>
+        <button id="consentDeclineBtn" class="consent-decline-btn">No thanks</button>
+      </div>
     </div>
   </div>
 
@@ -1059,6 +1164,89 @@
     let conversationId = null;
     let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
+
+    // ── GDPR Consent (MAYA-GDPR-001-01) ─────────────────────────────────────
+    const CONSENT_KEY = 'maya_consent';
+    const CONSENT_VERSION = '1'; // Bump this when the notice text changes materially
+
+    function hasConsent() {
+      try {
+        const raw = localStorage.getItem(CONSENT_KEY);
+        if (!raw) return false;
+        const stored = JSON.parse(raw);
+        return stored && stored.version === CONSENT_VERSION && stored.granted === true;
+      } catch (_) { return false; }
+    }
+
+    function grantConsent() {
+      localStorage.setItem(CONSENT_KEY, JSON.stringify({
+        granted: true,
+        version: CONSENT_VERSION,
+        timestamp: new Date().toISOString()
+      }));
+      hideConsentOverlay();
+      showWithdrawLink();
+    }
+
+    function revokeConsent() {
+      localStorage.setItem(CONSENT_KEY, JSON.stringify({
+        granted: false,
+        version: CONSENT_VERSION,
+        timestamp: new Date().toISOString()
+      }));
+      hideConsentOverlay();
+      hideWithdrawLink();
+    }
+
+    function showConsentOverlay() {
+      const overlay = document.getElementById('consentOverlay');
+      if (overlay) {
+        overlay.classList.add('visible');
+        const acceptBtn = document.getElementById('consentAcceptBtn');
+        if (acceptBtn) acceptBtn.focus();
+      }
+    }
+
+    function hideConsentOverlay() {
+      const overlay = document.getElementById('consentOverlay');
+      if (overlay) overlay.classList.remove('visible');
+    }
+
+    function showWithdrawLink() {
+      const link = document.getElementById('consentWithdrawLink');
+      if (link) link.classList.add('visible');
+    }
+
+    function hideWithdrawLink() {
+      const link = document.getElementById('consentWithdrawLink');
+      if (link) link.classList.remove('visible');
+    }
+
+    function initConsent() {
+      const acceptBtn = document.getElementById('consentAcceptBtn');
+      const declineBtn = document.getElementById('consentDeclineBtn');
+      const withdrawLink = document.getElementById('consentWithdrawLink');
+
+      if (acceptBtn) acceptBtn.addEventListener('click', grantConsent);
+      if (declineBtn) declineBtn.addEventListener('click', revokeConsent);
+
+      if (withdrawLink) {
+        withdrawLink.addEventListener('click', () => {
+          revokeConsent();
+          // Inform the user that withdrawal stops future logging and points to erasure
+          const msg = 'Consent withdrawn. Your session will no longer be logged. To request deletion of past data, email info@janetxiushi.me or see the <a href="/privacy.html" target="_blank">Privacy Notice</a>.';
+          addMessage('assistant', msg, 'consent-withdraw-' + Date.now(), false);
+        });
+        withdrawLink.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); withdrawLink.click(); }
+        });
+      }
+
+      if (hasConsent()) {
+        showWithdrawLink();
+      }
+    }
+    // ── End GDPR Consent ─────────────────────────────────────────────────────
 
     function generateConversationId() {
       return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -1191,6 +1379,7 @@
 
     // Initialize
     function init() {
+      initConsent();
       renderChatHistory();
       if (chats.length > 0) {
         const mostRecent = chats[0];
@@ -1720,6 +1909,12 @@
       }
       const message = chatInput.value.trim();
       if (!message) return;
+
+      // GDPR gate: block send until user has given consent (MAYA-GDPR-001-01)
+      if (!hasConsent()) {
+        showConsentOverlay();
+        return;
+      }
 
       // Block messages in chats from a previous day
       const currentChat = chats.find(c => c.id === currentChatId);
