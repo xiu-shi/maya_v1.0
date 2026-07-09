@@ -27,6 +27,7 @@ import {
 import { auditLog } from "./middleware/audit.js";
 import { requireAdminAuth } from "./middleware/adminAuth.js";
 import { logInfo, logError } from "./utils/logger.js";
+import { startLogCleanupScheduler } from "./utils/log-cleanup-scheduler.js";
 import {
   sanitizeTestOutput,
   sanitizeJestResults,
@@ -1387,6 +1388,7 @@ if (process.env.NODE_ENV !== "test" && !process.env.SKIP_SERVER_START) {
     });
     logInfo(`Frontend available at: http://0.0.0.0:${PORT}/maya.html`);
     logInfo(`Health check: http://0.0.0.0:${PORT}/health`);
+    startLogCleanupScheduler();
   });
 
   logInfo("app.listen() called, server should be starting...");

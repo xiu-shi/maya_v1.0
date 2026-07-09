@@ -677,7 +677,7 @@ export async function getStorageStats() {
  * Delete old logs (older than specified days)
  *
  * @param {number} daysToKeep - Number of days to keep (default: 90)
- * @returns {Promise<number>} Number of files deleted
+ * @returns {Promise<{ deletedCount: number, bytesReclaimed: number }>}
  */
 export async function cleanupOldLogs(daysToKeep = 90) {
   try {
@@ -690,6 +690,7 @@ export async function cleanupOldLogs(daysToKeep = 90) {
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
     let deletedCount = 0;
+    let bytesReclaimed = 0;
 
     for (const file of jsonFiles) {
       const dateStr = file.replace(".json", "");
@@ -697,13 +698,27 @@ export async function cleanupOldLogs(daysToKeep = 90) {
 
       if (fileDate < cutoffDate) {
         const filePath = path.join(LOGS_DIR, file);
+        const stat = await fs.stat(filePath);
+        bytesReclaimed += stat.size;
         await fs.unlink(filePath);
         deletedCount++;
-        logInfo("Deleted old log file", { file, date: dateStr });
+        logInfo("Deleted old log file", {
+          file,
+          date: dateStr,
+          bytes: stat.size,
+        });
       }
     }
 
-    return deletedCount;
+    if (deletedCount > 0) {
+      logInfo("Local chat log cleanup summary", {
+        deletedCount,
+        bytesReclaimed,
+        daysToKeep,
+      });
+    }
+
+    return { deletedCount, bytesReclaimed };
   } catch (error) {
     logError("Failed to cleanup old logs", error);
     throw error;
