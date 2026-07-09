@@ -14,6 +14,7 @@ import {
 import { logInfo, logError, logWarning } from "./logger.js";
 import { withTimeout, TIMEOUTS } from "./timeout.js";
 import config from "../config/env.js";
+import { assertIpHashSecretConfigured, hashIp } from "./ip-hash.js";
 
 // S3 Configuration
 const AWS_REGION = process.env.AWS_REGION || "eu-west-1"; // Ireland region
@@ -138,8 +139,12 @@ if (ENABLE_S3_LOGGING && AWS_S3_BUCKET) {
   });
 }
 
+if (ENABLE_S3_LOGGING) {
+  assertIpHashSecretConfigured();
+}
+
 /**
- * Get S3 key for a log file (date-based path) – legacy single-file-per-day
+ * Get S3 key for a log file (date-based path): legacy single-file-per-day
  * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DD.json (UTC/GMT normalized)
  * Used for listing/fetching; new writes use getS3KeyForEntry for unique keys.
  */
@@ -153,8 +158,8 @@ export function getS3Key(date = new Date()) {
 
 /**
  * Get unique S3 key for a single log entry (no overwrite).
- * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DDTHH-mm-ss-sssZ_<ip>_<region>_<short-id>.json
- * Ensures each day's logs are captured by unique timestamp, IP, and optional region; previous messages are never overwritten.
+ * Format: chat-logs/YYYY/MM/DD/YYYY-MM-DDTHH-mm-ss-sssZ_<ipHash>_<region>_<short-id>.json
+ * ipHash is HMAC-SHA256(ip, IP_HASH_SECRET) truncated to 16 hex chars (no raw IP in key).
  *
  * @param {Object} logEntry - Log entry with timestamp, ip, id, and optional region
  * @returns {string} Unique S3 key
@@ -166,16 +171,16 @@ export function getS3KeyForEntry(logEntry) {
   const day = String(date.getUTCDate()).padStart(2, "0");
   const iso = date.toISOString();
   const safeTimestamp = iso.replace(/:/g, "-").replace(/\./g, "-");
-  const sanitizedIp = (logEntry.ip || "unknown")
-    .replace(/\./g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "");
+  const ipHash = hashIp(logEntry.ip);
   const sanitizedRegion = (logEntry.region || "unknown")
     .replace(/[^a-zA-Z0-9-]/g, "")
     .slice(0, 10);
   const shortId = (logEntry.id || "unknown").replace(/[^a-zA-Z0-9_]/g, "").slice(0, 20);
-  const filename = `${safeTimestamp}_${sanitizedIp || "unknown"}_${sanitizedRegion}_${shortId || "id"}.json`;
+  const filename = `${safeTimestamp}_${ipHash}_${sanitizedRegion}_${shortId || "id"}.json`;
   return `chat-logs/${year}/${month}/${day}/${filename}`;
 }
+
+export { hashIp } from "./ip-hash.js";
 
 /** True if key is the legacy single-file-per-day key (no unique suffix). */
 export function isLegacyDayKey(s3Key) {

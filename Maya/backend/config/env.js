@@ -157,6 +157,7 @@ const config = {
     enabled: getEnv("ENABLE_S3_LOGGING", "false") === "true",
     region: getEnv("AWS_REGION", "eu-west-1"), // Ireland region
     bucket: getEnv("AWS_S3_BUCKET", ""),
+    ipHashSecret: getEnv("IP_HASH_SECRET", null),
     configured: !!(
       (getEnv("AWS_S3_BUCKET", "") && getEnv("AWS_ACCESS_KEY_ID")) ||
       getEnv("AWS_SECRET_ACCESS_KEY")
@@ -185,6 +186,12 @@ if (config.maxMessageLength < 1 || config.maxMessageLength > 10000) {
 if (config.rateLimitMaxRequests < 1) {
   throw new Error(
     `Invalid RATE_LIMIT_MAX_REQUESTS: ${config.rateLimitMaxRequests}. Must be at least 1`,
+  );
+}
+
+if (config.s3Logging.enabled && !config.s3Logging.ipHashSecret) {
+  throw new Error(
+    "IP_HASH_SECRET is required when ENABLE_S3_LOGGING is true (S3 key IP pseudonymisation)",
   );
 }
 
