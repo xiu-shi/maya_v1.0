@@ -1,0 +1,59 @@
+---
+description: Git remote and push verification - single origin, no false "ahead" reports
+alwaysApply: true
+---
+
+# Git Remote Hygiene
+
+## Canonical Remote
+
+This repo has **one** remote: `origin` → `git@github.com:xiu-shi/maya_v1.0.git`
+
+- Always push with: `git push origin main` (or `git push -u origin HEAD` on a feature branch)
+- Never add a second remote pointing at the same GitHub URL under a different name
+- `main` tracks `origin/main` only
+
+## Before Reporting Push Failure
+
+A push can succeed while `git status` still shows "ahead" if the upstream tracking ref is stale. **Never tell the user a push failed based on `git status` alone.**
+
+After every push, verify sync with ALL of:
+
+```bash
+git fetch origin
+git rev-parse HEAD origin/main   # SHAs must match
+git status -sb                   # must NOT show "ahead"
+```
+
+If SHAs match but status still shows ahead, run:
+
+```bash
+git branch -u origin/main main
+git fetch origin
+```
+
+Optionally confirm on GitHub:
+
+```bash
+gh api repos/xiu-shi/maya_v1.0/commits/main --jq '.sha[0:7]'
+```
+
+## After Push Checklist (Agent)
+
+1. Run `git push origin main` (or current branch)
+2. Run `git fetch origin`
+3. Confirm `git rev-parse HEAD` equals `git rev-parse origin/main`
+4. Report the commit SHA and GitHub commits URL to the user
+5. Do not conflate "git push" with "deployed to production" - deployment is separate
+
+## Common False Alarm
+
+| Symptom | Actual cause | Fix |
+|---|---|---|
+| "ahead by N commits" after push | Stale remote-tracking ref or wrong upstream | `git fetch origin && git branch -u origin/main main` |
+| Two remotes, same URL | Duplicate remote added (e.g. maya-space + origin) | Remove duplicate: `git remote remove <name>` |
+| GitHub UI looks unchanged | Browser cache or viewing wrong branch | Hard refresh; confirm `main` at github.com/xiu-shi/maya_v1.0 |
+
+## Model-Agnostic
+
+Push and tracking behaviour is git configuration, not model-specific. Any agent must follow this rule regardless of which model is active.
