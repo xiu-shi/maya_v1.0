@@ -676,10 +676,10 @@ export async function getStorageStats() {
 /**
  * Delete old logs (older than specified days)
  *
- * @param {number} daysToKeep - Number of days to keep (default: 90)
+ * @param {number} daysToKeep - Number of days to keep (default: 180)
  * @returns {Promise<{ deletedCount: number, bytesReclaimed: number }>}
  */
-export async function cleanupOldLogs(daysToKeep = 90) {
+export async function cleanupOldLogs(daysToKeep = 180) {
   try {
     await ensureLogsDirectory();
 
