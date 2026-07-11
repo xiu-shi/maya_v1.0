@@ -8,7 +8,7 @@ import { cleanupOldLogs } from "./chat-logger.js";
 import { logInfo, logError } from "./logger.js";
 
 export const LOG_CLEANUP_HOUR_UTC = 3;
-export const LOG_RETENTION_DAYS = 180;
+export const LOG_RETENTION_DAYS = 90;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 let activeTimer = null;
