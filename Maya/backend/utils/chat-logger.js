@@ -16,6 +16,7 @@ import {
   setConversationEndHandler,
 } from "./conversation-session.js";
 import config from "../config/env.js";
+import { LOG_RETENTION_DAYS } from "./log-retention.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -676,10 +677,10 @@ export async function getStorageStats() {
 /**
  * Delete old logs (older than specified days)
  *
- * @param {number} daysToKeep - Number of days to keep (default: 90)
+ * @param {number} daysToKeep - Number of days to keep (default: LOG_RETENTION_DAYS)
  * @returns {Promise<{ deletedCount: number, bytesReclaimed: number }>}
  */
-export async function cleanupOldLogs(daysToKeep = 90) {
+export async function cleanupOldLogs(daysToKeep = LOG_RETENTION_DAYS) {
   try {
     await ensureLogsDirectory();
 

@@ -18,6 +18,7 @@ import { apiLimiter, chatLimiter } from "./middleware/rateLimit.js";
 import {
   validateChatRequest,
   validateRequestSize,
+  validateConsentRequest,
 } from "./middleware/validation.js";
 import {
   errorHandler,
@@ -28,6 +29,7 @@ import { auditLog } from "./middleware/audit.js";
 import { requireAdminAuth } from "./middleware/adminAuth.js";
 import { logInfo, logError } from "./utils/logger.js";
 import { startLogCleanupScheduler } from "./utils/log-cleanup-scheduler.js";
+import { recordConsentReceipt } from "./utils/consent-receipt.js";
 import {
   sanitizeTestOutput,
   sanitizeJestResults,
@@ -978,6 +980,24 @@ app.get(
 
 // API routes with rate limiting
 app.use("/api", apiLimiter);
+
+// Consent receipt (GDPR Art 7(1) evidence) - no chat content, minimal payload
+app.post(
+  "/api/consent",
+  validateConsentRequest,
+  asyncHandler(async (req, res) => {
+    const { version, choice, ts } = req.consentPayload;
+    await recordConsentReceipt({
+      version,
+      choice,
+      ts,
+      ip: req.ip,
+      userAgent: req.get("user-agent"),
+      requestHost: req.get("host") || req.hostname || null,
+    });
+    res.status(204).end();
+  }),
+);
 
 // Chat endpoint with stricter rate limiting and validation
 app.post(

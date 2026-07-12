@@ -95,6 +95,41 @@ export function validateRequestSize(req, res, next) {
   next();
 }
 
+const CONSENT_VERSION_PATTERN = /^[\w.-]{1,32}$/;
+const ISO8601_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
+
+/**
+ * Validate POST /api/consent body (GDPR Art 7(1) receipt).
+ */
+export function validateConsentRequest(req, res, next) {
+  try {
+    if (req.get('content-type') && !req.get('content-type').includes('application/json')) {
+      return res.status(400).json({
+        error: 'Invalid content type. Expected application/json',
+      });
+    }
+
+    const { version, choice, ts } = req.body || {};
+    const validChoices = ['accepted', 'declined', 'withdrawn'];
+
+    if (!version || typeof version !== 'string' || !CONSENT_VERSION_PATTERN.test(version)) {
+      return res.status(400).json({ error: 'Invalid or missing version' });
+    }
+    if (!choice || !validChoices.includes(choice)) {
+      return res.status(400).json({ error: 'Invalid or missing choice' });
+    }
+    if (!ts || typeof ts !== 'string' || !ISO8601_PATTERN.test(ts)) {
+      return res.status(400).json({ error: 'Invalid or missing ts (ISO8601 UTC required)' });
+    }
+
+    req.consentPayload = { version, choice, ts };
+    next();
+  } catch (error) {
+    logError('Consent validation error', error, { path: req.path });
+    return res.status(400).json({ error: 'Invalid request format' });
+  }
+}
+
 /**
  * Parse size string (e.g., "1mb") to bytes
  */

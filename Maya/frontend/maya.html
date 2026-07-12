@@ -120,14 +120,6 @@
   }
   </script>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BSD88YBS4B"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-BSD88YBS4B');
-  </script>
   <!-- Code Protection CSS -->
   <style>
     /* Prevent text selection (with exceptions for accessibility) */
@@ -901,32 +893,43 @@
       gap: var(--spacing-sm);
       align-items: center;
     }
-    .consent-accept-btn {
-      background: var(--accent-color);
-      color: var(--bg-primary);
-      border: none;
+    .consent-accept-btn,
+    .consent-decline-btn {
       border-radius: 6px;
       padding: var(--spacing-sm) var(--spacing-lg);
       font-size: var(--font-size-sm);
       font-weight: 500;
       font-family: var(--font-family);
       cursor: pointer;
-      transition: background var(--transition-fast);
+      transition: background var(--transition-fast), color var(--transition-fast);
+      flex: 1;
+      text-align: center;
+    }
+    .consent-accept-btn {
+      background: var(--accent-color);
+      color: var(--bg-primary);
+      border: 1px solid var(--accent-color);
     }
     .consent-accept-btn:hover {
       background: var(--accent-hover);
     }
     .consent-decline-btn {
-      background: none;
-      border: none;
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-      font-family: var(--font-family);
-      cursor: pointer;
-      text-decoration: underline;
-      padding: var(--spacing-sm);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
     }
-    .consent-decline-btn:hover { color: var(--text-primary); }
+    .consent-decline-btn:hover {
+      background: var(--bg-secondary);
+    }
+    .maya-ai-disclosure {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+      text-align: center;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      line-height: 1.5;
+    }
     /* Withdraw consent link in input area */
     .consent-withdraw-link {
       display: none;
@@ -995,7 +998,7 @@
                 📅 Book a Free Strategy Call
               </a>
               <a href="mailto:info@janetxiushi.me?subject=Strategy%20Session%20Inquiry" style="display: inline-block; padding: var(--spacing-md) var(--spacing-xl); background: transparent; color: var(--accent-color); text-decoration: none; border: 2px solid var(--accent-color); border-radius: 8px; font-weight: 600; transition: all var(--transition-normal); text-align: center; min-width: 200px;">
-                📩 Email Me Directly
+                📩 Email Janet Directly
               </a>
             </div>
           </div>
@@ -1014,7 +1017,7 @@
           Ask questions and get instant insights on AI strategy, cloud architecture, AI governance, quality, and digital transformation, grounded in Janet Xiu Shi's real-world experience. Whether you're a business leader, student, or executive, Maya is here to help.
         </p>
         <p class="maya-chat-intro-disclaimer" style="margin-top: var(--spacing-md); font-size: var(--font-size-sm); color: var(--text-muted);">
-          By chatting with Maya, you accept our T&amp;C. Think common sense, nothing surprising.<br />AI can make mistakes, always verify.
+          AI can make mistakes. Always verify important information.
         </p>
       </div>
     </section>
@@ -1036,6 +1039,9 @@
 
       <!-- Main Chat Area -->
       <main class="maya-chat-main">
+        <p class="maya-ai-disclosure" role="note" aria-label="AI disclosure">
+          You are chatting with Maya, an AI system. Replies are AI-generated and may be inaccurate.
+        </p>
         <div class="maya-chat-messages" id="chatMessages">
           <!-- Empty state -->
           <div class="maya-empty-state" id="emptyState">
@@ -1088,8 +1094,8 @@
             <button id="submitBtn" type="button" class="maya-submit-btn">Send</button>
           </div>
           <span id="consentWithdrawLink" class="consent-withdraw-link" role="button" tabindex="0"
-            title="Withdraw consent - stops logging for this session">
-            Logging enabled &middot; withdraw consent
+            title="Withdraw consent - chat will be unavailable until you accept again">
+            Logging consent active &middot; withdraw consent
           </span>
         </div>
       </main>
@@ -1101,16 +1107,19 @@
     <div class="consent-box">
       <h3 id="consentTitle">Before you chat with Maya</h3>
       <p>
-        Maya logs your conversation to improve the service. This includes your messages,
-        IP address, and browser information. No account needed.
-        Logs are automatically deleted after 90 days.
+        Maya is an AI system, not Janet in person. Replies are AI-generated and may be inaccurate.
+        <br /><br />
+        To generate replies, your messages are processed by our AI provider outside the European Economic Area,
+        including in the United States.
+        <br /><br />
+        If you continue, you consent to conversation logging (messages, pseudonymised IP, browser info). Logs are
+        automatically deleted after 90 days.
         <br /><br />
         <a href="/privacy.html" target="_blank" rel="noopener">Read the full Privacy Notice</a>
-        to see exactly what is collected and how to request deletion.
       </p>
       <div class="consent-actions">
-        <button id="consentAcceptBtn" class="consent-accept-btn">Accept and continue</button>
-        <button id="consentDeclineBtn" class="consent-decline-btn">No thanks</button>
+        <button id="consentAcceptBtn" class="consent-accept-btn" type="button">Allow logging and chat</button>
+        <button id="consentDeclineBtn" class="consent-decline-btn" type="button">No thanks</button>
       </div>
     </div>
   </div>
@@ -1165,37 +1174,91 @@
     let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
 
-    // ── GDPR Consent (MAYA-GDPR-001-01) ─────────────────────────────────────
+    // ── GDPR Consent (MAYA-GDPR-001-01 / compliance 2026-07-15) ─────────────
     const CONSENT_KEY = 'maya_consent';
-    const CONSENT_VERSION = '1'; // Bump this when the notice text changes materially
+    const CONSENT_VERSION = '2026-07-15'; // Bump when privacy notice changes materially
+    const AI_INTRO_MESSAGE = "Hi, I'm Maya, Janet's AI digital twin. I'm an AI system, not Janet herself. Ask me about AI strategy, cloud, or governance, and for anything personal or confidential, email Janet directly at info@janetxiushi.me.";
 
-    function hasConsent() {
+    function readStoredConsent() {
       try {
         const raw = localStorage.getItem(CONSENT_KEY);
-        if (!raw) return false;
-        const stored = JSON.parse(raw);
-        return stored && stored.version === CONSENT_VERSION && stored.granted === true;
-      } catch (_) { return false; }
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (_) {
+        return null;
+      }
     }
 
-    function grantConsent() {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify({
-        granted: true,
-        version: CONSENT_VERSION,
-        timestamp: new Date().toISOString()
-      }));
-      hideConsentOverlay();
-      showWithdrawLink();
+    function hasConsent() {
+      const stored = readStoredConsent();
+      return !!(stored && stored.version === CONSENT_VERSION && stored.granted === true);
     }
 
-    function revokeConsent() {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify({
-        granted: false,
+    async function postConsentReceipt(choice) {
+      const payload = {
         version: CONSENT_VERSION,
-        timestamp: new Date().toISOString()
+        choice,
+        ts: new Date().toISOString(),
+      };
+      let apiUrl = API_BASE_URL === '' ? '/api/consent' : `${API_BASE_URL}/api/consent`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return response.status === 204;
+    }
+
+    function persistConsent(granted) {
+      localStorage.setItem(CONSENT_KEY, JSON.stringify({
+        granted,
+        version: CONSENT_VERSION,
+        timestamp: new Date().toISOString(),
       }));
+    }
+
+    function clearStoredConsent() {
+      localStorage.removeItem(CONSENT_KEY);
+    }
+
+    async function grantConsent() {
+      try {
+        const recorded = await postConsentReceipt('accepted');
+        if (!recorded) {
+          console.error('Failed to record consent receipt on server');
+          return;
+        }
+        persistConsent(true);
+        hideConsentOverlay();
+        showWithdrawLink();
+        showAiIntroMessageIfNeeded();
+      } catch (error) {
+        console.error('Consent acceptance failed:', error);
+      }
+    }
+
+    async function declineConsent() {
+      try {
+        await postConsentReceipt('declined');
+      } catch (error) {
+        console.error('Consent decline receipt failed:', error);
+      }
+      persistConsent(false);
       hideConsentOverlay();
       hideWithdrawLink();
+    }
+
+    async function revokeConsent() {
+      try {
+        await postConsentReceipt('withdrawn');
+      } catch (error) {
+        console.error('Consent withdrawal receipt failed:', error);
+      }
+      persistConsent(false);
+      hideConsentOverlay();
+      hideWithdrawLink();
+      chatInput.disabled = false;
+      submitBtn.disabled = false;
     }
 
     function showConsentOverlay() {
@@ -1222,20 +1285,32 @@
       if (link) link.classList.remove('visible');
     }
 
+    function showAiIntroMessageIfNeeded() {
+      if (!hasConsent() || messageHistory.length > 0) return;
+      const introId = 'ai-intro-' + (currentChatId || 'session');
+      if (document.querySelector(`[data-message-id="${introId}"]`)) return;
+      if (emptyState) emptyState.style.display = 'none';
+      addMessage('maya', AI_INTRO_MESSAGE, introId);
+    }
+
     function initConsent() {
+      const stored = readStoredConsent();
+      if (stored && stored.version !== CONSENT_VERSION) {
+        clearStoredConsent();
+      }
+
       const acceptBtn = document.getElementById('consentAcceptBtn');
       const declineBtn = document.getElementById('consentDeclineBtn');
       const withdrawLink = document.getElementById('consentWithdrawLink');
 
-      if (acceptBtn) acceptBtn.addEventListener('click', grantConsent);
-      if (declineBtn) declineBtn.addEventListener('click', revokeConsent);
+      if (acceptBtn) acceptBtn.addEventListener('click', () => { grantConsent(); });
+      if (declineBtn) declineBtn.addEventListener('click', () => { declineConsent(); });
 
       if (withdrawLink) {
-        withdrawLink.addEventListener('click', () => {
-          revokeConsent();
-          // Inform the user that withdrawal stops future logging and points to erasure
-          const msg = 'Consent withdrawn. Your session will no longer be logged. To request deletion of past data, email info@janetxiushi.me or see the <a href="/privacy.html" target="_blank">Privacy Notice</a>.';
-          addMessage('assistant', msg, 'consent-withdraw-' + Date.now(), false);
+        withdrawLink.addEventListener('click', async () => {
+          await revokeConsent();
+          const msg = 'Consent withdrawn. You cannot send further messages until you accept the Privacy Notice again. To request deletion of past data, email info@janetxiushi.me or see the <a href="/privacy.html" target="_blank">Privacy Notice</a>.';
+          addMessage('maya', msg, 'consent-withdraw-' + Date.now());
         });
         withdrawLink.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); withdrawLink.click(); }
@@ -1244,6 +1319,7 @@
 
       if (hasConsent()) {
         showWithdrawLink();
+        showAiIntroMessageIfNeeded();
       }
     }
     // ── End GDPR Consent ─────────────────────────────────────────────────────
@@ -1323,15 +1399,6 @@
       setTimeout(() => {
         input.style.boxShadow = '';
       }, 500);
-      
-      // Track sample question click (direct onclick handler)
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'sample_question_clicked', {
-          'event_category': 'engagement',
-          'event_label': 'sample_question_direct',
-          'question': prompt.substring(0, 50)
-        });
-      }
       
       // Auto-submit after short delay
       setTimeout(() => {
@@ -1633,15 +1700,6 @@
           
           console.log('✅ Prompt populated in chat input:', prompt);
           
-          // Track sample question click
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'sample_question_clicked', {
-              'event_category': 'engagement',
-              'event_label': 'sample_question',
-              'question': prompt.substring(0, 50)
-            });
-          }
-          
           // Auto-submit for guided experience (first-time users)
           // Small delay to ensure UI updates are complete
           setTimeout(() => {
@@ -1716,15 +1774,6 @@
               chatInput.focus();
               chatInput.style.height = 'auto';
               chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-              
-              // Track sample question click
-              if (typeof gtag !== 'undefined') {
-                gtag('event', 'sample_question_clicked', {
-                  'event_category': 'engagement',
-                  'event_label': 'sample_question',
-                  'question': prompt.substring(0, 50)
-                });
-              }
               
               setTimeout(() => {
                 sendMessage();
@@ -1899,14 +1948,7 @@
 
     // Send message
     async function sendMessage() {
-      // Track chat message sent event
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'chat_message_sent', {
-          'event_category': 'engagement',
-          'event_label': 'user_initiated_chat',
-          'value': 1
-        });
-      }
+      // Track chat message sent event (analytics removed from chat page - see privacy notice)
       const message = chatInput.value.trim();
       if (!message) return;
 

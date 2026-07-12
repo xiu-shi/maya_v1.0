@@ -25,7 +25,8 @@
     "docs:push": "node scripts/project-docs.js push",
     "docs:pull": "node scripts/project-docs.js pull",
     "docs:list": "node scripts/project-docs.js list",
-    "docs:status": "node scripts/project-docs.js status"
+    "docs:status": "node scripts/project-docs.js status",
+    "erasure": "node scripts/erasure.js"
   },
   "keywords": [
     "ai",
