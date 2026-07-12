@@ -6,7 +6,7 @@
 
 import cors from 'cors';
 import config from '../config/env.js';
-import { logChatAttempt } from '../utils/chat-logger.js';
+import { logChatAttemptIfAllowed } from '../utils/conversation-logging.js';
 import { logWarning } from '../utils/logger.js';
 
 /**
@@ -93,7 +93,7 @@ export function corsErrorHandler(err, req, res, next) {
   if (err && err.message && err.message.includes('CORS')) {
     // Log CORS error for chat requests
     if (req.path === '/api/chat' && req.body?.message) {
-      logChatAttempt({
+      logChatAttemptIfAllowed(req, {
         userMessage: req.body.message || '',
         ip: req.ip,
         userAgent: req.get('user-agent'),

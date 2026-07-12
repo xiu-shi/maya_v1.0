@@ -6,7 +6,7 @@
 
 import rateLimit from 'express-rate-limit';
 import config from '../config/env.js';
-import { logChatAttempt } from '../utils/chat-logger.js';
+import { logChatAttemptIfAllowed } from '../utils/conversation-logging.js';
 import { logWarning } from '../utils/logger.js';
 
 /**
@@ -25,7 +25,7 @@ export const apiLimiter = rateLimit({
     // Log rate-limited chat attempt
     const userMessage = req.body?.message || '';
     if (req.path === '/api/chat' && userMessage) {
-      logChatAttempt({
+      logChatAttemptIfAllowed(req, {
         userMessage: userMessage,
         ip: req.ip,
         userAgent: req.get('user-agent'),

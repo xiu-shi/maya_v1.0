@@ -17,6 +17,7 @@ import {
 } from "./conversation-session.js";
 import config from "../config/env.js";
 import { LOG_RETENTION_DAYS } from "./log-retention.js";
+import { hashIp } from "./ip-hash.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -321,7 +322,7 @@ export async function logChatAttempt({
       userMessage: sanitizedMessage,
       assistantResponse: assistantResponse ? assistantResponse.substring(0, 5000) : null,
       historyLength: history ? history.length : 0,
-      ip: ip || "unknown",
+      ipHash: hashIp(ip),
       region: region || "unknown",
       userAgent: userAgent || "unknown",
       warnings: warnings || [],
@@ -391,7 +392,7 @@ export async function logChatAttempt({
     // After 5 minutes of no messages, the session manager marks the
     // conversation as "completed" in S3 with duration and end timestamp.
     trackConversationMessage(convId, {
-      ip: logEntry.ip,
+      ipHash: logEntry.ipHash,
       userAgent: logEntry.userAgent,
     });
 
@@ -561,7 +562,7 @@ export async function getChatLogsByConversation(startDate, endDate) {
         firstMessage: log.timestamp,
         lastMessage: log.timestamp,
         totalMessages: 0,
-        ip: log.ip,
+        ipHash: log.ipHash,
         userAgent: log.userAgent,
       };
     }

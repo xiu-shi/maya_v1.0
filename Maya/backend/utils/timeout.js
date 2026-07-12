@@ -10,6 +10,12 @@ import { logError, logWarning } from './logger.js';
 /**
  * Default timeout values (in milliseconds)
  */
+/** Max date range for admin chat-logs API (avoids slow S3 fetches / proxy 502). */
+export const CHAT_LOGS_MAX_DAYS = 31;
+
+/** Respond before typical reverse-proxy timeout (~60s). */
+export const CHAT_LOGS_REQUEST_MS = 45000;
+
 export const TIMEOUTS = {
   KB_LOAD: 30000,           // 30 seconds for KB loading
   KB_REFRESH: 30000,        // 30 seconds for KB refresh

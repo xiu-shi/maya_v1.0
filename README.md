@@ -2,22 +2,78 @@
 
 **"Turning Complexity into Your Lasting Advantage"**
 
+![EU AI Act](https://img.shields.io/badge/EU_AI_Act-Article_50_aligned-1a4d8f)
+![GDPR](https://img.shields.io/badge/GDPR-consent_by_design-1a6b3a)
+![Data residency](https://img.shields.io/badge/logs-EU_(Ireland)_only-5b2d8f)
+![Retention](https://img.shields.io/badge/auto_deletion-90_days-8f5b1a)
+
+> **EU AI Act and GDPR aligned by design.** Maya discloses that she is an AI at first
+> interaction (EU AI Act Article 50, applying from 2 August 2026), asks before saving
+> anything, works fully without saving, pseudonymises IP addresses in storage, and deletes
+> logs automatically after 90 days in EU (Ireland) storage. The consent logic is
+> fail-closed and open for inspection in this repository.
+>
+> [Read the Privacy Notice](https://maya-agent.ai-builders.space/privacy.html) ·
+> [Chat with Maya](https://maya-agent.ai-builders.space/maya.html)
+
+---
+
+## Compliance by Design (EU AI Act + GDPR)
+
+Maya is built the way Janet advises clients to build AI: transparency and consent are
+architecture, not paperwork. Every claim below is either visible in this repository's
+code or observable in the live product.
+
+**AI transparency (EU AI Act Article 50).** Users are told they are talking to an AI at
+four independent layers: a persistent disclosure banner in the chat window, Maya's opening
+message, the welcome screen, and the About Maya FAQ (mirrored in machine-readable
+schema.org markup).
+
+**Freely given consent (GDPR Articles 6 and 7).** Conversation saving is opt-in via an
+unticked checkbox, never pre-ticked (CJEU Planet49 compliant). Declining does not block
+chat: users who never opt in get the full service with no conversation logs kept. Consent
+can be withdrawn at any time from the chat interface without losing access, and every
+consent choice generates a server-side receipt so consent can be demonstrated.
+
+**Fail-closed logging.** Conversation content is stored only when the request explicitly
+carries `logging: true`. An absent, malformed, or false flag means nothing is written, on
+every code path, including rate-limit and CORS error paths. When in doubt, the system
+loses a log, never the user's trust.
+
+**Data minimisation.** No account, no name, no email. No third-party analytics or
+advertising trackers. IP addresses are stored only in salted-hash (HMAC) pseudonymised
+form. Conversation logs and consent records live exclusively in the EU (AWS eu-west-1,
+Ireland) and are deleted automatically after 90 days.
+
+**Compliance that stays true.** An automated compliance test suite runs before every
+release, including regression guards that fail the build if the consent checkbox is ever
+pre-ticked, if public files leak infrastructure detail, or if the consent version drifts
+from the published Privacy Notice. A reproducible proof script allows the ON/OFF saving
+behaviour to be verified end to end against production.
+
+Compliance is maintained, not claimed once. Questions or scrutiny welcome:
+[info@janetxiushi.me](mailto:info@janetxiushi.me)
+
 ---
 
 ## About Janet Xiu Shi ([janetxiushi.me](https://janetxiushi.me))
 
 **Strategic AI and Cloud Advisor | AI Evals and Quality | AI Educator**
 
-Janet works at the intersection of AI governance, cloud strategy, quality and evaluation, cybersecurity, and digital transformation. She brings enterprise-grade discipline together with startup agility and creative problem-solving. She works directly with founders and senior leaders to map operations, uncover hidden risks, and build AI-powered workflows with responsible governance embedded from day one.
+Janet works at the intersection of AI governance, cloud strategy, quality and evaluation,
+cybersecurity, and digital transformation. She brings enterprise-grade discipline together
+with startup agility and creative problem-solving. She works directly with founders and
+senior leaders to map operations, uncover hidden risks, and build AI-powered workflows
+with responsible governance embedded from day one.
 
 **Professional Experience:**
 
 - **Connectd**: Strategic AI and business technology advisor
 - **SOLAS / Skills to Advance**: Programme Instructor and QA Framework Architect for two national, state-funded QQI-accredited AI workforce programmes (QQI Level 4 and Level 5), developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
 - **IADT (Dún Laoghaire Institute of Art, Design + Technology)**: Industry Expert Lecturer preparing future digital leaders through:
-  - **Enterprise Cloud**: Strategic cloud adoption and architecture for AI-powered organisations
-  - **Generative AI**: AI transformation, responsible AI adoption, and the agentic era
-  - **Web Application Development in the AI Era**: AI-first web development with dual-audience thinking for non-CS background students in business
+  * **Enterprise Cloud**: Strategic cloud adoption and architecture for AI-powered organisations
+  * **Generative AI**: AI transformation, responsible AI adoption, and the agentic era
+  * **Web Application Development in the AI Era**: AI-first web development with dual-audience thinking for non-CS background students in business
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
 - **Huawei**: Strategic telecommunications and broadband deployments with EU compliance focus
 
@@ -55,31 +111,30 @@ These programmes are accredited by Quality and Qualifications Ireland (QQI) and 
 > *"Designed to equip participants with foundational knowledge, skills and competencies in the rapidly evolving area of AI."*
 
 **What participants can do on completion:**
+
 - Discuss the evolution of AI, including key concepts, terminology, ethical use, societal impact, and real-world applications
 - Explore how data can be collected and used in AI applications
 - Identify and use a variety of AI applications to tackle real-world problems
 
-**Delivery:** In-person (LOETB / Hartley People Training)
-**Duration:** 30 hours classroom + 20 hours independent learning
-**Audience:** General workforce and adult learners building foundational AI literacy from scratch
+**Delivery:** In-person (LOETB / Hartley People Training) **Duration:** 30 hours classroom + 20 hours independent learning **Audience:** General workforce and adult learners building foundational AI literacy from scratch
 
 ### QQI Level 5 - Enhancing Productivity with AI
 
 > *"Empowering participants to confidently begin integrating tools and technologies into their professional environments."*
 
 **What participants can do on completion:**
+
 - Explain the core principles of GenAI and its place within the broader context of Artificial Intelligence
 - Demonstrate the ethical and legal use of GenAI tools to produce a range of content modes in a professional context
 - Use prompt crafting skills to optimise the outputs of GenAI tools
 - Evaluate suitable GenAI solutions in the context of their professional roles, reflecting on use, impact, limitations, and ethical implications
 
-**Delivery:** Blended (asynchronous self-paced + synchronous live Zoom)
-**Duration:** 24 hours classroom + 26 hours independent learning
-**Audience:** Employed professionals applying AI tools in their own work context
+**Delivery:** Blended (asynchronous self-paced + synchronous live Zoom) **Duration:** 24 hours classroom + 26 hours independent learning **Audience:** Employed professionals applying AI tools in their own work context
 
 ### QQI Level 6 - AI Strategic Planning and Legal Review *(In development, not yet launched)*
 
 Two micro-qualifications in development:
+
 - **AI Legal and Ethical Considerations**
 - **Strategic Planning for AI**
 
@@ -102,8 +157,7 @@ Maya is formally documented as a **curriculum-scoped AI Educator** in the QA mat
 - **Prompt discipline by design**: Learners have a limited number of requests per session to build intentional prompting habits
 - **Pedagogical code formatting**: Technical examples formatted for reading and understanding, not direct copy-paste
 
-**Public verification:**
-The programme was launched on 3 February 2026 by Minister James Lawless TD, Minister for Further and Higher Education, Research, Innovation and Science: [solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/](https://www.solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/)
+**Public verification:** The programme was launched on 3 February 2026 by Minister James Lawless TD, Minister for Further and Higher Education, Research, Innovation and Science: [solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/](https://www.solas.ie/latest-news/micro-qualifications-in-artificial-intelligence-to-address-critical-skills-gaps-launched-by-minister-lawless/)
 
 ---
 
@@ -154,7 +208,7 @@ Maya is an AI agent that represents me when I'm unavailable, and serves as a for
 
 **Maya provides informed responses to:**
 
-- "What's Janet's experience with AI governance?" *(Lakera contributor, AI security certified)*
+- "What's Janet's experience with AI governance?" *(Lakera contributor, AI security certified, and Maya itself is her EU AI Act and GDPR case study)*
 - "How can Janet help with our cloud strategy?" *(AWS and Google Cloud certified, enterprise experience)*
 - "What's her teaching approach?" *(Harvard-certified educator, Socratic method, foundations-first philosophy)*
 - "What courses does Janet teach?" *(Enterprise Cloud, Generative AI, Web Application Development in the AI Era)*
@@ -164,11 +218,13 @@ Maya is an AI agent that represents me when I'm unavailable, and serves as a for
 ### Why This Matters
 
 **For People Reaching Out:**
+
 - Get immediate context about my expertise and credentials
 - Understand if I'm the right fit for their needs
 - Make informed decisions without waiting
 
 **For Me:**
+
 - Focus on deep work instead of repetitive explanations
 - Serve multiple time zones simultaneously
 - Ensure consistent, accurate information about my services
@@ -190,8 +246,8 @@ Socratic Response ---> Accurate, conversational, guides thinking rather than rep
 
 **Architecture:**
 
-- **Frontend**: Clean chat interface
-- **Backend**: Secure Node.js API with rate limiting and validation
+- **Frontend**: Clean chat interface with layered AI disclosure and opt-in consent
+- **Backend**: Secure Node.js API with rate limiting, validation, and fail-closed conversation logging
 - **Knowledge Base**: Structured markdown covering expertise, education, experience, and honours
 - **AI Engine**: Conversational responses grounded in factual, verified knowledge
 
@@ -201,7 +257,7 @@ Socratic Response ---> Accurate, conversational, guides thinking rather than rep
 - Accurate responses based on verified credentials and experience
 - Socratic questioning approach, building understanding rather than shortcutting it
 - Professional tone matching my communication style
-- Privacy-focused (no personal data collection)
+- Privacy by design: opt-in conversation saving, chat works fully without saving, hashed IPs, 90-day automatic deletion, EU (Ireland) log storage
 - Security-first design with comprehensive protection measures
 
 **Knowledge Base Scope:**
@@ -223,10 +279,11 @@ maya_v1.0/
 │   ├── backend/              # Node.js API server
 │   │   ├── server.js         # Main application
 │   │   ├── middleware/       # Security, validation
-│   │   └── utils/            # Helper functions
+│   │   └── utils/            # Helper functions (incl. fail-closed conversation logging)
 │   │
 │   ├── frontend/             # Chat interface
-│   │   └── maya.html         # User interface
+│   │   ├── maya.html         # User interface with consent and AI disclosure
+│   │   └── privacy.html      # Plain-English GDPR privacy notice
 │   │
 │   └── knowledge/            # Janet's professional knowledge base
 │       └── docs/
@@ -237,21 +294,22 @@ maya_v1.0/
 │           └── honors_awards/    # SOLAS appointment, VIBE Award, Lakera recognition
 │
 ├── tests/                    # Deployment and security tests
-├── Dockerfile                # Koyeb deployment configuration
+├── Dockerfile                # Deployment configuration
 ├── README.md
 └── SECURITY.md
 ```
 
 ---
 
-## Built with Security and Quality
+## Built with Security, Quality, and Compliance
 
 This is production-ready:
 
+- **Compliance by design**: EU AI Act Article 50 transparency and GDPR consent architecture (see Compliance by Design above), with automated regression guards so compliance survives future changes
 - **Security-first**: Rate limiting, input validation, prompt injection protection
-- **Test-driven**: Comprehensive test suite for reliability and security
-- **Privacy-focused**: No personal data collection, secure logging practices
-- **Production-ready**: Comprehensive logging, monitoring, and error handling
+- **Test-driven**: Comprehensive test suite for reliability, security, and compliance
+- **Privacy by design**: Opt-in conversation saving, pseudonymised IPs, 90-day automatic deletion, no third-party trackers
+- **Production-ready**: Comprehensive logging controls, monitoring, and error handling
 - **IP Protection**: Automated checks to prevent sensitive information leakage
 
 **Technology:** Node.js, Express, Docker, Koyeb
@@ -273,6 +331,13 @@ This is production-ready:
 - Security best practices drawn from enterprise experience
 - Production deployment with monitoring via Koyeb
 
+**Governance in Practice:**
+
+- EU AI Act Article 50 transparency implemented ahead of its 2 August 2026 application date
+- GDPR consent model with freely given, opt-in, withdrawable consent and server-side receipts
+- Fail-closed logging architecture, inspectable in this repository
+- The same standard Janet advises clients to build to, demonstrated rather than described
+
 **Practical and Recognised Impact:**
 
 - First AI agent formally documented as a teaching resource in an Irish state-funded AI workforce programme
@@ -283,7 +348,7 @@ This is production-ready:
 
 ## Use Cases
 
-**For Potential Clients:** "What's Janet's approach to AI governance?" - Accurate answer drawing on Lakera, enterprise background, and SOLAS QA framework design experience
+**For Potential Clients:** "What's Janet's approach to AI governance?" - Accurate answer drawing on Lakera, enterprise background, and SOLAS QA framework design experience, with Maya itself as the live case study
 
 **For Educators and Curriculum Designers:** "What courses does Janet teach and how?" - Details on Enterprise Cloud, Generative AI, and Web Application Development in the AI Era; teaching philosophy and methodology
 
@@ -312,7 +377,7 @@ Maya is one of three AI agents Janet has built. The full Agent Boutique lives at
 - **Website**: [janetxiushi.me](https://janetxiushi.me)
 - **LinkedIn**: [linkedin.com/in/janetxiushi](https://linkedin.com/in/janetxiushi)
 - **Medium**: [medium.com/@janetxiushi](https://medium.com/@janetxiushi)
-- **Email**: info@janetxiushi.me
+- **Email**: <info@janetxiushi.me>
 
 **Or chat with Maya directly**: [maya-agent.ai-builders.space/maya.html](https://maya-agent.ai-builders.space/maya.html)
 
@@ -332,7 +397,7 @@ Maya is one of three AI agents Janet has built. The full Agent Boutique lives at
 
 © 2026 Janet Xiu Shi. All rights reserved. Maya by Janet Xiu Shi™
 
-This repository is a portfolio and showcase project demonstrating technical implementation, AI educator design, and knowledge architecture. The Knowledge Base contains professionally verified information sourced from Janet's credentials, published work, and documented programme materials.
+This repository is a portfolio and showcase project demonstrating technical implementation, AI educator design, knowledge architecture, and EU AI Act and GDPR aligned engineering. The Knowledge Base contains professionally verified information sourced from Janet's credentials, published work, and documented programme materials.
 
 ---
 

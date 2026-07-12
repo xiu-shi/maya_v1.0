@@ -29,14 +29,22 @@ import { auditLog } from "./middleware/audit.js";
 import { requireAdminAuth } from "./middleware/adminAuth.js";
 import { logInfo, logError } from "./utils/logger.js";
 import { startLogCleanupScheduler } from "./utils/log-cleanup-scheduler.js";
+import {
+  withTimeout,
+  importWithTimeout,
+  CHAT_LOGS_MAX_DAYS,
+  CHAT_LOGS_REQUEST_MS,
+} from "./utils/timeout.js";
 import { recordConsentReceipt } from "./utils/consent-receipt.js";
 import {
   sanitizeTestOutput,
   sanitizeJestResults,
 } from "./utils/sanitize-output.js";
 import {
-  logChatMessage,
-  logChatAttempt,
+  logChatAttemptIfEnabled as chatAttemptIfEnabled,
+  logChatMessageIfEnabled as chatMessageIfEnabled,
+} from "./utils/conversation-logging.js";
+import {
   getChatLogs,
   getChatLogsByConversation,
   getStorageStats,
@@ -57,16 +65,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-
-function chatAttemptIfEnabled(enabled, payload) {
-  if (!enabled) return Promise.resolve();
-  return logChatAttempt(payload);
-}
-
-function chatMessageIfEnabled(enabled, payload) {
-  if (!enabled) return Promise.resolve();
-  return logChatMessage(payload);
-}
 
 // Trust proxy (if behind reverse proxy)
 if (config.trustProxy) {
@@ -212,8 +210,6 @@ async function getAPIClient() {
     // Lazy import the API client module with timeout protection (Issue #10)
     if (!apiClientModule) {
       logInfo("Lazy loading API client module...");
-      const { importWithTimeout, TIMEOUTS } =
-        await import("./utils/timeout.js");
       apiClientModule = await importWithTimeout(
         import("./api-client.js"),
         "./api-client.js",
@@ -577,19 +573,6 @@ app.post(
     });
   }),
 );
-
-// Max date range and request timeout for chat-logs (avoid proxy 502 on slow S3 fetches)
-const CHAT_LOGS_MAX_DAYS = 31;
-const CHAT_LOGS_REQUEST_MS = 45000; // Respond before typical proxy timeout (~60s)
-
-function withTimeout(promise, ms, message) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(message)), ms)
-    ),
-  ]);
-}
 
 // Admin endpoints for chat logs (before rate limiting - admin endpoints should have different limits)
 app.get(
@@ -1016,7 +999,7 @@ app.post(
   validateChatRequest,
   asyncHandler(async (req, res) => {
     // Access sanitized input
-    const { message, history, warnings, conversationLogging = true } = req.sanitized;
+    const { message, history, warnings, conversationLogging = false } = req.sanitized;
 
     // Log warnings if any
     if (warnings && warnings.length > 0) {

@@ -171,7 +171,7 @@ export function getS3KeyForEntry(logEntry) {
   const day = String(date.getUTCDate()).padStart(2, "0");
   const iso = date.toISOString();
   const safeTimestamp = iso.replace(/:/g, "-").replace(/\./g, "-");
-  const ipHash = hashIp(logEntry.ip);
+  const ipHash = logEntry.ipHash || hashIp(logEntry.ip);
   const sanitizedRegion = (logEntry.region || "unknown")
     .replace(/[^a-zA-Z0-9-]/g, "")
     .slice(0, 10);
@@ -309,7 +309,7 @@ export async function uploadConversationToS3(s3Key, newEntries) {
         messageCap: CONVERSATION_MESSAGE_CAP,
         environment: firstEntry.environment,
         serverHost: firstEntry.serverHost,
-        ip: firstEntry.ip,
+        ipHash: firstEntry.ipHash || hashIp(firstEntry.ip),
         region: firstEntry.region || "unknown",
         userAgent: firstEntry.userAgent || "unknown",
         messages: [],
@@ -573,7 +573,7 @@ export async function fetchLogsFromS3(startDate, endDate) {
                 conversationId: parsed.conversationId,
                 environment: parsed.environment,
                 serverHost: parsed.serverHost,
-                ip: parsed.ip,
+                ipHash: parsed.ipHash || (parsed.ip ? hashIp(parsed.ip) : undefined),
                 region: parsed.region,
                 userAgent: parsed.userAgent,
               }));

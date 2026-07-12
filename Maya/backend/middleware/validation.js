@@ -6,7 +6,7 @@
 
 import { sanitizeChatInput } from '../utils/sanitize.js';
 import { logWarning, logError } from '../utils/logger.js';
-import { logChatAttempt } from '../utils/chat-logger.js';
+import { logChatAttemptIfAllowed } from '../utils/conversation-logging.js';
 import config from '../config/env.js';
 
 /**
@@ -37,8 +37,8 @@ export function validateChatRequest(req, res, next) {
     // Check for errors
     if (sanitized.errors.length > 0) {
       // Log validation error for chat requests
-      if (req.path === '/api/chat' && req.body?.message && req.body?.logging !== false) {
-        logChatAttempt({
+      if (req.path === '/api/chat' && req.body?.message) {
+        logChatAttemptIfAllowed(req, {
           userMessage: req.body.message,
           ip: req.ip,
           userAgent: req.get('user-agent'),
@@ -59,7 +59,7 @@ export function validateChatRequest(req, res, next) {
     }
     
     // Attach sanitized data to request
-    const conversationLogging = req.body?.logging !== false;
+    const conversationLogging = req.body?.logging === true;
 
     req.sanitized = {
       message: sanitized.message,
