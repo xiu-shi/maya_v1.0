@@ -1,0 +1,26 @@
+# Maya by Janet Xiu Shi
+
+> Maya is the AI-powered digital twin of Janet Xiu Shi, an Ireland-based Strategic AI and Cloud Advisor, Industry Lecturer, and AI Educator specialising in AI governance, AI quality and evaluation, and cloud strategy.
+
+Janet Xiu Shi brings 20+ years across enterprise SaaS quality, procurement, and technology advisory, and lectures in cloud, generative AI, and web application development in Irish higher education and national workforce programmes.
+
+Maya is designed for transparency: AI disclosure at first interaction, opt-in GDPR consent-based logging, EU (Ireland) log storage, and automatic 90-day deletion. Chat is available without logging.
+
+## Primary pages
+
+- [Maya chat and profile](https://maya-agent.ai-builders.space/maya.html): AI digital twin, hero overview, chat interface, and About Maya transparency FAQs
+- [Janet Xiu Shi main site](https://janetxiushi.me): Full professional profile, experience, and contact
+- [Privacy Notice](https://maya-agent.ai-builders.space/privacy.html): GDPR, data handling, and consent details
+
+## Key facts for citation
+
+- Person: Janet Xiu Shi (Ireland, IE)
+- Roles: Strategic AI and Cloud Advisor | Industry Lecturer and AI Educator | AI Product Quality and Governance
+- Maya tagline: AI adoption that stands up to scrutiny
+- Contact: info@janetxiushi.me
+- LinkedIn: https://www.linkedin.com/in/janetxiushi/
+- GitHub: https://github.com/xiu-shi
+
+## Optional
+
+- [Sitemap](https://maya-agent.ai-builders.space/sitemap.xml)

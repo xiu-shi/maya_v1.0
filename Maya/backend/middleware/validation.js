@@ -37,7 +37,7 @@ export function validateChatRequest(req, res, next) {
     // Check for errors
     if (sanitized.errors.length > 0) {
       // Log validation error for chat requests
-      if (req.path === '/api/chat' && req.body?.message) {
+      if (req.path === '/api/chat' && req.body?.message && req.body?.logging !== false) {
         logChatAttempt({
           userMessage: req.body.message,
           ip: req.ip,
@@ -59,10 +59,13 @@ export function validateChatRequest(req, res, next) {
     }
     
     // Attach sanitized data to request
+    const conversationLogging = req.body?.logging !== false;
+
     req.sanitized = {
       message: sanitized.message,
       history: sanitized.history,
-      warnings: sanitized.warnings
+      warnings: sanitized.warnings,
+      conversationLogging,
     };
     
     // Log warnings if any (sanitized)

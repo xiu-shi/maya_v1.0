@@ -58,6 +58,16 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
+function chatAttemptIfEnabled(enabled, payload) {
+  if (!enabled) return Promise.resolve();
+  return logChatAttempt(payload);
+}
+
+function chatMessageIfEnabled(enabled, payload) {
+  if (!enabled) return Promise.resolve();
+  return logChatMessage(payload);
+}
+
 // Trust proxy (if behind reverse proxy)
 if (config.trustProxy) {
   app.set("trust proxy", 1);
@@ -1006,7 +1016,7 @@ app.post(
   validateChatRequest,
   asyncHandler(async (req, res) => {
     // Access sanitized input
-    const { message, history, warnings } = req.sanitized;
+    const { message, history, warnings, conversationLogging = true } = req.sanitized;
 
     // Log warnings if any
     if (warnings && warnings.length > 0) {
@@ -1021,7 +1031,7 @@ app.post(
       });
       
       // Log config error attempt
-      logChatAttempt({
+      chatAttemptIfEnabled(conversationLogging, {
         userMessage: message,
         ip: req.ip,
         userAgent: req.get("user-agent"),
@@ -1054,7 +1064,7 @@ app.post(
       });
       
       // Log API client initialization error
-      logChatAttempt({
+      chatAttemptIfEnabled(conversationLogging, {
         userMessage: message,
         ip: req.ip,
         userAgent: req.get("user-agent"),
@@ -1086,7 +1096,7 @@ app.post(
         });
         
         // Log API method error
-        logChatAttempt({
+        chatAttemptIfEnabled(conversationLogging, {
           userMessage: message,
           ip: req.ip,
           userAgent: req.get("user-agent"),
@@ -1129,7 +1139,7 @@ app.post(
         // Log API response error
         const requestStartTime = req.startTime || Date.now();
         const responseTime = Date.now() - requestStartTime;
-        logChatAttempt({
+        chatAttemptIfEnabled(conversationLogging, {
           userMessage: message,
           ip: req.ip,
           userAgent: req.get("user-agent"),
@@ -1161,7 +1171,7 @@ app.post(
         // Log empty response error
         const requestStartTime = req.startTime || Date.now();
         const responseTime = Date.now() - requestStartTime;
-        logChatAttempt({
+        chatAttemptIfEnabled(conversationLogging, {
           userMessage: message,
           ip: req.ip,
           userAgent: req.get("user-agent"),
@@ -1217,7 +1227,7 @@ app.post(
       const isApiClientError = !!(result.error || result.errorType);
 
       if (isApiClientError) {
-        logChatAttempt({
+        chatAttemptIfEnabled(conversationLogging, {
           userMessage: message,
           assistantResponse: content,
           history: history,
@@ -1235,7 +1245,7 @@ app.post(
           logError("Failed to log API client error attempt", err);
         });
       } else {
-        logChatMessage({
+        chatMessageIfEnabled(conversationLogging, {
           userMessage: message,
           assistantResponse: content,
           history: history,
@@ -1270,7 +1280,7 @@ app.post(
         // Log timeout error
         const requestStartTime = req.startTime || Date.now();
         const responseTime = Date.now() - requestStartTime;
-        logChatAttempt({
+        chatAttemptIfEnabled(conversationLogging, {
           userMessage: message,
           ip: req.ip,
           userAgent: req.get("user-agent"),
@@ -1309,7 +1319,7 @@ app.post(
       // Log API or unknown error
       const requestStartTime = req.startTime || Date.now();
       const responseTime = Date.now() - requestStartTime;
-      logChatAttempt({
+      chatAttemptIfEnabled(conversationLogging, {
         userMessage: message,
         ip: req.ip,
         userAgent: req.get("user-agent"),

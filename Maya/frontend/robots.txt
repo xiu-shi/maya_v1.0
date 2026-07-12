@@ -1,0 +1,37 @@
+# Maya by Janet Xiu Shi - robots.txt
+# Allows search engines and AI answer crawlers to index public pages.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /chat_logs.html
+
+User-agent: GPTBot
+Allow: /maya.html
+Allow: /privacy.html
+Allow: /llms.txt
+Allow: /sitemap.xml
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://maya-agent.ai-builders.space/sitemap.xml
