@@ -508,6 +508,26 @@ export class MayaAPIClient {
           });
         }
 
+        if (typeof guardrails.checkIdentityFraming === 'function') {
+          const identityCheck = guardrails.checkIdentityFraming(content);
+          if (!identityCheck.passed) {
+            logInfo('Identity framing check flagged issues', {
+              violationCount: identityCheck.violations.length,
+              types: identityCheck.violations.map((v) => v.type),
+            });
+          }
+        }
+
+        if (typeof guardrails.checkKbGrounding === 'function') {
+          const kbGroundingCheck = guardrails.checkKbGrounding(content);
+          if (!kbGroundingCheck.passed) {
+            logInfo('KB grounding check flagged issues', {
+              violationCount: kbGroundingCheck.violations.length,
+              types: kbGroundingCheck.violations.map((v) => v.type),
+            });
+          }
+        }
+
         const validation = guardrails.validateResponse(content);
         if (!validation.isValid) {
           logWarning('Response sanitized due to information leakage', {
