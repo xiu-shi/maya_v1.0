@@ -70,10 +70,12 @@ with responsible governance embedded from day one.
 
 - **Connectd**: Strategic AI and business technology advisor
 - **SOLAS / Skills to Advance**: Programme Instructor and QA Framework Architect for two national, state-funded QQI-accredited AI workforce programmes (QQI Level 4 and Level 5), developed in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
-- **IADT (Dún Laoghaire Institute of Art, Design + Technology)**: Industry Expert Lecturer preparing future digital leaders through:
-  * **Enterprise Cloud**: Strategic cloud adoption and architecture for AI-powered organisations
-  * **Generative AI**: AI transformation, responsible AI adoption, and the agentic era
-  * **Web Application Development in the AI Era**: AI-first web development with dual-audience thinking for non-CS background students in business
+- **IADT (Dún Laoghaire Institute of Art, Design + Technology)**: Industry Expert Lecturer preparing future digital leaders through three **QQI Level 8** modules:
+  * **Enterprise Cloud** (QQI Level 8): Strategic cloud adoption and architecture for AI-powered organisations
+  * **Generative AI** (QQI Level 8): AI transformation, responsible AI adoption, and the agentic era
+  * **Web Application Development in the AI Era** (QQI Level 8): AI-first web development with dual-audience thinking for non-CS background students in business
+
+  Janet's teaching range spans the QQI framework from Level 4 and Level 5 national workforce programmes (SOLAS) to Level 8 higher education modules (IADT).
 - **Workday**: Delivered development excellence and shaped compliant SaaS frameworks serving millions globally
 - **Huawei**: Strategic telecommunications and broadband deployments with EU compliance focus
 
@@ -350,7 +352,7 @@ This is production-ready:
 
 **For Potential Clients:** "What's Janet's approach to AI governance?" - Accurate answer drawing on Lakera, enterprise background, and SOLAS QA framework design experience, with Maya itself as the live case study
 
-**For Educators and Curriculum Designers:** "What courses does Janet teach and how?" - Details on Enterprise Cloud, Generative AI, and Web Application Development in the AI Era; teaching philosophy and methodology
+**For Educators and Curriculum Designers:** "What courses does Janet teach and how?" - Details on the QQI Level 8 modules Enterprise Cloud, Generative AI, and Web Application Development in the AI Era; teaching philosophy and methodology
 
 **For SOLAS Programme Learners:** "Can you help me understand this concept before our next session?" - Socratic support calibrated to QQI Level 4 or Level 5 curriculum scope; session-limited by design to build prompt discipline
 
