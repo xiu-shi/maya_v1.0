@@ -885,36 +885,49 @@
     }
     .consent-actions {
       display: flex;
+      flex-direction: column;
       gap: var(--spacing-sm);
-      align-items: center;
+      align-items: stretch;
     }
-    .consent-accept-btn,
-    .consent-decline-btn {
-      border-radius: 6px;
-      padding: var(--spacing-sm) var(--spacing-lg);
+    .consent-opt-in {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
       font-size: var(--font-size-sm);
-      font-weight: 500;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0 0 var(--spacing-md) 0;
+      cursor: pointer;
+    }
+    .consent-opt-in input {
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+    .consent-start-btn {
+      border-radius: 8px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      font-size: var(--font-size-base);
+      font-weight: 600;
       font-family: var(--font-family);
       cursor: pointer;
       transition: background var(--transition-fast), color var(--transition-fast);
-      flex: 1;
+      width: 100%;
       text-align: center;
-    }
-    .consent-accept-btn {
       background: var(--accent-color);
       color: var(--bg-primary);
       border: 1px solid var(--accent-color);
     }
-    .consent-accept-btn:hover {
+    .consent-start-btn:hover {
       background: var(--accent-hover);
     }
-    .consent-decline-btn {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
+    .consent-footer-link {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+      text-align: center;
+      margin: var(--spacing-md) 0 0 0;
     }
-    .consent-decline-btn:hover {
-      background: var(--bg-secondary);
+    .consent-footer-link a {
+      color: var(--text-muted);
     }
     .maya-ai-disclosure {
       font-size: var(--font-size-xs);
@@ -1195,24 +1208,24 @@
   <!-- GDPR consent overlay (MAYA-GDPR-001-01) -->
   <div id="consentOverlay" class="consent-overlay" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
     <div class="consent-box">
-      <h3 id="consentTitle">Before you chat with Maya</h3>
+      <h3 id="consentTitle">Welcome to Maya</h3>
       <p>
-        Maya is an AI system, not Janet in person. Replies are AI-generated and may be inaccurate.
+        Hi! I'm Maya, Janet's AI assistant. I'm not Janet herself, and I can make mistakes,
+        so please sense-check anything important.
         <br /><br />
-        To generate replies, your messages are processed by our AI provider, which can involve
-        processing outside the European Economic Area, including in the United States. This
-        applies whichever option you choose below.
-        <br /><br />
-        If you allow logging, conversations (messages, pseudonymised IP, browser info) are kept
-        for up to 90 days to improve Maya. If you chat without logging, no conversation logs are
-        kept.
-        <br /><br />
-        <a href="/privacy.html" target="_blank" rel="noopener">Read the full Privacy Notice</a>
+        Your messages are processed securely by our AI service to generate replies.
+        Nothing is saved unless you tick the box below.
       </p>
+      <label class="consent-opt-in" for="consentSaveCheckbox">
+        <input type="checkbox" id="consentSaveCheckbox" />
+        <span>Help improve Maya by saving this chat (optional, deleted automatically after 90 days)</span>
+      </label>
       <div class="consent-actions">
-        <button id="consentAcceptBtn" class="consent-accept-btn" type="button">Allow logging and chat</button>
-        <button id="consentDeclineBtn" class="consent-decline-btn" type="button">Chat without logging</button>
+        <button id="consentStartBtn" class="consent-start-btn" type="button">Start chatting</button>
       </div>
+      <p class="consent-footer-link">
+        <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>
+      </p>
     </div>
   </div>
 
@@ -1335,10 +1348,21 @@
     }
 
     async function grantConsent() {
+      const savingFailedMsg = "I couldn't switch saving on just now, so this chat isn't being saved. You can try again using the link below the chat box.";
+      function finishWithoutSaving(showFailureNote) {
+        persistConsent(false);
+        hideConsentOverlay();
+        updateLoggingStatusLink();
+        showAiIntroMessageIfNeeded();
+        if (showFailureNote) {
+          addMessage('maya', savingFailedMsg, 'consent-save-failed-' + Date.now());
+        }
+      }
       try {
         const recorded = await postConsentReceipt('accepted');
         if (!recorded) {
           devError('Failed to record consent receipt on server');
+          finishWithoutSaving(true);
           return;
         }
         persistConsent(true);
@@ -1347,6 +1371,7 @@
         showAiIntroMessageIfNeeded();
       } catch (error) {
         devError('Consent acceptance failed:', error);
+        finishWithoutSaving(true);
       }
     }
 
@@ -1375,12 +1400,14 @@
       submitBtn.disabled = false;
     }
 
-    function showConsentOverlay() {
+    function showConsentOverlay(preTickSave = false) {
       const overlay = document.getElementById('consentOverlay');
       if (overlay) {
         overlay.classList.add('visible');
-        const acceptBtn = document.getElementById('consentAcceptBtn');
-        if (acceptBtn) acceptBtn.focus();
+        const startBtn = document.getElementById('consentStartBtn');
+        const saveCheckbox = document.getElementById('consentSaveCheckbox');
+        if (saveCheckbox) saveCheckbox.checked = preTickSave;
+        if (startBtn) startBtn.focus();
       }
     }
 
@@ -1398,11 +1425,11 @@
       }
       link.classList.add('visible');
       if (hasConsent()) {
-        link.innerHTML = 'Logging on &middot; withdraw consent';
-        link.title = 'Withdraw logging consent. You can keep chatting; messages will no longer be logged.';
+        link.innerHTML = 'Saving on &middot; change';
+        link.title = 'Maya is saving this conversation. Click to change.';
       } else {
-        link.innerHTML = 'Logging off &middot; enable logging';
-        link.title = 'Conversation logging is off. Click to review the notice and enable logging (optional).';
+        link.innerHTML = 'Not saving &middot; turn on';
+        link.title = 'Maya is not saving this conversation. Click to turn on saving (optional).';
       }
     }
 
@@ -1420,12 +1447,16 @@
         clearStoredConsent();
       }
 
-      const acceptBtn = document.getElementById('consentAcceptBtn');
-      const declineBtn = document.getElementById('consentDeclineBtn');
+      const startBtn = document.getElementById('consentStartBtn');
+      const saveCheckbox = document.getElementById('consentSaveCheckbox');
       const withdrawLink = document.getElementById('consentWithdrawLink');
 
-      if (acceptBtn) acceptBtn.addEventListener('click', () => { grantConsent(); });
-      if (declineBtn) declineBtn.addEventListener('click', () => { declineConsent(); });
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          if (saveCheckbox && saveCheckbox.checked) grantConsent();
+          else declineConsent();
+        });
+      }
 
       if (withdrawLink) {
         withdrawLink.addEventListener('click', async () => {
@@ -1434,7 +1465,7 @@
             const msg = 'Logging consent withdrawn. You can keep chatting; further messages will not be logged. To request deletion of past data, email info@janetxiushi.me or see the <a href="/privacy.html" target="_blank">Privacy Notice</a>.';
             addMessage('maya', msg, 'consent-withdraw-' + Date.now());
           } else {
-            showConsentOverlay();
+            showConsentOverlay(true);
           }
         });
         withdrawLink.addEventListener('keydown', (e) => {
