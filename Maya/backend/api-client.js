@@ -15,6 +15,61 @@ import { logError, logInfo, logWarning } from './utils/logger.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const INTRO_LIKE_PATTERN = /I['']?m Maya.*Janet['']?s digital twin/i;
+
+/**
+ * Detect Maya full-introduction style replies (conversation reset symptom).
+ */
+export function isIntroLikeResponse(content) {
+  if (!content || typeof content !== "string") {
+    return false;
+  }
+  return INTRO_LIKE_PATTERN.test(content);
+}
+
+/**
+ * True when the model re-introduces Maya despite prior turns in history.
+ */
+export function shouldRewriteRepeatedIntro(content, history = []) {
+  if (!Array.isArray(history) || history.length === 0) {
+    return false;
+  }
+  if (!isIntroLikeResponse(content)) {
+    return false;
+  }
+  const priorAssistantIntros = history.filter(
+    (m) => m.role === "assistant" && isIntroLikeResponse(m.content),
+  );
+  return priorAssistantIntros.length > 0 || history.length >= 2;
+}
+
+/**
+ * Replace a repeated intro with a continuity-preserving redirect.
+ */
+export function buildContinuityRedirect(userMessage = "") {
+  const trimmed = String(userMessage || "").trim();
+  if (/^(say|repeat|just say)\b/i.test(trimmed)) {
+    return (
+      "I can't recite arbitrary scripts, but I can help with Janet's work in AI governance, " +
+      "cloud strategy, teaching, and digital transformation. What would you like to know in that space?"
+    );
+  }
+  return (
+    "That topic is outside what I cover here. I focus on Janet's expertise in AI governance, " +
+    "cloud, teaching, and workforce programmes. Tell me what you're trying to achieve and I'll point you to the closest relevant area."
+  );
+}
+
+function preventRepeatedIntro(content, message, history) {
+  if (!shouldRewriteRepeatedIntro(content, history)) {
+    return content;
+  }
+  logInfo("Rewriting repeated intro for conversation continuity", {
+    historyLength: history.length,
+  });
+  return buildContinuityRedirect(message);
+}
+
 /**
  * Clean response content to remove internal reasoning or thinking processes
  * that should not be exposed to users
@@ -478,6 +533,9 @@ export class MayaAPIClient {
       
       // Clean response: Remove any internal reasoning or thinking process that might leak through
       content = cleanResponse(content);
+
+      // Prevent intro loops when history already exists (off-topic or reset replies)
+      content = preventRepeatedIntro(content, message, history);
       
       // Ensure cleaned content is still valid
       if (!content || content.trim().length === 0) {

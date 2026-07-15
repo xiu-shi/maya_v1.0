@@ -1441,6 +1441,18 @@
       addMessage('maya', AI_INTRO_MESSAGE, introId);
     }
 
+    /** Include UI intro in first API call so the model does not re-greet cold. */
+    function getApiHistoryForRequest() {
+      const apiHistory = messageHistory.map(({ role, content }) => ({ role, content }));
+      if (apiHistory.length === 0) {
+        const introId = 'ai-intro-' + (currentChatId || 'session');
+        if (document.querySelector(`[data-message-id="${introId}"]`)) {
+          return [{ role: 'assistant', content: AI_INTRO_MESSAGE }];
+        }
+      }
+      return apiHistory;
+    }
+
     function initConsent() {
       const stored = readStoredConsent();
       if (stored && stored.version !== CONSENT_VERSION) {
@@ -2186,7 +2198,8 @@
         devLog('📤 Sending request to:', apiUrl);
         devLog('📤 API_BASE_URL:', API_BASE_URL);
         devLog('📤 Full URL:', window.location.origin + apiUrl);
-        devLog('📤 Request payload:', { message, history: messageHistory });
+        const apiHistory = getApiHistoryForRequest();
+        devLog('📤 Request payload:', { message, history: apiHistory });
         
         // Create abort controller for timeout handling
         const controller = new AbortController();
@@ -2202,7 +2215,7 @@
           },
           body: JSON.stringify({
             message,
-            history: messageHistory,
+            history: apiHistory,
             conversationId: conversationId,
             logging: hasConsent()
           }),
