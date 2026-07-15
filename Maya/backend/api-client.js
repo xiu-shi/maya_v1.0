@@ -28,7 +28,7 @@ export function isIntroLikeResponse(content) {
 }
 
 /**
- * True when the model re-introduces Maya despite prior turns in history.
+ * True when the model re-introduces Maya after an intro already exists in history.
  */
 export function shouldRewriteRepeatedIntro(content, history = []) {
   if (!Array.isArray(history) || history.length === 0) {
@@ -40,23 +40,46 @@ export function shouldRewriteRepeatedIntro(content, history = []) {
   const priorAssistantIntros = history.filter(
     (m) => m.role === "assistant" && isIntroLikeResponse(m.content),
   );
-  return priorAssistantIntros.length > 0 || history.length >= 2;
+  return priorAssistantIntros.length > 0;
 }
 
 /**
- * Replace a repeated intro with a continuity-preserving redirect.
+ * Fallback when the model loops an intro instead of answering (not a scope gate).
  */
-export function buildContinuityRedirect(userMessage = "") {
+export function buildContinuityFallback(userMessage = "") {
   const trimmed = String(userMessage || "").trim();
-  if (/^(say|repeat|just say)\b/i.test(trimmed)) {
+  const lower = trimmed.toLowerCase();
+
+  if (/dealer|customer inquiry|inquiry process/.test(lower)) {
     return (
-      "I can't recite arbitrary scripts, but I can help with Janet's work in AI governance, " +
-      "cloud strategy, teaching, and digital transformation. What would you like to know in that space?"
+      "At a high level, a basic dealer customer inquiry process usually covers intake " +
+      "(what the customer needs), qualification (fit, budget, timing), information exchange, " +
+      "recommendation or next step, and follow-up. A common design risk is losing traceability " +
+      "at intake when channels are disconnected. What industry or workflow are you applying this to?"
     );
   }
+
+  if (/sales process|sales workflow/.test(lower)) {
+    return (
+      "At a high level, a sales process often spans prospecting, qualification, discovery, " +
+      "proposal, decision, and handoff to delivery. The quality angle is keeping commitments " +
+      "and customer context consistent from first touch through CRM. Which stage are you trying to improve?"
+    );
+  }
+
+  const sayMatch = trimmed.match(/^(?:say|repeat|just say)\s+(.+)/i);
+  if (sayMatch?.[1]) {
+    const concept = sayMatch[1].replace(/[.?!]+$/, "").trim();
+    return (
+      `On "${concept}": I can help you think that through at a high level. ` +
+      "Give me the business context and what decision you are trying to support, " +
+      "and I will outline stages, risks, and practical next questions."
+    );
+  }
+
   return (
-    "That topic is outside what I cover here. I focus on Janet's expertise in AI governance, " +
-    "cloud, teaching, and workforce programmes. Tell me what you're trying to achieve and I'll point you to the closest relevant area."
+    "I'll focus on your question rather than repeat an introduction. " +
+    "Share the outcome you are aiming for and I will respond at a practical high level."
   );
 }
 
@@ -67,7 +90,7 @@ function preventRepeatedIntro(content, message, history) {
   logInfo("Rewriting repeated intro for conversation continuity", {
     historyLength: history.length,
   });
-  return buildContinuityRedirect(message);
+  return buildContinuityFallback(message);
 }
 
 /**
