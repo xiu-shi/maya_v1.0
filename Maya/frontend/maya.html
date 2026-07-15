@@ -1441,13 +1441,65 @@
       addMessage('maya', AI_INTRO_MESSAGE, introId);
     }
 
-    /** Include UI intro in first API call so the model does not re-greet cold. */
+    const INTRO_LIKE_REPLY_RE = /I['']?m Maya.*digital twin/i;
+    const INTRO_CAPABILITY_REPLY_RE = /AI governance.*evaluation quality.*digital transformation/i;
+
+    function isIntroLikeReply(text) {
+      if (!text || typeof text !== 'string') return false;
+      const trimmed = text.trim();
+      if (INTRO_LIKE_REPLY_RE.test(trimmed)) return true;
+      return INTRO_CAPABILITY_REPLY_RE.test(trimmed) && trimmed.length < 320;
+    }
+
+    function buildClientContinuityFallback(userMessage) {
+      const trimmed = String(userMessage || '').trim();
+      const lower = trimmed.toLowerCase();
+      const turn = messageHistory.filter(m => m.role === 'user').length;
+      const nudges = [
+        "I'm still here. Add a bit more context (industry, goal, or process stage) and I will respond at a practical high level.",
+        "To move this forward, tell me what you are trying to decide or design.",
+        "Try a more specific angle, for example the workflow stage or outcome you care about most.",
+      ];
+      const nudge = nudges[turn % nudges.length];
+
+      if (/dealer|customer inquiry|inquiry process/.test(lower)) {
+        return 'At a high level, a basic dealer customer inquiry process covers intake, qualification, recommendation, and follow-up. ' + nudge;
+      }
+      if (/sales process|sales workflow|^sales$/.test(lower)) {
+        return 'At a high level, a sales process spans prospecting, qualification, discovery, proposal, decision, and handoff. Which stage matters most for you?';
+      }
+      if (/^education$|teaching|learning|training/.test(lower)) {
+        return 'On education: curriculum design, assessment quality, learner support, and responsible AI in teaching are all fair game. ' + nudge;
+      }
+      if (/^all$|everything|overview/.test(lower)) {
+        return 'I can cover advisory work, teaching programmes, or high-level process design. ' + nudge;
+      }
+      return 'Let me stay with your question instead of repeating an introduction. ' + nudge;
+    }
+
+    function softenRepeatedIntro(apiText, userMessage) {
+      if (!isIntroLikeReply(apiText)) return apiText;
+      const priorIntroInHistory = messageHistory.some(
+        m => m.role === 'assistant' && isIntroLikeReply(m.content)
+      );
+      const uiIntroVisible = !!document.querySelector('[data-message-id^="ai-intro-"]');
+      const userAlreadySpoke = messageHistory.some(m => m.role === 'user');
+      if (!priorIntroInHistory && !uiIntroVisible && !userAlreadySpoke) {
+        return apiText;
+      }
+      return buildClientContinuityFallback(userMessage);
+    }
+
+    /** Include UI intro in API history so the model does not re-greet cold. */
     function getApiHistoryForRequest() {
       const apiHistory = messageHistory.map(({ role, content }) => ({ role, content }));
-      if (apiHistory.length === 0) {
+      const introAlreadyInHistory = apiHistory.some(
+        m => m.role === 'assistant' && isIntroLikeReply(m.content)
+      );
+      if (!introAlreadyInHistory) {
         const introId = 'ai-intro-' + (currentChatId || 'session');
         if (document.querySelector(`[data-message-id="${introId}"]`)) {
-          return [{ role: 'assistant', content: AI_INTRO_MESSAGE }];
+          apiHistory.unshift({ role: 'assistant', content: AI_INTRO_MESSAGE });
         }
       }
       return apiHistory;
@@ -1543,9 +1595,9 @@
         emptyStateEl.style.display = 'none';
       }
       
-      // Create new chat if none exists
+      // Start session without clearing the consent intro
       if (!currentChatId) {
-        createNewChat();
+        ensureChatSession();
       }
       
       // Set prompt text
@@ -1840,9 +1892,9 @@
             emptyState.style.display = 'none';
           }
           
-          // Create new chat if none exists (for first-time users)
+          // Start session without clearing the consent intro (first-time users)
           if (!currentChatId) {
-            createNewChat();
+            ensureChatSession();
           }
           
           // Set the prompt text
@@ -1931,9 +1983,9 @@
                 emptyState.style.display = 'none';
               }
               
-              // Create new chat if none exists
+              // Start session without clearing the consent intro
               if (!currentChatId) {
-                createNewChat();
+                ensureChatSession();
               }
               
               // Set prompt and submit
@@ -1985,6 +2037,25 @@
         }
       }
     });
+
+    /** Start a chat session without wiping the consent intro or in-memory history. */
+    function ensureChatSession() {
+      if (currentChatId) return;
+      currentChatId = Date.now().toString();
+      conversationId = generateConversationId();
+      chats.unshift({
+        id: currentChatId,
+        conversationId: conversationId,
+        title: 'New Chat',
+        createdAt: Date.now(),
+        messages: []
+      });
+      saveChats();
+      renderChatHistory();
+      if (emptyState) {
+        emptyState.style.display = 'none';
+      }
+    }
 
     // Create new chat
     function createNewChat() {
@@ -2152,10 +2223,8 @@
         return;
       }
 
-      // Create new chat if none exists
-      if (!currentChatId) {
-        createNewChat();
-      }
+      // Start session without clearing the UI intro shown after consent
+      ensureChatSession();
 
       // Hide empty state
       if (emptyState) {
@@ -2179,6 +2248,9 @@
       if (messageHistory.length === 0) {
         updateChatTitle(message.substring(0, 50));
       }
+
+      // Include the current user turn in API history before the request
+      messageHistory.push(userMessage);
 
       // Show typing indicator
       const typingId = showTypingIndicator();
@@ -2285,8 +2357,9 @@
           saveChats();
         }
 
-        // Add Maya's response
-        const mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
+        // Add Maya's response (vary wording if the model repeats its intro)
+        let mayaResponse = data.response || data.message || 'I apologize, but I encountered an error processing your request.';
+        mayaResponse = softenRepeatedIntro(mayaResponse, message);
         devLog('💬 Maya response extracted:', mayaResponse);
         
         if (!mayaResponse || mayaResponse.trim() === '') {
@@ -2336,16 +2409,13 @@
         // Also use the helper function
         scrollToBottom(true);
         
-        // Update history
-        messageHistory.push(
-          userMessage,
-          { 
-            id: assistantMessageId,
-            role: 'assistant', 
-            content: mayaResponse,
-            timestamp: Date.now()
-          }
-        );
+        // Update history (user turn was added before the API call)
+        messageHistory.push({
+          id: assistantMessageId,
+          role: 'assistant',
+          content: mayaResponse,
+          timestamp: Date.now()
+        });
 
         // Check if chat limit is approaching or reached
         const totalMessages = messageHistory.length;
@@ -2371,6 +2441,12 @@
 
       } catch (error) {
         removeTypingIndicator(typingId);
+
+        // Roll back the optimistic user turn if the request failed
+        const lastMsg = messageHistory[messageHistory.length - 1];
+        if (lastMsg && lastMsg.role === 'user' && lastMsg.id === userMessageId) {
+          messageHistory.pop();
+        }
         
         // Log detailed error information
         devError('❌ Chat error:', {

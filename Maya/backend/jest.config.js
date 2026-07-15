@@ -25,7 +25,10 @@ export default {
   ],
   testPathIgnorePatterns: [
     'post-deployment-verification\\.test\\.js$',  // Run via run-post-deployment-tests.sh after deploy
-    '/backend/tests/'  // Old location - consolidated into Maya/tests/backend_tests/ (MAYA-DEVOPS-001-03)
+    '/backend/tests/',  // Old location - consolidated into Maya/tests/backend_tests/ (MAYA-DEVOPS-001-03)
+    'tests/maya-html\\.test\\.js$',  // node:test runner (see Maya/tests/package.json)
+    'tests/privacy-consent\\.test\\.js$',
+    'tests/seo-geo-files\\.test\\.js$',
   ],
   rootDir: '..',
   // Runtime code only - excludes dev/test scripts that inflated the denominator (Finding F).

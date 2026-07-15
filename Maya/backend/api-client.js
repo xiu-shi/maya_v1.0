@@ -15,7 +15,25 @@ import { logError, logInfo, logWarning } from './utils/logger.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const INTRO_LIKE_PATTERN = /I['']?m Maya.*Janet['']?s digital twin/i;
+const INTRO_LIKE_PATTERN = /I['']?m Maya.*(?:Janet['']?s )?(?:AI )?digital twin/i;
+const INTRO_CAPABILITY_PATTERN =
+  /AI governance.*evaluation quality.*digital transformation/i;
+
+const CONTINUITY_NUDGES = [
+  "I'm still here. Add a bit more context (industry, goal, or process stage) and I will respond at a practical high level.",
+  "To move this forward, tell me what you are trying to decide or design, and I will outline useful next steps.",
+  "Try a more specific angle, for example the workflow stage, team, or outcome you care about most.",
+  "I can help with high-level process design. What business context should I assume for your question?",
+];
+
+function pickVariantIndex(seed, count) {
+  let hash = 0;
+  const text = String(seed || "");
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash + text.charCodeAt(i) * (i + 1)) % count;
+  }
+  return hash;
+}
 
 /**
  * Detect Maya full-introduction style replies (conversation reset symptom).
@@ -24,11 +42,15 @@ export function isIntroLikeResponse(content) {
   if (!content || typeof content !== "string") {
     return false;
   }
-  return INTRO_LIKE_PATTERN.test(content);
+  const trimmed = content.trim();
+  if (INTRO_LIKE_PATTERN.test(trimmed)) {
+    return true;
+  }
+  return INTRO_CAPABILITY_PATTERN.test(trimmed) && trimmed.length < 320;
 }
 
 /**
- * True when the model re-introduces Maya after an intro already exists in history.
+ * True when the model re-introduces Maya after the conversation already started.
  */
 export function shouldRewriteRepeatedIntro(content, history = []) {
   if (!Array.isArray(history) || history.length === 0) {
@@ -37,33 +59,64 @@ export function shouldRewriteRepeatedIntro(content, history = []) {
   if (!isIntroLikeResponse(content)) {
     return false;
   }
+  const hasUserTurn = history.some((m) => m.role === "user");
   const priorAssistantIntros = history.filter(
     (m) => m.role === "assistant" && isIntroLikeResponse(m.content),
   );
-  return priorAssistantIntros.length > 0;
+  if (priorAssistantIntros.length > 0 || hasUserTurn) {
+    return true;
+  }
+  return false;
 }
 
 /**
  * Fallback when the model loops an intro instead of answering (not a scope gate).
  */
-export function buildContinuityFallback(userMessage = "") {
+export function buildContinuityFallback(userMessage = "", history = []) {
   const trimmed = String(userMessage || "").trim();
   const lower = trimmed.toLowerCase();
+  const userTurns = Array.isArray(history)
+    ? history.filter((m) => m.role === "user").length
+    : 0;
+  const nudge =
+    CONTINUITY_NUDGES[
+      pickVariantIndex(`${trimmed}:${userTurns}`, CONTINUITY_NUDGES.length)
+    ];
 
   if (/dealer|customer inquiry|inquiry process/.test(lower)) {
+    const dealerVariants = [
+      "At a high level, a basic dealer customer inquiry process usually covers intake (what the customer needs), qualification (fit, budget, timing), information exchange, recommendation or next step, and follow-up.",
+      "For dealer inquiries, think in stages: capture the need, qualify fit and timing, exchange product or service details, agree a next step, and follow up. Traceability at intake matters when channels are disconnected.",
+    ];
     return (
-      "At a high level, a basic dealer customer inquiry process usually covers intake " +
-      "(what the customer needs), qualification (fit, budget, timing), information exchange, " +
-      "recommendation or next step, and follow-up. A common design risk is losing traceability " +
-      "at intake when channels are disconnected. What industry or workflow are you applying this to?"
+      dealerVariants[pickVariantIndex(trimmed, dealerVariants.length)] +
+      " " +
+      nudge
     );
   }
 
-  if (/sales process|sales workflow/.test(lower)) {
+  if (/sales process|sales workflow|^sales$/.test(lower)) {
+    const salesVariants = [
+      "At a high level, a sales process often spans prospecting, qualification, discovery, proposal, decision, and handoff to delivery.",
+      "A practical sales workflow moves from lead intake through qualification and discovery, then proposal, close, and delivery handoff, with CRM keeping context consistent.",
+    ];
     return (
-      "At a high level, a sales process often spans prospecting, qualification, discovery, " +
-      "proposal, decision, and handoff to delivery. The quality angle is keeping commitments " +
-      "and customer context consistent from first touch through CRM. Which stage are you trying to improve?"
+      salesVariants[pickVariantIndex(trimmed, salesVariants.length)] +
+      " Which stage are you trying to improve?"
+    );
+  }
+
+  if (/^education$|teaching|learning|training|student|course|programme|program/.test(lower)) {
+    return (
+      "On education and training: useful angles include curriculum design, assessment quality, learner support, and how AI fits responsibly in the classroom or workforce programme. " +
+      nudge
+    );
+  }
+
+  if (/^all$|everything|both|overview|general/.test(lower)) {
+    return (
+      "I can cover several angles: advisory and AI adoption, teaching programmes, or high-level process design. " +
+      nudge
     );
   }
 
@@ -72,14 +125,20 @@ export function buildContinuityFallback(userMessage = "") {
     const concept = sayMatch[1].replace(/[.?!]+$/, "").trim();
     return (
       `On "${concept}": I can help you think that through at a high level. ` +
-      "Give me the business context and what decision you are trying to support, " +
+      "Share the business context and the decision you are trying to support, " +
       "and I will outline stages, risks, and practical next questions."
     );
   }
 
+  const genericVariants = [
+    "I'll stay with your question rather than repeat an introduction.",
+    "Let me answer your prompt directly instead of re-introducing myself.",
+    "I'm listening. Here is how we can make progress on what you asked.",
+  ];
   return (
-    "I'll focus on your question rather than repeat an introduction. " +
-    "Share the outcome you are aiming for and I will respond at a practical high level."
+    genericVariants[pickVariantIndex(trimmed + userTurns, genericVariants.length)] +
+    " " +
+    nudge
   );
 }
 
@@ -90,7 +149,7 @@ function preventRepeatedIntro(content, message, history) {
   logInfo("Rewriting repeated intro for conversation continuity", {
     historyLength: history.length,
   });
-  return buildContinuityFallback(message);
+  return buildContinuityFallback(message, history);
 }
 
 /**
