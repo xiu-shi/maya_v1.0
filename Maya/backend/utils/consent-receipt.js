@@ -58,7 +58,16 @@ export async function recordConsentReceipt({
     process.env.ENABLE_S3_LOGGING === "true" &&
     process.env.AWS_S3_BUCKET
   ) {
-    await writeReceiptToS3(receipt);
+    try {
+      await writeReceiptToS3(receipt);
+    } catch (s3Error) {
+      logError("S3 consent receipt upload failed; falling back to local storage", s3Error, {
+        choice,
+        version,
+        bucket: process.env.AWS_S3_BUCKET,
+      });
+      await writeReceiptLocally(receipt);
+    }
   } else {
     await writeReceiptLocally(receipt);
   }

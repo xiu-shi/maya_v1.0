@@ -1335,6 +1335,37 @@
       return response.status === 204;
     }
 
+    async function postConsentReceiptWithRetry(choice, attempts = 2) {
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        try {
+          if (await postConsentReceipt(choice)) return true;
+        } catch (error) {
+          devError('Consent receipt attempt failed:', error);
+        }
+        if (attempt < attempts - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+      }
+      return false;
+    }
+
+    function flushPendingMessageAfterConsent() {
+      const pending = chatInput && chatInput.value.trim();
+      if (pending) {
+        setTimeout(() => sendMessage(), 50);
+        return;
+      }
+      if (chatInput) chatInput.focus();
+    }
+
+    function completeConsentFlow({ granted, receiptRecorded }) {
+      persistConsent(!!granted && receiptRecorded);
+      hideConsentOverlay();
+      updateLoggingStatusLink();
+      showAiIntroMessageIfNeeded();
+      flushPendingMessageAfterConsent();
+    }
+
     function persistConsent(granted) {
       localStorage.setItem(CONSENT_KEY, JSON.stringify({
         granted,
@@ -1348,43 +1379,25 @@
     }
 
     async function grantConsent() {
-      const savingFailedMsg = "I couldn't switch saving on just now, so this chat isn't being saved. You can try again using the link below the chat box.";
-      function finishWithoutSaving(showFailureNote) {
-        persistConsent(false);
-        hideConsentOverlay();
-        updateLoggingStatusLink();
-        showAiIntroMessageIfNeeded();
-        if (showFailureNote) {
-          addMessage('maya', savingFailedMsg, 'consent-save-failed-' + Date.now());
-        }
-      }
       try {
-        const recorded = await postConsentReceipt('accepted');
+        const recorded = await postConsentReceiptWithRetry('accepted');
         if (!recorded) {
-          devError('Failed to record consent receipt on server');
-          finishWithoutSaving(true);
-          return;
+          devError('Failed to record consent receipt on server after retry');
         }
-        persistConsent(true);
-        hideConsentOverlay();
-        updateLoggingStatusLink();
-        showAiIntroMessageIfNeeded();
+        completeConsentFlow({ granted: true, receiptRecorded: recorded });
       } catch (error) {
         devError('Consent acceptance failed:', error);
-        finishWithoutSaving(true);
+        completeConsentFlow({ granted: true, receiptRecorded: false });
       }
     }
 
     async function declineConsent() {
       try {
-        await postConsentReceipt('declined');
+        await postConsentReceiptWithRetry('declined');
       } catch (error) {
         devError('Consent decline receipt failed:', error);
       }
-      persistConsent(false);
-      hideConsentOverlay();
-      updateLoggingStatusLink();
-      showAiIntroMessageIfNeeded();
+      completeConsentFlow({ granted: false, receiptRecorded: true });
     }
 
     async function revokeConsent() {
