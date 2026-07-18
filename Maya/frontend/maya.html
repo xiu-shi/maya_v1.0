@@ -1343,8 +1343,7 @@
     // Per-chat opt-in: locked once Start chatting is tapped. Opt-out via + New Chat only.
     const CONSENT_KEY = 'maya_consent';
     const CONSENT_VERSION = '2026-07-18';
-    const AI_INTRO_MESSAGE = "Hi, I'm Maya, Janet's AI digital twin. I'm an AI system, not Janet herself. Ask me about AI strategy, cloud, or governance, and for anything personal or confidential, email Janet directly at info@janetxiushi.me.";
-    const OPT_IN_NOTICE_MESSAGE = "This chat is being saved to help improve Maya's answers (deleted automatically after 90 days). Please avoid personal or financial details.\n\n**Do not want this chat saved?** You cannot turn saving off in this chat. Click **+ New Chat** on the left, leave the save box unticked, and click **Start chatting** again.";
+    const AI_INTRO_MESSAGE = "Hi! Great to meet you. I'm Maya, Janet's AI digital twin. I can help with AI strategy, cloud, governance, education, and responsible AI adoption. What would you like to explore today?";
 
     function defaultChatConsentFields() {
       return {
@@ -1490,17 +1489,11 @@
 
       const pendingMessage = chatInput && chatInput.value.trim();
       if (pendingMessage) {
-        if (granted && receiptRecorded) {
-          showOptInNoticeIfNeeded();
-        }
         flushPendingMessageAfterConsent();
         return;
       }
 
       showAiIntroMessageIfNeeded();
-      if (granted && receiptRecorded) {
-        showOptInNoticeIfNeeded();
-      }
       if (chatInput) chatInput.focus();
     }
 
@@ -1618,17 +1611,6 @@
           learnBtn.setAttribute('aria-label', 'Learn more about saving choices');
         }
       }
-    }
-
-    function showOptInNoticeIfNeeded() {
-      const chat = getCurrentChat();
-      if (!chat || !hasConsent() || chat.optInNoticeShown) return;
-      chat.optInNoticeShown = true;
-      saveChats();
-      const noticeId = 'opt-in-notice-' + (currentChatId || 'session');
-      if (document.querySelector(`[data-message-id="${noticeId}"]`)) return;
-      if (emptyState) emptyState.style.display = 'none';
-      addMessage('maya', OPT_IN_NOTICE_MESSAGE, noticeId);
     }
 
     function showAiIntroMessageIfNeeded() {
