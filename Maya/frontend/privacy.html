@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex" />
-  <title>Privacy Notice - Maya by Janet Xiu Shi</title>
+  <meta name="robots" content="index, follow" />
+  <title>Privacy Notice and Terms of Use - Maya by Janet Xiu Shi</title>
+  <meta name="description" content="Privacy Notice and Terms of Use for Maya by Janet Xiu Shi: Opt-in conversation saving, EU log storage, 90-day deletion, AI disclosure, and plain-English rules for using the chat." />
+  <link rel="canonical" href="https://maya-agent.ai-builders.space/privacy.html" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -48,6 +50,17 @@
       font-size: var(--font-size-sm);
       margin: 0;
     }
+    .privacy-jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm) var(--spacing-md);
+      margin: var(--spacing-md) 0 0 0;
+      font-size: var(--font-size-sm);
+    }
+    .privacy-jump a {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
     .privacy-section {
       margin-bottom: var(--spacing-2xl);
     }
@@ -70,7 +83,8 @@
       line-height: 1.7;
       margin: 0 0 var(--spacing-sm) 0;
     }
-    .privacy-section ul {
+    .privacy-section ul,
+    .privacy-section ol {
       padding-left: var(--spacing-lg);
       margin: 0 0 var(--spacing-sm) 0;
     }
@@ -91,6 +105,22 @@
       color: var(--text-secondary);
       line-height: 1.6;
     }
+    .privacy-part-divider {
+      margin: var(--spacing-3xl) 0 var(--spacing-2xl);
+      padding-top: var(--spacing-2xl);
+      border-top: 1px solid var(--border-color);
+    }
+    .privacy-part-divider h2 {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+    .privacy-part-divider p {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      margin: 0;
+    }
     .privacy-footer {
       padding-top: var(--spacing-xl);
       border-top: 1px solid var(--border-color);
@@ -109,9 +139,57 @@
     <a href="/" class="privacy-back">&#8592; Back to Maya</a>
 
     <div class="privacy-header">
-      <h1>Privacy Notice</h1>
-      <p class="privacy-subtitle">Maya by Janet Xiu Shi: privacy and transparency for her AI digital twin</p>
-      <p>Last updated: 18 July 2026 &nbsp;|&nbsp; Effective: 12 July 2026</p>
+      <h1>Privacy Notice and Terms of Use</h1>
+      <p class="privacy-subtitle">Maya by Janet Xiu Shi: privacy, transparency, and rules for her AI digital twin</p>
+      <p>Last updated: 18 July 2026 &nbsp;|&nbsp; Effective: 12 July 2026 (Privacy) / 18 July 2026 (Terms)</p>
+      <nav class="privacy-jump" aria-label="On this page">
+        <a href="#at-a-glance">How Maya handles your data</a>
+        <a href="#privacy-notice">Privacy Notice</a>
+        <a href="#terms">Terms of Use</a>
+      </nav>
+    </div>
+
+    <div id="at-a-glance" class="privacy-section">
+      <h2>How Maya handles your data</h2>
+      <p>
+        A short public summary of Maya's privacy and transparency controls.
+        Full detail follows in the Privacy Notice below.
+      </p>
+      <ul>
+        <li>
+          <strong>AI disclosure:</strong> Maya states that it is an AI system at first interaction
+          (EU AI Act Article 50 transparency posture).
+        </li>
+        <li>
+          <strong>Opt-in saving:</strong> Conversation logging uses GDPR consent. Chat works fully
+          if you leave saving unticked.
+        </li>
+        <li>
+          <strong>Per-chat choice:</strong> Each new chat starts with a fresh saving decision.
+        </li>
+        <li>
+          <strong>EU log storage:</strong> Saved conversation logs and consent records are stored in
+          the EU (AWS eu-west-1, Ireland).
+        </li>
+        <li>
+          <strong>90-day retention:</strong> Saved chats and consent records are deleted automatically
+          after 90 days.
+        </li>
+        <li>
+          <strong>Server-side consent receipts:</strong> When you make a saving choice, a minimal
+          consent record is kept so consent can be demonstrated.
+        </li>
+        <li>
+          <strong>Inference may leave the EEA:</strong> Your message is sent to an AI provider to
+          generate a reply. That processing may take place outside the EEA, including in the United
+          States, with GDPR Chapter V safeguards where applicable.
+        </li>
+      </ul>
+    </div>
+
+    <div class="privacy-part-divider" id="privacy-notice">
+      <h2>Privacy Notice</h2>
+      <p>Full detail on data processing, consent, retention, and your rights.</p>
     </div>
 
     <div class="highlight-box">
@@ -377,10 +455,100 @@
       </p>
     </div>
 
+    <div class="privacy-part-divider" id="terms">
+      <h2>Terms of Use</h2>
+      <p>Rules for using Maya. Effective 18 July 2026.</p>
+    </div>
+
+    <div class="highlight-box">
+      <p>
+        <strong>The short version:</strong> Maya is an AI system, not Janet in person.
+        Replies can be wrong. Do not treat chat as legal, medical, financial, or contractual advice.
+        Do not share sensitive personal data. Use the service respectfully.
+        How your data is handled is explained in the Privacy Notice above.
+      </p>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T1. What Maya is</h2>
+      <p>
+        Maya is the AI-powered digital twin of Janet Xiu Shi, an Ireland-based AI Evals and Quality
+        Advisor working across strategic AI and cloud, and AI Educator. Maya answers questions and
+        shares Janet's thinking. Janet does the advisory work. Replies are AI-generated and may be
+        inaccurate or incomplete.
+      </p>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T2. Not professional advice</h2>
+      <p>
+        Nothing Maya says is legal, medical, financial, tax, or contractual advice, and nothing here
+        creates a client relationship. For personal, confidential, or contractual matters, contact
+        Janet directly at
+        <a href="mailto:info@janetxiushi.me">info@janetxiushi.me</a>
+        or via
+        <a href="https://janetxiushi.me" target="_blank" rel="noopener">janetxiushi.me</a>.
+      </p>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T3. Your responsibility</h2>
+      <ul>
+        <li>Verify important information before you rely on it.</li>
+        <li>Do not submit sensitive personal data, secrets, or confidential business information in chat.</li>
+        <li>You are responsible for how you use Maya's outputs.</li>
+      </ul>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T4. Acceptable use</h2>
+      <p>You agree not to:</p>
+      <ul>
+        <li>Abuse, overload, or disrupt the service</li>
+        <li>Scrape, bulk-harvest, or automate access beyond normal interactive use</li>
+        <li>Attempt to bypass safety, consent, or rate limits for harmful purposes</li>
+        <li>Use Maya to generate content that is unlawful or intended to cause harm</li>
+      </ul>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T5. Data and privacy</h2>
+      <p>
+        Message processing, optional conversation saving, retention, and your rights are described in the
+        <a href="#privacy-notice">Privacy Notice</a> on this page.
+      </p>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T6. Availability</h2>
+      <p>
+        Maya is provided as-is for information and demonstration. The service may change, pause, or
+        become unavailable without notice. No uptime or outcome is guaranteed.
+      </p>
+    </div>
+
+    <div class="privacy-section">
+      <h2>T7. Contact</h2>
+      <p>
+        Questions about these terms:
+        <a href="mailto:info@janetxiushi.me">info@janetxiushi.me</a>.
+        The service is operated from Ireland by Janet Xiu Shi.
+      </p>
+    </div>
+
     <div class="privacy-footer">
       <p>
         Maya demonstrates Janet Xiu Shi's expertise in responsible AI digital solutions:
         transparency-by-design, consent-based logging, and audit-ready controls documented here.
+      </p>
+      <p>
+        <a href="#at-a-glance">How Maya handles your data</a>
+        &nbsp;|&nbsp;
+        <a href="#privacy-notice">Privacy Notice</a>
+        &nbsp;|&nbsp;
+        <a href="#terms">Terms of Use</a>
+        &nbsp;|&nbsp;
+        <a href="/">Back to Maya</a>
       </p>
       <p>
         Designed, built, and run by <a href="/">Janet Xiu Shi</a>.
