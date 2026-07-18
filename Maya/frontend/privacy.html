@@ -121,14 +121,14 @@
       font-size: var(--font-size-sm);
       margin: 0;
     }
-    .privacy-footer {
-      padding-top: var(--spacing-xl);
+    .privacy-page-footer {
+      margin-top: var(--spacing-3xl);
+      padding: var(--spacing-xl) 0;
       border-top: 1px solid var(--border-color);
-      color: var(--text-muted);
-      font-size: var(--font-size-sm);
+      text-align: center;
     }
-    .privacy-footer p {
-      margin: 0 0 var(--spacing-sm) 0;
+    .privacy-page-footer p {
+      margin: 0;
       line-height: 1.6;
     }
   </style>
@@ -536,27 +536,17 @@
       </p>
     </div>
 
-    <div class="privacy-footer">
-      <p>
-        Maya demonstrates Janet Xiu Shi's expertise in responsible AI digital solutions:
-        transparency-by-design, consent-based logging, and audit-ready controls documented here.
-      </p>
-      <p>
-        <a href="#at-a-glance">How Maya handles your data</a>
+    <footer class="privacy-page-footer">
+      <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: 0;">&copy; 2026 <a href="https://janetxiushi.me" style="color: var(--text-muted); text-decoration: none;">Janet Xiu Shi</a> | AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator</p>
+      <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: var(--spacing-xs) 0 0 0;">All rights reserved.</p>
+      <p style="margin: var(--spacing-sm) 0 0 0;">
+        <a href="/privacy.html" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">Privacy Notice</a>
         &nbsp;|&nbsp;
-        <a href="#privacy-notice">Privacy Notice</a>
+        <a href="/privacy.html#terms" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">Terms of Use</a>
         &nbsp;|&nbsp;
-        <a href="#terms">Terms of Use</a>
-        &nbsp;|&nbsp;
-        <a href="/">Back to Maya</a>
+        <a href="/privacy.html#at-a-glance" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">How Maya handles your data</a>
       </p>
-      <p>
-        Designed, built, and run by <a href="/">Janet Xiu Shi</a>.
-        Questions or advisory conversations:
-        <a href="mailto:info@janetxiushi.me">info@janetxiushi.me</a>.
-        Professional profile: <a href="https://janetxiushi.me" target="_blank" rel="noopener">janetxiushi.me</a>.
-      </p>
-    </div>
+    </footer>
 
   </div>
 </body>
