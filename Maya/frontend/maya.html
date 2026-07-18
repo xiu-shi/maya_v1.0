@@ -1241,13 +1241,14 @@
       <div id="consentWelcomeView">
         <h3 id="consentTitle">Welcome to Maya</h3>
         <p>
-          Hi! I'm Maya, Janet's AI assistant. I'm not Janet herself, and I can make mistakes,
-          so please sense-check anything important.
+          Hi, I'm Maya, Janet Xiu Shi's AI digital twin. Curious about her advisory services,
+          AI strategy, cloud, or governance? Ask me anything you're exploring.
           <br /><br />
-          Your messages are processed securely by our AI service to generate replies.
-          Nothing is saved unless you tick the box below.
-          <br /><br />
-          Each chat has its own saving choice. What you choose here applies to <strong>this chat only</strong>.
+          Maya is built the way Janet advises clients to build AI: transparent under the
+          <strong>EU AI Act</strong>, and privacy-first under <strong>GDPR</strong>.
+          You're chatting with AI, your messages are processed securely to generate replies,
+          and nothing is saved unless you choose to below.
+          This choice applies to <strong>this chat only</strong>.
         </p>
         <label class="consent-opt-in" for="consentSaveCheckbox">
           <input type="checkbox" id="consentSaveCheckbox" />
@@ -1461,9 +1462,10 @@
       const pending = chatInput && chatInput.value.trim();
       if (pending) {
         setTimeout(() => sendMessage(), 50);
-        return;
+        return true;
       }
       if (chatInput) chatInput.focus();
+      return false;
     }
 
     function applyChatConsent(chat, { granted, receiptRecorded }) {
@@ -1485,11 +1487,21 @@
       }
       hideConsentOverlay();
       updateConsentStatusFooter();
+
+      const pendingMessage = chatInput && chatInput.value.trim();
+      if (pendingMessage) {
+        if (granted && receiptRecorded) {
+          showOptInNoticeIfNeeded();
+        }
+        flushPendingMessageAfterConsent();
+        return;
+      }
+
       showAiIntroMessageIfNeeded();
       if (granted && receiptRecorded) {
         showOptInNoticeIfNeeded();
       }
-      flushPendingMessageAfterConsent();
+      if (chatInput) chatInput.focus();
     }
 
     async function grantConsent() {
@@ -1757,56 +1769,48 @@
       scrollToBottom(true);
     }
     
-    // Global function for sample question clicks (accessible from onclick attribute)
-    // This ensures clicks work even if event listeners fail
-    window.handleSampleQuestionClick = function(element) {
-      const prompt = element.getAttribute('data-prompt');
-      const input = document.getElementById('chatInput');
-      
-      devLog('🎯 Direct onclick handler triggered:', prompt);
-      
+    // Populate input from a sample question; consent first, then auto-send after Start chatting.
+    function handleSampleQuestion(prompt) {
+      const input = chatInput || document.getElementById('chatInput');
       if (!prompt || !input) {
-        devError('❌ Missing prompt or input element');
-        return false;
+        devError('❌ Missing prompt or input for sample question');
+        return;
       }
-      
-      // Hide empty state
-      const emptyStateEl = document.getElementById('emptyState');
-      if (emptyStateEl) {
-        emptyStateEl.style.display = 'none';
+
+      if (emptyState) {
+        emptyState.style.display = 'none';
       }
-      
-      // Start session without clearing the consent intro
+
       if (!currentChatId) {
         ensureChatSession();
       }
-      
-      // Set prompt text
+
       input.value = prompt;
-      
-      // Trigger input event for auto-resize
       input.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      // Focus input
-      input.focus();
-      
-      // Auto-resize
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 200) + 'px';
-      
-      // Visual feedback
+
       input.style.transition = 'box-shadow 0.3s ease';
       input.style.boxShadow = '0 0 0 2px var(--accent-color)';
       setTimeout(() => {
         input.style.boxShadow = '';
       }, 500);
-      
-      // Auto-submit after short delay
-      setTimeout(() => {
-        sendMessage();
-      }, 200);
-      
-      return false; // Prevent default behavior
+
+      if (!hasMadeConsentChoice()) {
+        showConsentWelcomeOverlay(false);
+        return;
+      }
+
+      input.focus();
+      setTimeout(() => sendMessage(), 200);
+    }
+
+    // Global function for sample question clicks (accessible from onclick attribute)
+    window.handleSampleQuestionClick = function(element) {
+      const prompt = element.getAttribute('data-prompt');
+      devLog('🎯 Direct onclick handler triggered:', prompt);
+      handleSampleQuestion(prompt);
+      return false;
     };
 
     // API Configuration
@@ -1858,7 +1862,6 @@
         }
       } else {
         showEmptyState();
-        showConsentWelcomeOverlay(false);
       }
     }
 
@@ -2068,46 +2071,9 @@
             devError('❌ No prompt found on clicked element');
             return;
           }
-          
-          // Hide empty state immediately for better UX
-          if (emptyState) {
-            emptyState.style.display = 'none';
-          }
-          
-          // Start session without clearing the consent intro (first-time users)
-          if (!currentChatId) {
-            ensureChatSession();
-          }
-          
-          // Set the prompt text
-          chatInput.value = prompt;
-          
-          // Trigger input event to ensure value is set and auto-resize works
-          const inputEvent = new Event('input', { bubbles: true, cancelable: true });
-          chatInput.dispatchEvent(inputEvent);
-          
-          // Focus the input
-          chatInput.focus();
-          
-          // Auto-resize textarea to fit content
-          chatInput.style.height = 'auto';
-          chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-          
-          // Visual feedback - briefly highlight the input
-          chatInput.style.transition = 'box-shadow 0.3s ease';
-          chatInput.style.boxShadow = '0 0 0 2px var(--accent-color)';
-          setTimeout(() => {
-            chatInput.style.boxShadow = '';
-          }, 500);
-          
+
           devLog('✅ Prompt populated in chat input:', prompt);
-          
-          // Auto-submit for guided experience (first-time users)
-          // Small delay to ensure UI updates are complete
-          setTimeout(() => {
-            devLog('🚀 Auto-submitting sample question for guided experience');
-            sendMessage();
-          }, 200);
+          handleSampleQuestion(prompt);
         };
         
         // Attach with capture phase AND as direct onclick (fallback)
@@ -2159,27 +2125,7 @@
             
             if (prompt && chatInput) {
               devLog('🔄 Fallback handler: Sample question clicked:', prompt);
-              
-              // Hide empty state
-              if (emptyState) {
-                emptyState.style.display = 'none';
-              }
-              
-              // Start session without clearing the consent intro
-              if (!currentChatId) {
-                ensureChatSession();
-              }
-              
-              // Set prompt and submit
-              chatInput.value = prompt;
-              chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-              chatInput.focus();
-              chatInput.style.height = 'auto';
-              chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-              
-              setTimeout(() => {
-                sendMessage();
-              }, 200);
+              handleSampleQuestion(prompt);
             }
           }
         }, true); // Use capture phase to catch before other handlers
@@ -2264,7 +2210,6 @@
       chatInput.placeholder = 'Type your message here... (支持中文输入)';
       chatInput.focus();
       updateConsentStatusFooter();
-      showConsentWelcomeOverlay(false);
     }
     function showEmptyState() {
       if (!chatMessages) {
