@@ -192,10 +192,14 @@
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 480px 1fr;
+      grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
       gap: var(--spacing-2xl);
       align-items: center;
       padding-bottom: var(--spacing-2xl);
+    }
+
+    .maya-hero-container > * {
+      min-width: 0; /* prevent grid/flex children from forcing page overflow */
     }
 
     .maya-hero-container > div:first-child {
@@ -203,14 +207,15 @@
       justify-content: center;
       align-items: center;
       padding: var(--spacing-2xl) 0 var(--spacing-md) 0;
+      max-width: 100%;
     }
 
     .maya-hero-image {
       width: 100%;
-      max-width: 480px;
+      max-width: min(480px, 100%);
       height: auto;
       max-height: 640px;
-      min-height: 520px;
+      min-height: 0;
       object-fit: contain;
       object-position: center center;
       border-radius: 16px;
@@ -220,6 +225,12 @@
       padding: var(--spacing-sm);
       display: block;
       margin: 0;
+    }
+
+    @media (min-width: 1025px) {
+      .maya-hero-image {
+        min-height: 520px;
+      }
     }
 
     .maya-hero-bio {
@@ -235,6 +246,23 @@
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: var(--spacing-sm);
+      overflow-wrap: anywhere;
+    }
+
+    .maya-hero-roleline {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-md);
+      font-weight: 500;
+      white-space: normal;
+    }
+
+    @media (min-width: 1025px) {
+      .maya-hero-roleline {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .maya-hero-subtitle {
@@ -278,7 +306,7 @@
     }
 
     .maya-chat-intro-container {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
       text-align: center;
     }
@@ -299,6 +327,12 @@
       margin-bottom: var(--spacing-md);
     }
 
+    /* Keep the grounded tagline on one line within the shared 1200px content width */
+    .maya-chat-intro-tagline {
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
     .maya-chat-intro-disclaimer {
       font-size: var(--font-size-xs);
       color: var(--text-muted);
@@ -311,11 +345,16 @@
       margin-right: auto;
     }
 
+    /* Chat shell: same horizontal inset as hero / intro (1200px content column) */
+    .maya-chat-shell {
+      padding: 0 var(--spacing-lg);
+    }
+
     /* Chat Container */
     .maya-chat-container {
       flex: 1;
       display: flex;
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
       width: 100%;
       height: calc(100vh - 200px);
@@ -812,34 +851,138 @@
       margin-bottom: var(--spacing-sm);
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* Responsive: tablet first (480px hero column breaks before 768) */
+    @media (max-width: 1024px) {
       .maya-hero-container {
         grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
         text-align: center;
       }
 
       .maya-hero-bio {
         padding-left: 0;
+        padding-right: 0;
       }
 
       .maya-hero-image {
         margin: 0 auto;
+        max-width: min(360px, 100%);
+        max-height: 420px;
+      }
+
+      .maya-hero-title {
+        font-size: var(--font-size-3xl);
+      }
+
+      .maya-chat-intro-tagline {
+        white-space: normal;
+      }
+
+      .maya-sidebar {
+        width: 220px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .maya-hero {
+        padding: var(--spacing-xl) var(--spacing-md);
+      }
+
+      .maya-hero-image {
+        max-width: min(280px, 100%);
+        max-height: 360px;
+      }
+
+      .maya-hero-title {
+        font-size: var(--font-size-2xl);
+      }
+
+      .maya-chat-intro {
+        padding: var(--spacing-lg) var(--spacing-md);
+      }
+
+      .maya-chat-intro-title {
+        font-size: var(--font-size-xl);
+      }
+
+      .maya-chat-shell {
+        padding: 0 var(--spacing-md);
       }
 
       .maya-chat-container {
         flex-direction: column;
+        height: auto;
+        min-height: calc(100dvh - 160px);
       }
 
       .maya-sidebar {
         width: 100%;
-        height: 200px;
+        height: auto;
+        max-height: 132px;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
       }
 
+      .maya-sidebar-header {
+        padding: var(--spacing-md);
+      }
+
       .maya-chat-main {
-        height: calc(100vh - 270px);
+        height: min(68dvh, 640px);
+        min-height: 420px;
+      }
+
+      .maya-empty-state {
+        padding: var(--spacing-lg) var(--spacing-md);
+        justify-content: flex-start;
+      }
+
+      .maya-input-container {
+        padding: var(--spacing-md);
+      }
+
+      .maya-input-wrapper {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+      }
+
+      .maya-submit-btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .maya-message {
+        max-width: 100%;
+      }
+
+      .maya-about {
+        padding: var(--spacing-xl) var(--spacing-md);
+      }
+
+      .consent-box {
+        max-width: 100%;
+        margin: 0 var(--spacing-md);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .maya-hero-image {
+        max-width: min(220px, 100%);
+        max-height: 300px;
+      }
+
+      .maya-page {
+        padding-top: 64px;
+      }
+
+      .maya-chat-main {
+        height: min(62dvh, 560px);
+        min-height: 360px;
+      }
+
+      .maya-new-chat-btn {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
       }
     }
 
@@ -1053,7 +1196,7 @@
         </div>
         <div class="maya-hero-bio">
           <h1 class="maya-hero-title">Maya by Janet Xiu Shi</h1>
-          <p style="font-size: var(--font-size-base); color: var(--text-secondary); margin-bottom: var(--spacing-md); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator</p>
+          <p class="maya-hero-roleline">AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator</p>
           <div class="maya-hero-description">
             <p>
               <strong>AI adoption that stands up to scrutiny.</strong>
@@ -1084,7 +1227,7 @@
     <section class="maya-chat-intro">
       <div class="maya-chat-intro-container">
         <h2 class="maya-chat-intro-title">💬 Chat with Maya</h2>
-        <p class="maya-chat-intro-description" style="margin-bottom: var(--spacing-sm);">
+        <p class="maya-chat-intro-description maya-chat-intro-tagline" style="margin-bottom: var(--spacing-sm);">
           Grounded in Janet Xiu Shi's frameworks and 20+ years across enterprise operations, procurement, and technology
         </p>
         <p class="maya-chat-intro-description">
@@ -1097,6 +1240,7 @@
     </section>
 
     <!-- Chat Container -->
+    <div class="maya-chat-shell">
     <div class="maya-chat-container">
       <!-- Sidebar -->
       <aside class="maya-sidebar">
@@ -1176,6 +1320,7 @@
           </div>
         </div>
       </main>
+    </div>
     </div>
 
     <!-- About Maya: visible transparency section (mirrors FAQPage JSON-LD) -->
