@@ -938,18 +938,48 @@
       background: var(--bg-secondary);
       line-height: 1.5;
     }
-    /* Withdraw consent link in input area */
-    .consent-withdraw-link {
+    /* Per-chat saving status below input (read-only; Learn more opens info panel) */
+    .consent-status-footer {
       display: none;
       font-size: var(--font-size-xs);
       color: var(--text-muted);
-      text-decoration: none;
       text-align: center;
-      padding: var(--spacing-xs) 0 0 0;
+      padding: var(--spacing-xs) var(--spacing-sm) 0;
+      line-height: 1.5;
+    }
+    .consent-status-footer.visible { display: block; }
+    .consent-learn-more-btn {
+      display: inline;
+      margin-left: 0.35rem;
+      padding: 0;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      text-decoration: underline;
       cursor: pointer;
     }
-    .consent-withdraw-link:hover { color: var(--text-secondary); }
-    .consent-withdraw-link.visible { display: block; }
+    .consent-learn-more-btn:hover { color: var(--text-primary); }
+    .consent-info-close-btn {
+      border-radius: 8px;
+      padding: var(--spacing-md) var(--spacing-lg);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      margin-top: var(--spacing-md);
+    }
+    .consent-info-close-btn:hover { background: var(--bg-tertiary); }
+    .consent-opt-in input:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
 
     /* About Maya: transparency section (visible GEO asset, mirrors FAQPage schema) */
     .maya-about {
@@ -1150,10 +1180,10 @@
             ></textarea>
             <button id="submitBtn" type="button" class="maya-submit-btn">Send</button>
           </div>
-          <span id="consentWithdrawLink" class="consent-withdraw-link" role="button" tabindex="0"
-            title="Withdraw logging consent. You can keep chatting; messages will no longer be logged.">
-            Logging on &middot; withdraw consent
-          </span>
+          <div id="consentStatusFooter" class="consent-status-footer" aria-live="polite">
+            <span id="consentStatusText"></span>
+            <button type="button" id="consentLearnMoreBtn" class="consent-learn-more-btn">Learn more</button>
+          </div>
         </div>
       </main>
     </div>
@@ -1208,24 +1238,38 @@
   <!-- GDPR consent overlay (MAYA-GDPR-001-01) -->
   <div id="consentOverlay" class="consent-overlay" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
     <div class="consent-box">
-      <h3 id="consentTitle">Welcome to Maya</h3>
-      <p>
-        Hi! I'm Maya, Janet's AI assistant. I'm not Janet herself, and I can make mistakes,
-        so please sense-check anything important.
-        <br /><br />
-        Your messages are processed securely by our AI service to generate replies.
-        Nothing is saved unless you tick the box below.
-      </p>
-      <label class="consent-opt-in" for="consentSaveCheckbox">
-        <input type="checkbox" id="consentSaveCheckbox" />
-        <span>Save this chat to help Janet improve Maya's answers (deleted automatically after 90 days)</span>
-      </label>
-      <div class="consent-actions">
-        <button id="consentStartBtn" class="consent-start-btn" type="button">Start chatting</button>
+      <div id="consentWelcomeView">
+        <h3 id="consentTitle">Welcome to Maya</h3>
+        <p>
+          Hi! I'm Maya, Janet's AI assistant. I'm not Janet herself, and I can make mistakes,
+          so please sense-check anything important.
+          <br /><br />
+          Your messages are processed securely by our AI service to generate replies.
+          Nothing is saved unless you tick the box below.
+          <br /><br />
+          Each chat has its own saving choice. What you choose here applies to <strong>this chat only</strong>.
+        </p>
+        <label class="consent-opt-in" for="consentSaveCheckbox">
+          <input type="checkbox" id="consentSaveCheckbox" />
+          <span>Save this chat to help Janet improve Maya's answers (deleted automatically after 90 days)</span>
+        </label>
+        <div class="consent-actions">
+          <button id="consentStartBtn" class="consent-start-btn" type="button">Start chatting</button>
+        </div>
+        <p class="consent-footer-link">
+          <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>
+        </p>
       </div>
-      <p class="consent-footer-link">
-        <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>
-      </p>
+      <div id="consentInfoView" style="display: none;">
+        <h3 id="consentInfoTitle">About saving this chat</h3>
+        <div id="consentInfoBody"></div>
+        <label class="consent-opt-in" for="consentInfoSaveCheckbox">
+          <input type="checkbox" id="consentInfoSaveCheckbox" disabled />
+          <span>Save this chat to help Janet improve Maya's answers (deleted automatically after 90 days)</span>
+        </label>
+        <p id="consentInfoOptOut" style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: 1.6; margin: var(--spacing-md) 0 0;"></p>
+        <button type="button" id="consentInfoCloseBtn" class="consent-info-close-btn">Got it</button>
+      </div>
     </div>
   </div>
 
@@ -1294,11 +1338,22 @@
     let chats = JSON.parse(localStorage.getItem('mayaChats') || '[]');
     let messageHistory = [];
 
-    // ── GDPR Consent (MAYA-GDPR-001-01 / compliance 2026-07-12) ─────────────
-    // Declining disables logging but never blocks chat. Consent must be freely given (GDPR Art 7(4)).
+    // ── GDPR Consent (MAYA-GDPR-001-01 / compliance 2026-07-18) ─────────────
+    // Per-chat opt-in: locked once Start chatting is tapped. Opt-out via + New Chat only.
     const CONSENT_KEY = 'maya_consent';
-    const CONSENT_VERSION = '2026-07-12'; // Bump when privacy notice changes materially. Deploy together with updated privacy.html.
+    const CONSENT_VERSION = '2026-07-18';
     const AI_INTRO_MESSAGE = "Hi, I'm Maya, Janet's AI digital twin. I'm an AI system, not Janet herself. Ask me about AI strategy, cloud, or governance, and for anything personal or confidential, email Janet directly at info@janetxiushi.me.";
+    const OPT_IN_NOTICE_MESSAGE = "This chat is being saved to help improve Maya's answers (deleted automatically after 90 days). Please avoid personal or financial details.\n\n**Do not want this chat saved?** You cannot turn saving off in this chat. Click **+ New Chat** on the left, leave the save box unticked, and click **Start chatting** again.";
+
+    function defaultChatConsentFields() {
+      return {
+        loggingConsent: 'pending',
+        loggingLocked: false,
+        consentReceiptRecorded: false,
+        optInNoticeShown: false,
+        consentVersion: CONSENT_VERSION,
+      };
+    }
 
     function readStoredConsent() {
       try {
@@ -1310,14 +1365,67 @@
       }
     }
 
-    function hasConsent() {
-      const stored = readStoredConsent();
-      return !!(stored && stored.version === CONSENT_VERSION && stored.granted === true);
+    function clearStoredConsent() {
+      localStorage.removeItem(CONSENT_KEY);
+    }
+
+    function getCurrentChat() {
+      if (!currentChatId) return null;
+      return chats.find(c => c.id === currentChatId) || null;
+    }
+
+    function migrateChatConsentFromLegacy(chat) {
+      const fields = defaultChatConsentFields();
+      const legacy = readStoredConsent();
+      if (legacy && legacy.version === '2026-07-12' && (chat.messages || []).length > 0) {
+        if (legacy.granted === true) {
+          fields.loggingConsent = 'accepted';
+          fields.consentReceiptRecorded = true;
+          fields.loggingLocked = true;
+          fields.optInNoticeShown = true;
+        } else if (typeof legacy.granted === 'boolean') {
+          fields.loggingConsent = 'declined';
+          fields.loggingLocked = true;
+          fields.optInNoticeShown = true;
+        }
+      } else if ((chat.messages || []).length > 0) {
+        fields.loggingConsent = 'declined';
+        fields.loggingLocked = true;
+        fields.optInNoticeShown = true;
+      }
+      Object.assign(chat, fields);
+    }
+
+    function ensureChatConsentFields(chat) {
+      if (!chat) return;
+      if (chat.consentVersion === CONSENT_VERSION && chat.loggingConsent !== undefined) {
+        return;
+      }
+      if (chat.consentVersion && chat.consentVersion !== CONSENT_VERSION) {
+        Object.assign(chat, defaultChatConsentFields());
+      } else if (chat.loggingConsent === undefined) {
+        migrateChatConsentFromLegacy(chat);
+      }
+      chat.consentVersion = CONSENT_VERSION;
+      saveChats();
+    }
+
+    function migrateAllChatsConsent() {
+      chats.forEach(ensureChatConsentFields);
     }
 
     function hasMadeConsentChoice() {
-      const stored = readStoredConsent();
-      return !!(stored && stored.version === CONSENT_VERSION && typeof stored.granted === 'boolean');
+      const chat = getCurrentChat();
+      if (!chat) return false;
+      ensureChatConsentFields(chat);
+      return chat.loggingConsent !== 'pending';
+    }
+
+    function hasConsent() {
+      const chat = getCurrentChat();
+      if (!chat) return false;
+      ensureChatConsentFields(chat);
+      return chat.loggingConsent === 'accepted' && chat.consentReceiptRecorded === true;
     }
 
     async function postConsentReceipt(choice) {
@@ -1358,24 +1466,30 @@
       if (chatInput) chatInput.focus();
     }
 
+    function applyChatConsent(chat, { granted, receiptRecorded }) {
+      ensureChatConsentFields(chat);
+      chat.loggingLocked = true;
+      chat.consentReceiptRecorded = !!(granted && receiptRecorded);
+      chat.loggingConsent = chat.consentReceiptRecorded ? 'accepted' : 'declined';
+      saveChats();
+    }
+
     function completeConsentFlow({ granted, receiptRecorded }) {
-      persistConsent(!!granted && receiptRecorded);
+      let chat = getCurrentChat();
+      if (!chat) {
+        ensureChatSession();
+        chat = getCurrentChat();
+      }
+      if (chat) {
+        applyChatConsent(chat, { granted, receiptRecorded });
+      }
       hideConsentOverlay();
-      updateLoggingStatusLink();
+      updateConsentStatusFooter();
       showAiIntroMessageIfNeeded();
+      if (granted && receiptRecorded) {
+        showOptInNoticeIfNeeded();
+      }
       flushPendingMessageAfterConsent();
-    }
-
-    function persistConsent(granted) {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify({
-        granted,
-        version: CONSENT_VERSION,
-        timestamp: new Date().toISOString(),
-      }));
-    }
-
-    function clearStoredConsent() {
-      localStorage.removeItem(CONSENT_KEY);
     }
 
     async function grantConsent() {
@@ -1400,28 +1514,68 @@
       completeConsentFlow({ granted: false, receiptRecorded: true });
     }
 
-    async function revokeConsent() {
-      try {
-        await postConsentReceipt('withdrawn');
-      } catch (error) {
-        devError('Consent withdrawal receipt failed:', error);
+    function showConsentWelcomeOverlay(preTickSave = false) {
+      const welcome = document.getElementById('consentWelcomeView');
+      const info = document.getElementById('consentInfoView');
+      if (welcome) welcome.style.display = 'block';
+      if (info) info.style.display = 'none';
+
+      const overlay = document.getElementById('consentOverlay');
+      const startBtn = document.getElementById('consentStartBtn');
+      const saveCheckbox = document.getElementById('consentSaveCheckbox');
+      if (saveCheckbox) {
+        saveCheckbox.disabled = false;
+        saveCheckbox.checked = preTickSave;
       }
-      persistConsent(false);
-      hideConsentOverlay();
-      updateLoggingStatusLink();
-      chatInput.disabled = false;
-      submitBtn.disabled = false;
+      if (overlay) overlay.classList.add('visible');
+      if (startBtn) startBtn.focus();
+    }
+
+    function showConsentInfoPanel() {
+      const welcome = document.getElementById('consentWelcomeView');
+      const info = document.getElementById('consentInfoView');
+      const infoBody = document.getElementById('consentInfoBody');
+      const infoOptOut = document.getElementById('consentInfoOptOut');
+      const infoSaveCheckbox = document.getElementById('consentInfoSaveCheckbox');
+      const saving = hasConsent();
+
+      if (welcome) welcome.style.display = 'none';
+      if (info) info.style.display = 'block';
+
+      if (infoBody) {
+        if (saving) {
+          infoBody.innerHTML = '<p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md);">This conversation is being saved for quality purposes. Saved messages are deleted automatically after 90 days. Please do not share personal or financial information.</p>';
+        } else {
+          infoBody.innerHTML = '<p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md);">This conversation is not being saved. Your messages are still processed by our AI service to generate replies, but no conversation log is kept.</p>';
+        }
+      }
+
+      if (infoSaveCheckbox) {
+        infoSaveCheckbox.checked = saving;
+        infoSaveCheckbox.disabled = true;
+      }
+
+      if (infoOptOut) {
+        if (saving) {
+          infoOptOut.textContent = 'To chat without saving, click + New Chat on the left, leave the save box unticked, and tap Start chatting.';
+        } else {
+          infoOptOut.textContent = 'Each new chat starts with a fresh saving choice on the welcome screen.';
+        }
+      }
+
+      const overlay = document.getElementById('consentOverlay');
+      if (overlay) overlay.classList.add('visible');
+      const closeBtn = document.getElementById('consentInfoCloseBtn');
+      if (closeBtn) closeBtn.focus();
     }
 
     function showConsentOverlay(preTickSave = false) {
-      const overlay = document.getElementById('consentOverlay');
-      if (overlay) {
-        overlay.classList.add('visible');
-        const startBtn = document.getElementById('consentStartBtn');
-        const saveCheckbox = document.getElementById('consentSaveCheckbox');
-        if (saveCheckbox) saveCheckbox.checked = preTickSave;
-        if (startBtn) startBtn.focus();
+      const chat = getCurrentChat();
+      if (chat && chat.loggingLocked && chat.loggingConsent !== 'pending') {
+        showConsentInfoPanel();
+        return;
       }
+      showConsentWelcomeOverlay(preTickSave);
     }
 
     function hideConsentOverlay() {
@@ -1429,21 +1583,40 @@
       if (overlay) overlay.classList.remove('visible');
     }
 
-    function updateLoggingStatusLink() {
-      const link = document.getElementById('consentWithdrawLink');
-      if (!link) return;
+    function updateConsentStatusFooter() {
+      const footer = document.getElementById('consentStatusFooter');
+      const text = document.getElementById('consentStatusText');
+      const learnBtn = document.getElementById('consentLearnMoreBtn');
+      if (!footer || !text) return;
+
       if (!hasMadeConsentChoice()) {
-        link.classList.remove('visible');
+        footer.classList.remove('visible');
         return;
       }
-      link.classList.add('visible');
+
+      footer.classList.add('visible');
       if (hasConsent()) {
-        link.innerHTML = 'Saving on &middot; change';
-        link.title = 'Maya is saving this conversation. Click to change.';
+        text.textContent = 'This conversation is being saved for quality purposes. Please do not share personal or financial information.';
+        if (learnBtn) {
+          learnBtn.setAttribute('aria-label', 'Learn more about saving and how to start a new chat without saving');
+        }
       } else {
-        link.innerHTML = 'Not saving &middot; turn on';
-        link.title = 'Maya is not saving this conversation. Click to turn on saving (optional).';
+        text.textContent = 'This conversation is not being saved.';
+        if (learnBtn) {
+          learnBtn.setAttribute('aria-label', 'Learn more about saving choices');
+        }
       }
+    }
+
+    function showOptInNoticeIfNeeded() {
+      const chat = getCurrentChat();
+      if (!chat || !hasConsent() || chat.optInNoticeShown) return;
+      chat.optInNoticeShown = true;
+      saveChats();
+      const noticeId = 'opt-in-notice-' + (currentChatId || 'session');
+      if (document.querySelector(`[data-message-id="${noticeId}"]`)) return;
+      if (emptyState) emptyState.style.display = 'none';
+      addMessage('maya', OPT_IN_NOTICE_MESSAGE, noticeId);
     }
 
     function showAiIntroMessageIfNeeded() {
@@ -1523,10 +1696,12 @@
       if (stored && stored.version !== CONSENT_VERSION) {
         clearStoredConsent();
       }
+      migrateAllChatsConsent();
 
       const startBtn = document.getElementById('consentStartBtn');
       const saveCheckbox = document.getElementById('consentSaveCheckbox');
-      const withdrawLink = document.getElementById('consentWithdrawLink');
+      const learnMoreBtn = document.getElementById('consentLearnMoreBtn');
+      const infoCloseBtn = document.getElementById('consentInfoCloseBtn');
 
       if (startBtn) {
         startBtn.addEventListener('click', () => {
@@ -1535,24 +1710,17 @@
         });
       }
 
-      if (withdrawLink) {
-        withdrawLink.addEventListener('click', async () => {
-          if (hasConsent()) {
-            await revokeConsent();
-            const msg = 'Logging consent withdrawn. You can keep chatting; further messages will not be logged. To request deletion of past data, email info@janetxiushi.me or see the <a href="/privacy.html" target="_blank">Privacy Notice</a>.';
-            addMessage('maya', msg, 'consent-withdraw-' + Date.now());
-          } else {
-            showConsentOverlay(true);
-          }
-        });
-        withdrawLink.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); withdrawLink.click(); }
+      if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          showConsentInfoPanel();
         });
       }
 
-      if (hasMadeConsentChoice()) {
-        updateLoggingStatusLink();
-        showAiIntroMessageIfNeeded();
+      if (infoCloseBtn) {
+        infoCloseBtn.addEventListener('click', () => {
+          hideConsentOverlay();
+        });
       }
     }
     // ── End GDPR Consent ─────────────────────────────────────────────────────
@@ -1690,6 +1858,7 @@
         }
       } else {
         showEmptyState();
+        showConsentWelcomeOverlay(false);
       }
     }
 
@@ -2061,7 +2230,8 @@
         conversationId: conversationId,
         title: 'New Chat',
         createdAt: Date.now(),
-        messages: []
+        messages: [],
+        ...defaultChatConsentFields(),
       });
       saveChats();
       renderChatHistory();
@@ -2080,7 +2250,8 @@
         conversationId: conversationId,
         title: 'New Chat',
         createdAt: Date.now(),
-        messages: []
+        messages: [],
+        ...defaultChatConsentFields(),
       });
       saveChats();
       renderChatHistory();
@@ -2092,9 +2263,9 @@
       submitBtn.disabled = false;
       chatInput.placeholder = 'Type your message here... (支持中文输入)';
       chatInput.focus();
+      updateConsentStatusFooter();
+      showConsentWelcomeOverlay(false);
     }
-    
-    // Show empty state with sample questions
     function showEmptyState() {
       if (!chatMessages) {
         devError('❌ chatMessages element not found');
@@ -2193,12 +2364,21 @@
       submitBtn.disabled = false;
       chatInput.placeholder = 'Type your message here... (支持中文输入)';
 
+      ensureChatConsentFields(chat);
+
       if (messageHistory.length === 0) {
         showEmptyState();
       } else if (emptyState) {
         emptyState.style.display = 'none';
       }
+
       chatInput.focus();
+      updateConsentStatusFooter();
+      if (chat.loggingConsent === 'pending') {
+        showConsentWelcomeOverlay(false);
+      } else {
+        showAiIntroMessageIfNeeded();
+      }
     }
 
     // Send message
