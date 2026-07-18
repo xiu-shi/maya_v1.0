@@ -4,7 +4,7 @@
 
 Janet Xiu Shi brings 20+ years across enterprise SaaS quality, procurement, and technology advisory, and lectures in cloud, generative AI, and web application development in Irish higher education and national workforce programmes.
 
-Maya is designed for transparency: AI disclosure at first interaction, opt-in GDPR consent-based logging, EU (Ireland) log storage, and automatic 90-day deletion. Chat is available without logging.
+Maya is built with transparency-by-design: AI disclosure at first interaction, optional Opt-in GDPR consent-based logging so users can support quality improvement of Janet's digital solutions, EU (Ireland) log storage, and automatic 90-day deletion. Chat is available without logging.
 
 ## Primary pages
 

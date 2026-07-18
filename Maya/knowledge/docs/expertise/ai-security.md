@@ -2,7 +2,7 @@
 
 **Category**: expertise
 **Priority**: high
-**Last Updated**: 2026-03-22
+**Last Updated**: 2026-07-18
 **Source**: Professional expertise and published contributions
 
 ## Summary
@@ -29,7 +29,7 @@ Prompt injection is the primary attack vector for LLM-based applications: malici
 
 **Enterprise AI Security Implementation**
 
-Janet applies security-first principles to AI system design: rate limiting, input validation, output filtering, prompt injection protection, and secure logging. Maya itself is built on this architecture, serving as a live demonstration of production-ready AI security practices: no personal data collection, automated IP protection checks, comprehensive error handling, and security-hardened API design.
+Janet applies security-first principles to AI system design: rate limiting, input validation, output filtering, prompt injection protection, and secure logging. Maya itself is built on this architecture, serving as a live demonstration of production-ready AI security practices: optional Opt-in conversation logging only when the user consents (EU storage, 90-day retention; chat available without saving), automated IP protection checks, comprehensive error handling, and security-hardened API design. See `docs/context/maya-product-transparency.md` for Maya's product privacy and Opt-in details.
 
 **Regulatory and Governance Context**
 
@@ -57,5 +57,6 @@ Janet teaches AI security principles embedded in her IADT curriculum (not as a s
 - docs/honors_awards/lakera-genai-report-2025.md
 - docs/expertise/ai-evaluation-quality.md
 - docs/expertise/digital-transformation.md
+- docs/context/maya-product-transparency.md
 - docs/experience/iadt.md
 - docs/bio/janet-bio.md

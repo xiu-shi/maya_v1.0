@@ -68,5 +68,5 @@ This is consistent with directive 5 (evidence or silence) and the no-commitments
 ## Related documents
 
 - `docs/expertise/ai-security.md`
-- `docs/context/conversation-boundaries.md`
+- `docs/context/maya-product-transparency.md`
 - `docs/context/verified-career-references.md`
