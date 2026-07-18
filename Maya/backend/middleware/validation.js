@@ -6,13 +6,13 @@
 
 import { sanitizeChatInput } from '../utils/sanitize.js';
 import { logWarning, logError } from '../utils/logger.js';
-import { logChatAttemptIfAllowed } from '../utils/conversation-logging.js';
+import { logChatAttemptIfAllowed, resolveConversationLogging } from '../utils/conversation-logging.js';
 import config from '../config/env.js';
 
 /**
  * Validate chat request body
  */
-export function validateChatRequest(req, res, next) {
+export async function validateChatRequest(req, res, next) {
   try {
     // Check content type
     if (req.get('content-type') && !req.get('content-type').includes('application/json')) {
@@ -38,7 +38,7 @@ export function validateChatRequest(req, res, next) {
     if (sanitized.errors.length > 0) {
       // Log validation error for chat requests
       if (req.path === '/api/chat' && req.body?.message) {
-        logChatAttemptIfAllowed(req, {
+        await logChatAttemptIfAllowed(req, {
           userMessage: req.body.message,
           ip: req.ip,
           userAgent: req.get('user-agent'),
@@ -58,8 +58,7 @@ export function validateChatRequest(req, res, next) {
       });
     }
     
-    // Attach sanitized data to request
-    const conversationLogging = req.body?.logging === true;
+    const conversationLogging = await resolveConversationLogging(req);
 
     req.sanitized = {
       message: sanitized.message,

@@ -35,7 +35,7 @@ import {
   CHAT_LOGS_MAX_DAYS,
   CHAT_LOGS_REQUEST_MS,
 } from "./utils/timeout.js";
-import { recordConsentReceipt } from "./utils/consent-receipt.js";
+import { recordConsentReceipt, CONSENT_RECEIPT_ID_HEADER } from "./utils/consent-receipt.js";
 import {
   sanitizeTestOutput,
   sanitizeJestResults,
@@ -980,7 +980,7 @@ app.post(
   validateConsentRequest,
   asyncHandler(async (req, res) => {
     const { version, choice, ts } = req.consentPayload;
-    await recordConsentReceipt({
+    const receipt = await recordConsentReceipt({
       version,
       choice,
       ts,
@@ -988,6 +988,7 @@ app.post(
       userAgent: req.get("user-agent"),
       requestHost: req.get("host") || req.hostname || null,
     });
+    res.setHeader(CONSENT_RECEIPT_ID_HEADER, receipt.id);
     res.status(204).end();
   }),
 );

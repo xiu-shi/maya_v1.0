@@ -5,18 +5,28 @@
  */
 
 import { logInfo, logWarning, logError } from '../utils/logger.js';
+import { hashIp } from '../utils/ip-hash.js';
+
+function auditIp(req) {
+  try {
+    return hashIp(req.ip);
+  } catch {
+    return 'unknown';
+  }
+}
 
 /**
  * Audit log middleware
  */
 export function auditLog(req, res, next) {
   const startTime = Date.now();
+  const ipHash = auditIp(req);
   
   // Log request
   logInfo('Request received', {
     method: req.method,
     path: req.path,
-    ip: req.ip,
+    ipHash,
     userAgent: req.get('user-agent'),
     timestamp: new Date().toISOString()
   });
@@ -32,20 +42,20 @@ export function auditLog(req, res, next) {
       path: req.path,
       statusCode: res.statusCode,
       duration: `${duration}ms`,
-      ip: req.ip
+      ipHash,
     });
     
     // Log security events
     if (res.statusCode === 429) {
       logWarning('Rate limit exceeded', {
-        ip: req.ip,
+        ipHash,
         path: req.path
       });
     }
     
     if (res.statusCode === 403) {
       logWarning('Access forbidden', {
-        ip: req.ip,
+        ipHash,
         path: req.path,
         reason: 'CORS or security policy violation'
       });
@@ -55,7 +65,7 @@ export function auditLog(req, res, next) {
       logError('Server error', null, {
         statusCode: res.statusCode,
         path: req.path,
-        ip: req.ip
+        ipHash,
       });
     }
     
@@ -74,4 +84,3 @@ export function logSecurityEvent(eventType, details) {
     timestamp: new Date().toISOString()
   });
 }
-

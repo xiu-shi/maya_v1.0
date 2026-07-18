@@ -93,7 +93,7 @@ export function corsErrorHandler(err, req, res, next) {
   if (err && err.message && err.message.includes('CORS')) {
     // Log CORS error for chat requests
     if (req.path === '/api/chat' && req.body?.message) {
-      logChatAttemptIfAllowed(req, {
+      void logChatAttemptIfAllowed(req, {
         userMessage: req.body.message || '',
         ip: req.ip,
         userAgent: req.get('user-agent'),

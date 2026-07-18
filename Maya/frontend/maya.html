@@ -94,7 +94,7 @@
         "@id": "https://maya-agent.ai-builders.space/maya.html#app",
         "name": "Maya by Janet Xiu Shi",
         "alternateName": "Maya by Janet Xiu Shi™",
-        "description": "Maya by Janet Xiu Shi is an AI-powered digital twin chatbot providing insights on AI strategy, cloud architecture, AI governance, quality, and digital transformation, built on Janet Xiu Shi's 20+ years of enterprise experience. Maya is designed to meet the transparency obligations of EU AI Act Article 50, with an explicit AI disclosure at first interaction, opt-in GDPR consent-based conversation logging, EU (Ireland) log storage, and automatic 90-day data deletion.",
+        "description": "Maya by Janet Xiu Shi is an AI-powered digital twin chatbot providing insights on AI strategy, cloud architecture, AI governance, quality, and digital transformation, built on Janet Xiu Shi's 20+ years of enterprise experience. Maya is built with transparency-by-design: EU AI Act Article 50 AI disclosure at first interaction, optional Opt-in GDPR consent-based conversation logging to support quality improvement of Janet's digital solutions, EU (Ireland) log storage, and automatic 90-day data deletion.",
         "url": "https://maya-agent.ai-builders.space/maya.html",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
@@ -146,7 +146,7 @@
             "name": "How does Maya handle my data?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Conversation logging is opt-in and consent based, and you can chat without logging. Logs are stored in the EU (AWS eu-west-1, Ireland) and deleted automatically after 90 days. Messages are processed by an AI provider to generate replies, which can involve processing outside the EEA. See the Privacy Notice for full details."
+              "text": "Conversation logging is Opt-in and consent based. If you tick Save this chat, you can support quality improvement of Janet's digital solutions for that chat only. You can also chat without logging. Logs are stored in the EU (AWS eu-west-1, Ireland) and held for 90 days only, then deleted automatically. Messages are processed by an AI provider to generate replies, which can involve processing outside the EEA. See the Privacy Notice for full details."
             }
           },
           {
@@ -154,7 +154,7 @@
             "name": "How does Maya address the EU AI Act and GDPR?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Maya is designed to meet the transparency obligations of EU AI Act Article 50, with a clear AI disclosure at first interaction, and applies GDPR principles: consent based logging, data minimisation with no account or name required, EU log storage, a 90 day retention limit, and user rights including access and erasure."
+              "text": "Maya is a living example of Janet Xiu Shi's transparency-by-design practice. It is designed to meet the transparency obligations of EU AI Act Article 50, with a clear AI disclosure at first interaction, and applies GDPR principles: consent based Opt-in logging, data minimisation with no account or name required, EU log storage, a 90 day retention limit, and user rights including access and erasure. These implemented controls support an audit-ready posture. See the Privacy Notice for the documented design."
             }
           }
         ]
@@ -1194,9 +1194,10 @@
         <h2>About Maya: AI transparency and your data</h2>
         <p class="maya-about-summary">
           Maya is an AI chatbot and digital twin built by Janet Xiu Shi, an Ireland based AI
-          governance, quality, and cloud strategy advisor and educator. Maya discloses that it is
-          an AI at first interaction, uses opt-in conversation logging under GDPR, stores logs in
-          the EU, and deletes them automatically after 90 days.
+          governance, quality, and cloud strategy advisor and educator. Maya is built with
+          transparency-by-design: it discloses that it is an AI at first interaction, uses optional
+          Opt-in conversation logging under GDPR so users can support quality improvement of Janet's
+          digital solutions, stores logs in the EU, and deletes them automatically after 90 days.
         </p>
         <details>
           <summary>Is Maya a real person?</summary>
@@ -1218,18 +1219,21 @@
         </details>
         <details>
           <summary>How does Maya handle my data?</summary>
-          <p>Conversation logging is opt-in and consent based, and you can chat without logging.
-            Logs are stored in the EU (AWS eu-west-1, Ireland) and deleted automatically after 90
-            days. Messages are processed by an AI provider to generate replies, which can involve
-            processing outside the EEA. See the
+          <p>Conversation logging is Opt-in and consent based. If you tick Save this chat, you can
+            support quality improvement of Janet's digital solutions for that chat only. You can also
+            chat without logging. Logs are stored in the EU (AWS eu-west-1, Ireland) and held for
+            90 days only, then deleted automatically. Messages are processed by an AI provider to
+            generate replies, which can involve processing outside the EEA. See the
             <a href="/privacy.html">Privacy Notice</a> for full details.</p>
         </details>
         <details>
           <summary>How does Maya address the EU AI Act and GDPR?</summary>
-          <p>Maya is designed to meet the transparency obligations of EU AI Act Article 50, with a
-            clear AI disclosure at first interaction, and applies GDPR principles: consent based
-            logging, data minimisation with no account or name required, EU log storage, a 90 day
-            retention limit, and user rights including access and erasure.</p>
+          <p>Maya is a living example of Janet Xiu Shi's transparency-by-design practice. It is designed to
+            meet the transparency obligations of EU AI Act Article 50, with a clear AI disclosure at
+            first interaction, and applies GDPR principles: consent based Opt-in logging, data
+            minimisation with no account or name required, EU log storage, a 90 day retention limit,
+            and user rights including access and erasure. These implemented controls support an
+            audit-ready posture. See the <a href="/privacy.html">Privacy Notice</a> for the documented design.</p>
         </details>
       </div>
     </section>
@@ -1259,6 +1263,8 @@
         </div>
         <p class="consent-footer-link">
           <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>
+          &nbsp;|&nbsp;
+          <a href="#about-maya">About Maya</a>
         </p>
       </div>
       <div id="consentInfoView" style="display: none;">
@@ -1350,6 +1356,7 @@
         loggingConsent: 'pending',
         loggingLocked: false,
         consentReceiptRecorded: false,
+        consentReceiptId: null,
         optInNoticeShown: false,
         consentVersion: CONSENT_VERSION,
       };
@@ -1379,10 +1386,11 @@
       const legacy = readStoredConsent();
       if (legacy && legacy.version === '2026-07-12' && (chat.messages || []).length > 0) {
         if (legacy.granted === true) {
-          fields.loggingConsent = 'accepted';
-          fields.consentReceiptRecorded = true;
-          fields.loggingLocked = true;
-          fields.optInNoticeShown = true;
+          // Require fresh consent under 2026-07-18; do not grandfather logging without server receipt
+          fields.loggingConsent = 'pending';
+          fields.consentReceiptRecorded = false;
+          fields.consentReceiptId = null;
+          fields.loggingLocked = false;
         } else if (typeof legacy.granted === 'boolean') {
           fields.loggingConsent = 'declined';
           fields.loggingLocked = true;
@@ -1425,7 +1433,12 @@
       const chat = getCurrentChat();
       if (!chat) return false;
       ensureChatConsentFields(chat);
-      return chat.loggingConsent === 'accepted' && chat.consentReceiptRecorded === true;
+      return (
+        chat.loggingConsent === 'accepted' &&
+        chat.consentReceiptRecorded === true &&
+        typeof chat.consentReceiptId === 'string' &&
+        chat.consentReceiptId.length > 0
+      );
     }
 
     async function postConsentReceipt(choice) {
@@ -1440,13 +1453,26 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload),
       });
-      return response.status === 204;
+      if (response.status !== 204) {
+        return { recorded: false, receiptId: null };
+      }
+      const receiptId = response.headers.get('X-Consent-Receipt-Id');
+      return {
+        recorded: true,
+        receiptId: receiptId && receiptId.trim() ? receiptId.trim() : null,
+      };
     }
 
     async function postConsentReceiptWithRetry(choice, attempts = 2) {
       for (let attempt = 0; attempt < attempts; attempt += 1) {
         try {
-          if (await postConsentReceipt(choice)) return true;
+          const result = await postConsentReceipt(choice);
+          if (!result.recorded) continue;
+          if (choice === 'accepted') {
+            if (result.receiptId) return result;
+          } else {
+            return result;
+          }
         } catch (error) {
           devError('Consent receipt attempt failed:', error);
         }
@@ -1454,7 +1480,7 @@
           await new Promise((resolve) => setTimeout(resolve, 400));
         }
       }
-      return false;
+      return { recorded: false, receiptId: null };
     }
 
     function flushPendingMessageAfterConsent() {
@@ -1467,22 +1493,23 @@
       return false;
     }
 
-    function applyChatConsent(chat, { granted, receiptRecorded }) {
+    function applyChatConsent(chat, { granted, receiptRecorded, receiptId }) {
       ensureChatConsentFields(chat);
       chat.loggingLocked = true;
-      chat.consentReceiptRecorded = !!(granted && receiptRecorded);
+      chat.consentReceiptRecorded = !!(granted && receiptRecorded && receiptId);
+      chat.consentReceiptId = chat.consentReceiptRecorded ? receiptId : null;
       chat.loggingConsent = chat.consentReceiptRecorded ? 'accepted' : 'declined';
       saveChats();
     }
 
-    function completeConsentFlow({ granted, receiptRecorded }) {
+    function completeConsentFlow({ granted, receiptRecorded, receiptId }) {
       let chat = getCurrentChat();
       if (!chat) {
         ensureChatSession();
         chat = getCurrentChat();
       }
       if (chat) {
-        applyChatConsent(chat, { granted, receiptRecorded });
+        applyChatConsent(chat, { granted, receiptRecorded, receiptId });
       }
       hideConsentOverlay();
       updateConsentStatusFooter();
@@ -1499,24 +1526,30 @@
 
     async function grantConsent() {
       try {
-        const recorded = await postConsentReceiptWithRetry('accepted');
-        if (!recorded) {
+        const result = await postConsentReceiptWithRetry('accepted');
+        if (!result.recorded || !result.receiptId) {
           devError('Failed to record consent receipt on server after retry');
         }
-        completeConsentFlow({ granted: true, receiptRecorded: recorded });
+        completeConsentFlow({
+          granted: true,
+          receiptRecorded: result.recorded,
+          receiptId: result.receiptId,
+        });
       } catch (error) {
         devError('Consent acceptance failed:', error);
-        completeConsentFlow({ granted: true, receiptRecorded: false });
+        completeConsentFlow({ granted: true, receiptRecorded: false, receiptId: null });
       }
     }
 
     async function declineConsent() {
+      let receiptRecorded = false;
       try {
-        await postConsentReceiptWithRetry('declined');
+        const result = await postConsentReceiptWithRetry('declined');
+        receiptRecorded = result.recorded;
       } catch (error) {
         devError('Consent decline receipt failed:', error);
       }
-      completeConsentFlow({ granted: false, receiptRecorded: true });
+      completeConsentFlow({ granted: false, receiptRecorded, receiptId: null });
     }
 
     function showConsentWelcomeOverlay(preTickSave = false) {
@@ -1642,6 +1675,10 @@
       ];
       const nudge = nudges[turn % nudges.length];
 
+      // Keep brief greetings warm instead of sounding like a continuity deflection
+      if (/^(hi|hello|hey)\b/.test(lower) && trimmed.length < 40) {
+        return "Hi! Great to have you here. What would you like to explore today?";
+      }
       if (/dealer|customer inquiry|inquiry process/.test(lower)) {
         return 'At a high level, a basic dealer customer inquiry process covers intake, qualification, recommendation, and follow-up. ' + nudge;
       }
@@ -1657,8 +1694,29 @@
       return 'Let me stay with your question instead of repeating an introduction. ' + nudge;
     }
 
+    function isIdentityOrConsentIntent(userMessage) {
+      const lower = String(userMessage || '').toLowerCase();
+      if (!lower.trim()) return false;
+      return (
+        /\bwho are you\b/.test(lower) ||
+        /\bwhat are you\b/.test(lower) ||
+        /\bare you (really )?(janet'?s )?agent\b/.test(lower) ||
+        /\bdigital twin\b/.test(lower) ||
+        /\bcheckbox\b/.test(lower) ||
+        /\btick(ed|ing)? (that |the )?box\b/.test(lower) ||
+        /\bsave this chat\b/.test(lower) ||
+        /\bopt[-\s]?in\b/.test(lower) ||
+        /\b(gdpr|eu ai act|privacy|logging|consent|audit|compliant|transparency)\b/.test(lower) ||
+        /\babout saving this chat\b/.test(lower) ||
+        /\bwhy (do i |did i )?(have to |need to )?tick\b/.test(lower) ||
+        /\brecord(ing)? (our |the )?chat/.test(lower)
+      );
+    }
+
     function softenRepeatedIntro(apiText, userMessage) {
       if (!isIntroLikeReply(apiText)) return apiText;
+      // Never replace identity, Opt-in, privacy, or transparency answers with continuity fallback
+      if (isIdentityOrConsentIntent(userMessage)) return apiText;
       const priorIntroInHistory = messageHistory.some(
         m => m.role === 'assistant' && isIntroLikeReply(m.content)
       );
@@ -1668,6 +1726,14 @@
         return apiText;
       }
       return buildClientContinuityFallback(userMessage);
+    }
+
+    function buildModelMessageWithSavingContext(userMessage) {
+      const savingOn = typeof hasConsent === 'function' && hasConsent();
+      const statusLine = savingOn
+        ? "Chat saving status: ON for this chat. Purpose: user Opt-in to support Janet's digital solutions / improve Maya quality. Retention: 90 days only, then auto-delete. EU storage. Product posture: transparency-by-design, consent-based logging."
+        : 'Chat saving status: OFF for this chat. User chose not to save. Chat still works. If asked about Opt-in, warmly explain the benefit, 90-day retention, and transparency-by-design; respect their choice.';
+      return `[Maya session context - not shown to the user]\n${statusLine}\n\n[User message]\n${userMessage}`;
     }
 
     /** Include UI intro in API history so the model does not re-greet cold. */
@@ -2301,9 +2367,7 @@
 
       chatInput.focus();
       updateConsentStatusFooter();
-      if (chat.loggingConsent === 'pending') {
-        showConsentWelcomeOverlay(false);
-      } else {
+      if (chat.loggingConsent !== 'pending') {
         showAiIntroMessageIfNeeded();
       }
     }
@@ -2391,7 +2455,8 @@
         devLog('📤 API_BASE_URL:', API_BASE_URL);
         devLog('📤 Full URL:', window.location.origin + apiUrl);
         const apiHistory = getApiHistoryForRequest();
-        devLog('📤 Request payload:', { message, history: apiHistory });
+        const modelMessage = buildModelMessageWithSavingContext(message);
+        devLog('📤 Request payload:', { message: modelMessage, history: apiHistory, logging: hasConsent() });
         
         // Create abort controller for timeout handling
         const controller = new AbortController();
@@ -2406,10 +2471,13 @@
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            message,
+            message: modelMessage,
             history: apiHistory,
             conversationId: conversationId,
-            logging: hasConsent()
+            logging: hasConsent(),
+            ...(hasConsent() && getCurrentChat()?.consentReceiptId
+              ? { consentReceiptId: getCurrentChat().consentReceiptId }
+              : {}),
           }),
           signal: controller.signal
         }).catch(fetchError => {
@@ -3091,7 +3159,7 @@
       <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: 0;">&copy; 2026 <a href="https://janetxiushi.me" style="color: var(--text-muted); text-decoration: none;">Janet Xiu Shi</a> | Strategic AI &amp; Cloud Advisor | Industry Lecturer &amp; AI Educator | AI Product Quality &amp; Governance</p>
       <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: var(--spacing-xs) 0 0 0;">All rights reserved.</p>
       <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin: var(--spacing-sm) 0 0 0; font-weight: 500;">Maya by Janet Xiu Shi™</p>
-      <p style="margin: var(--spacing-sm) 0 0 0;"><a href="/privacy.html" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">Privacy Notice</a> <span style="color: var(--text-muted); font-size: var(--font-size-sm);">&middot;</span> <a href="#about-maya" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">About Maya &amp; AI transparency</a></p>
+      <p style="margin: var(--spacing-sm) 0 0 0;"><a href="/privacy.html" style="color: var(--text-muted); font-size: var(--font-size-sm); text-decoration: underline;">Privacy Notice</a></p>
     </div>
   </footer>
 

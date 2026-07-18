@@ -22,10 +22,9 @@ export const apiLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
   handler: async (req, res) => {
-    // Log rate-limited chat attempt
     const userMessage = req.body?.message || '';
     if (req.path === '/api/chat' && userMessage) {
-      logChatAttemptIfAllowed(req, {
+      await logChatAttemptIfAllowed(req, {
         userMessage: userMessage,
         ip: req.ip,
         userAgent: req.get('user-agent'),
@@ -38,16 +37,14 @@ export const apiLimiter = rateLimit({
         logWarning('Failed to log rate-limited attempt', { error: err.message });
       });
     }
-    
+
     res.status(429).json({
       error: 'Too many requests',
       message: `Rate limit exceeded. Maximum ${config.rateLimitMaxRequests} requests per ${config.rateLimitWindowMs / 1000} seconds.`,
       retryAfter: Math.ceil(config.rateLimitWindowMs / 1000)
     });
   },
-  // Skip successful requests in counting (only count errors)
   skipSuccessfulRequests: false,
-  // Skip failed requests in counting
   skipFailedRequests: false,
 });
 
@@ -63,6 +60,29 @@ export const chatLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  handler: async (req, res) => {
+    const userMessage = req.body?.message || '';
+    if (req.path === '/api/chat' && userMessage) {
+      await logChatAttemptIfAllowed(req, {
+        userMessage,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        status: 'rate_limited',
+        statusCode: 429,
+        errorType: 'chat_rate_limit_exceeded',
+        errorMessage: 'Chat rate limit exceeded.',
+        requestHost: req.get('host') || req.hostname || null,
+      }).catch(err => {
+        logWarning('Failed to log chat rate-limited attempt', { error: err.message });
+      });
+    }
+
+    res.status(429).json({
+      error: 'Too many chat requests. Please slow down.',
+      message: `Rate limit exceeded. Maximum ${Math.floor(config.rateLimitMaxRequests * 0.8)} chat requests per ${config.rateLimitWindowMs / 1000} seconds.`,
+      retryAfter: Math.ceil(config.rateLimitWindowMs / 1000),
+    });
+  },
 });
 
 /**
@@ -77,4 +97,3 @@ export const healthCheckLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-

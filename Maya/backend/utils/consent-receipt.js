@@ -3,19 +3,26 @@
  * Stores minimal records: notice version, choice, timestamp, hashed IP.
  */
 
+import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { logInfo, logError } from "./logger.js";
+import { logInfo, logError, logWarning } from "./logger.js";
 import { hashIp } from "./ip-hash.js";
 import { LOG_RETENTION_DAYS } from "./log-retention.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const LOCAL_RECEIPTS_DIR = path.join(__dirname, "..", "data", "consent-receipts");
+export const LOCAL_RECEIPTS_DIR = path.join(__dirname, "..", "data", "consent-receipts");
+export const CONSENT_RECEIPT_ID_HEADER = "X-Consent-Receipt-Id";
+
+/** Notice versions that may authorise conversation logging when choice is accepted. */
+export const ACCEPTED_CONSENT_VERSIONS = new Set(["2026-07-12", "2026-07-18"]);
 
 const VALID_CHOICES = new Set(["accepted", "declined", "withdrawn"]);
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 /**
  * @param {object} params
@@ -43,6 +50,7 @@ export async function recordConsentReceipt({
 
   const recordedAt = new Date().toISOString();
   const receipt = {
+    id: randomUUID(),
     type: "consent_receipt",
     version,
     choice,
@@ -75,10 +83,53 @@ export async function recordConsentReceipt({
   logInfo("Consent receipt recorded", {
     choice,
     version,
+    receiptId: receipt.id,
     ipHash: receipt.ipHash,
   });
 
   return receipt;
+}
+
+/**
+ * Verify an accepted consent receipt before honouring logging: true on /api/chat.
+ * Fail-closed: returns false when receipt missing, wrong choice, version, or IP hash.
+ *
+ * @param {string} receiptId
+ * @param {string|null|undefined} ip
+ * @returns {Promise<boolean>}
+ */
+export async function verifyConsentReceiptForLogging(receiptId, ip) {
+  if (!receiptId || typeof receiptId !== "string" || !UUID_PATTERN.test(receiptId)) {
+    return false;
+  }
+
+  let receipt;
+  try {
+    const filePath = path.join(LOCAL_RECEIPTS_DIR, `${receiptId}.json`);
+    const raw = await fs.readFile(filePath, "utf8");
+    receipt = JSON.parse(raw);
+  } catch {
+    return false;
+  }
+
+  if (!receipt || receipt.type !== "consent_receipt") {
+    return false;
+  }
+  if (receipt.choice !== "accepted") {
+    return false;
+  }
+  if (!ACCEPTED_CONSENT_VERSIONS.has(receipt.version)) {
+    return false;
+  }
+  if (receipt.ipHash !== hashIp(ip)) {
+    logWarning("Consent receipt IP hash mismatch", {
+      receiptId,
+      expectedHash: receipt.ipHash,
+    });
+    return false;
+  }
+
+  return true;
 }
 
 function buildS3Key(receipt) {
@@ -86,8 +137,7 @@ function buildS3Key(receipt) {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");
-  const safeTs = receipt.recordedAt.replace(/:/g, "-").replace(/\./g, "-");
-  return `consent/${year}/${month}/${day}/${safeTs}_${receipt.ipHash}_${receipt.choice}.json`;
+  return `consent/${year}/${month}/${day}/${receipt.id}.json`;
 }
 
 async function writeReceiptToS3(receipt) {
@@ -120,9 +170,8 @@ async function writeReceiptToS3(receipt) {
 
 async function writeReceiptLocally(receipt) {
   await fs.mkdir(LOCAL_RECEIPTS_DIR, { recursive: true });
-  const filename = `${receipt.recordedAt.replace(/[:.]/g, "-")}_${receipt.ipHash}_${receipt.choice}.json`;
-  const filePath = path.join(LOCAL_RECEIPTS_DIR, filename);
+  const filePath = path.join(LOCAL_RECEIPTS_DIR, `${receipt.id}.json`);
   await fs.writeFile(filePath, JSON.stringify(receipt, null, 2), "utf8");
 }
 
-export { VALID_CHOICES, LOCAL_RECEIPTS_DIR };
+export { VALID_CHOICES, UUID_PATTERN };
