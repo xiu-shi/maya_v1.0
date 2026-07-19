@@ -1813,8 +1813,15 @@
       const nudge = nudges[turn % nudges.length];
 
       // Keep brief greetings warm instead of sounding like a continuity deflection
-      if (/^(hi|hello|hey)\b/.test(lower) && trimmed.length < 40) {
+      if (/^(hi|hello|hey|hiya|good (morning|afternoon|evening))\b/.test(lower) && trimmed.length < 48) {
         return "Hi! Great to have you here. What would you like to explore today?";
+      }
+      // Tone feedback: acknowledge, do not deflect
+      if (/\b(unfriendly|rude|cold|robotic|harsh|too direct)\b/.test(lower)) {
+        return "Thanks for saying that. I will keep this warmer and more practical. What would you like to work through?";
+      }
+      if (/^(thanks|thank you|thx|cheers)\b/.test(lower) && trimmed.length < 40) {
+        return "You're welcome. Happy to keep going whenever you are ready.";
       }
       if (/dealer|customer inquiry|inquiry process/.test(lower)) {
         return 'At a high level, a basic dealer customer inquiry process covers intake, qualification, recommendation, and follow-up. ' + nudge;
@@ -1828,7 +1835,8 @@
       if (/^all$|everything|overview/.test(lower)) {
         return 'I can cover advisory work, teaching programmes, or high-level process design. ' + nudge;
       }
-      return 'Let me stay with your question instead of repeating an introduction. ' + nudge;
+      // Prefer a warm nudge over "stay with your question" legalese
+      return "Happy to help with that. " + nudge;
     }
 
     function isIdentityOrConsentIntent(userMessage) {
@@ -1850,7 +1858,24 @@
       );
     }
 
+    function isBriefGreeting(userMessage) {
+      const trimmed = String(userMessage || '').trim();
+      const lower = trimmed.toLowerCase();
+      return /^(hi|hello|hey|hiya|good (morning|afternoon|evening))\b/.test(lower) && trimmed.length < 48;
+    }
+
+    function isToneComplaint(userMessage) {
+      return /\b(unfriendly|rude|cold|robotic|harsh|too direct)\b/i.test(String(userMessage || ''));
+    }
+
     function softenRepeatedIntro(apiText, userMessage) {
+      // Brief greetings: prefer warm short reply over intro dumps or continuity legalese
+      if (isBriefGreeting(userMessage) && isIntroLikeReply(apiText)) {
+        return buildClientContinuityFallback(userMessage);
+      }
+      if (isToneComplaint(userMessage) && isIntroLikeReply(apiText)) {
+        return buildClientContinuityFallback(userMessage);
+      }
       if (!isIntroLikeReply(apiText)) return apiText;
       // Never replace identity, Opt-in, privacy, or transparency answers with continuity fallback
       if (isIdentityOrConsentIntent(userMessage)) return apiText;

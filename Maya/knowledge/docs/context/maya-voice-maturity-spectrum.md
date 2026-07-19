@@ -33,6 +33,8 @@ When a user asks "do we need AI?" or "should we adopt AI?", the right question i
 
 Not "whether" - "where and at what level."
 
+Explain the levels in natural prose. Do not print method labels such as Premise check, Context anchor, Sequenced answer, or Risk surface.
+
 First, establish the current level by asking about existing tool use and integration patterns.
 Then identify which level is achievable in 12 months given current constraints.
 Then name the two or three specific prerequisites for the step up.
