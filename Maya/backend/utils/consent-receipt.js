@@ -62,6 +62,12 @@ export async function recordConsentReceipt({
     retentionDays: LOG_RETENTION_DAYS,
   };
 
+  // Always persist locally first. Chat logging authorization
+  // (verifyConsentReceiptForLogging) reads only from local disk. Writing S3
+  // alone would make Opt-in appear to succeed in the UI while conversation
+  // logs silently fail-closed in production.
+  await writeReceiptLocally(receipt);
+
   if (
     process.env.ENABLE_S3_LOGGING === "true" &&
     process.env.AWS_S3_BUCKET
@@ -69,15 +75,17 @@ export async function recordConsentReceipt({
     try {
       await writeReceiptToS3(receipt);
     } catch (s3Error) {
-      logError("S3 consent receipt upload failed; falling back to local storage", s3Error, {
-        choice,
-        version,
-        bucket: process.env.AWS_S3_BUCKET,
-      });
-      await writeReceiptLocally(receipt);
+      logError(
+        "S3 consent receipt upload failed; local receipt retained for chat authorization",
+        s3Error,
+        {
+          choice,
+          version,
+          bucket: process.env.AWS_S3_BUCKET,
+          receiptId: receipt.id,
+        },
+      );
     }
-  } else {
-    await writeReceiptLocally(receipt);
   }
 
   logInfo("Consent receipt recorded", {
