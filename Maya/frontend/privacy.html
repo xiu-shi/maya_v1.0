@@ -141,7 +141,7 @@
     <div class="privacy-header">
       <h1>Privacy Notice and Terms of Use</h1>
       <p class="privacy-subtitle">Maya by Janet Xiu Shi: privacy, transparency, and rules for her AI digital twin</p>
-      <p>Last updated: 18 July 2026 &nbsp;|&nbsp; Effective: 12 July 2026 (Privacy) / 18 July 2026 (Terms)</p>
+      <p>Last updated: 19 July 2026 &nbsp;|&nbsp; Effective: 12 July 2026 (Privacy) / 18 July 2026 (Terms)</p>
       <nav class="privacy-jump" aria-label="On this page">
         <a href="#at-a-glance">How Maya handles your data</a>
         <a href="#privacy-notice">Privacy Notice</a>
@@ -161,11 +161,19 @@
           (EU AI Act Article 50 transparency posture).
         </li>
         <li>
+          <strong>No account:</strong> You do not need an account, name, or email to chat.
+        </li>
+        <li>
           <strong>Opt-in saving:</strong> Conversation logging uses GDPR consent. Chat works fully
           if you leave saving unticked.
         </li>
         <li>
           <strong>Per-chat choice:</strong> Each new chat starts with a fresh saving decision.
+        </li>
+        <li>
+          <strong>Inference is not saved by Maya:</strong> Messages are processed to generate a reply,
+          but Maya does not keep that conversation content unless you Opt-in to save. Without Opt-in,
+          there is no Maya conversation log to attach to an account (Maya has no user accounts).
         </li>
         <li>
           <strong>EU log storage:</strong> Saved conversation logs and consent records are stored in
@@ -180,9 +188,10 @@
           consent record is kept so consent can be demonstrated.
         </li>
         <li>
-          <strong>Inference may leave the EEA:</strong> Your message is sent to an AI provider to
-          generate a reply. That processing may take place outside the EEA, including in the United
-          States, with GDPR Chapter V safeguards where applicable.
+          <strong>Hosting and inference outside the EEA:</strong> The Maya app is hosted in the
+          United States. Your message is sent through an AI API to generate a reply; that processing
+          may take place outside the EEA, including in the United States. This happens whether or not
+          you save the chat.
         </li>
       </ul>
     </div>
@@ -197,7 +206,9 @@
         <strong>The short version:</strong> This notice documents how Maya, Janet Xiu Shi's AI digital twin,
         is built with <strong>transparency-by-design</strong> as part of Janet's digital solutions practice.
         No account is needed, there are no advertising trackers, and nothing is ever sold to anyone.
-        When you chat, your message is processed by an AI service to generate a reply (this can happen outside the EU).
+        When you chat, your message is processed to generate a reply (the app is hosted in the United States;
+        AI processing can happen outside the EU).
+        Maya does <strong>not</strong> save that conversation content unless you Opt-in; there is no user account.
         <strong>Saving chats is optional and off by default.</strong>
         Each chat has its own saving choice.
         If you Opt-in, you can support quality improvement of Janet's digital solutions;
@@ -264,7 +275,7 @@
         <li><strong>Technical metadata</strong> - response time, status codes</li>
       </ul>
       <p>
-        A minimal consent record (notice version, your choice, timestamp, pseudonymised IP) is kept on our side
+        A minimal consent record (your saving choice, timestamp, and a pseudonymised IP) is kept on our side
         so consent can be demonstrated. Your saving choice for each chat is stored with that chat session in
         your browser. <strong>A new chat always starts with a fresh consent step.</strong>
       </p>
@@ -369,16 +380,23 @@
 
     <div class="privacy-section">
       <h2>7. Who processes your data?</h2>
-      <p>Your data passes through two processors when you use the chat:</p>
+      <p>When you use the chat, your data may pass through these parties:</p>
       <ul>
         <li>
-          <strong>AI Builders API</strong> - processes your message to generate Maya's
-          response. Messages are sent over an encrypted connection. Processing may take place
-          outside the EEA, including in the United States (see section 9).
+          <strong>Koyeb</strong> - hosts the Maya application. Hosting is currently in the United States.
         </li>
         <li>
-          <strong>Amazon Web Services (AWS S3, eu-west-1)</strong> - stores
-          conversation logs and consent records in Ireland. IP addresses are stored only in
+          <strong>AI Builders</strong> - routes your message to a model API so Maya can reply.
+          This routing takes place outside the EEA, including in the United States (see section 9).
+        </li>
+        <li>
+          <strong>Model provider for Maya's configured model</strong> - processes message content
+          to generate the reply (inference). This can take place outside the EEA and happens whether
+          or not you save the chat. Maya does not store that conversation content unless you Opt-in.
+        </li>
+        <li>
+          <strong>Amazon Web Services (AWS S3, eu-west-1)</strong> - stores conversation logs and
+          consent records in Ireland when you Opt-in to save. IP addresses are stored only in
           pseudonymised (hashed) form in storage.
         </li>
       </ul>
@@ -387,9 +405,8 @@
         networks (Google Fonts and jsDelivr). These providers receive standard technical data
         such as IP address and browser type when the page loads, never your chat content.
       </p>
-      <p>No other third parties receive your chat data.</p>
       <p>
-        For more detail on how any processor handles your data, contact
+        For more detail on how any of these parties handle your data, contact
         <a href="mailto:info@janetxiushi.me">info@janetxiushi.me</a> and Janet will respond directly.
       </p>
     </div>
@@ -422,13 +439,21 @@
     <div class="privacy-section">
       <h2>9. Data transfers outside the EEA</h2>
       <p>
-        Generating Maya's replies involves sending your message content to our AI provider, whose processing
-        may take place outside the EEA, including in the United States. This transfer is protected by
-        appropriate safeguards under GDPR Chapter V, including Standard Contractual Clauses where applicable.
+        The Maya application is hosted in the United States. Generating replies also involves sending
+        your message content through AI Builders to a model provider. That processing may take place
+        outside the EEA, including in the United States. It applies whether or not you save the chat.
+        Maya itself does not keep conversation content from that step unless you Opt-in to save.
       </p>
       <p>
-        Conversation logs and consent records are stored only in the EEA (AWS eu-west-1, Ireland) and are not
-        transferred outside it. For details of the transfer safeguards, contact
+        Maya on AI Builders Space is a professional personal project. Cross-border processing uses the
+        hosting and AI platform providers' standard terms. This notice does not claim an enterprise-grade
+        transfer framework (such as independently verified Data Privacy Framework certification or
+        Standard Contractual Clauses put in place by Janet for every provider). Stronger contractual
+        packaging is planned for a later Maya version.
+      </p>
+      <p>
+        Conversation logs and consent records are stored only in the EEA (AWS eu-west-1, Ireland) when
+        you Opt-in to save, and are not transferred outside the EEA for storage. For questions, contact
         <a href="mailto:info@janetxiushi.me">info@janetxiushi.me</a>.
       </p>
     </div>
@@ -451,7 +476,8 @@
       <p>
         If this notice changes materially (new data collected, new processor, changed
         retention period), the consent prompt will reappear and you must review it and make your choice again before chatting.
-        The "Last updated" and "Effective" dates at the top of this page reflect when this notice was published and when it applies.
+        The "Last updated" and "Effective" dates at the top of this page reflect when this notice was
+        last published and when the Privacy Notice first applied.
       </p>
     </div>
 
