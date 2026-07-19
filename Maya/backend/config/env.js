@@ -129,6 +129,13 @@ const config = {
   // Required (but allow null during build - will be validated at runtime)
   aiBuilderToken: validateToken(getEnv("AI_BUILDER_TOKEN", null, false)), // Changed to false - don't require during build
 
+  // LLM routing (must match production deploy env)
+  aiBuildersModel: getEnv("AI_BUILDERS_MODEL", "grok-4-fast"),
+  aiBuildersApiUrl: getEnv(
+    "AI_BUILDERS_API_URL",
+    "https://api.aibuilders.co/v1/chat/completions",
+  ),
+
   // Server
   nodeEnv: getEnv("NODE_ENV", "development"),
   port: parseInt(getEnv("PORT", "3000"), 10), // Default matches production deployment
@@ -207,6 +214,7 @@ console.log(`   Max Message Length: ${config.maxMessageLength} characters`);
 console.log(
   `   AI_BUILDER_TOKEN: ${config.aiBuilderToken ? "✅ Set" : "❌ Missing"}`,
 );
+console.log(`   AI_BUILDERS_MODEL: ${config.aiBuildersModel}`);
 console.log(
   `   ADMIN_TOKEN: ${config.adminToken ? "✅ Set" : "⚠️  Not set (admin endpoints will be unavailable)"}`,
 );

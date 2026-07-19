@@ -267,6 +267,8 @@ app.get("/health", async (req, res) => {
     environment: config.nodeEnv,
     apiReady: !!config.aiBuilderToken,
     tokenConfigured: !!config.aiBuilderToken,
+    // Non-secret: which chat model this instance is configured to call
+    aiBuildersModel: config.aiBuildersModel || process.env.AI_BUILDERS_MODEL || "grok-4-fast",
     kb: kbStatus || { status: "not_available" },
   });
 });
