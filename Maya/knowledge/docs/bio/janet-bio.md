@@ -2,20 +2,21 @@
 
 **Category**: bio
 **Priority**: high
-**Last Updated**: 2026-07-08
+**Last Updated**: 2026-07-20
 **Source**: Professional background
 
 ## Summary
 
-Janet Xiu Shi is a Strategic AI and Cloud Advisor, AI Evals and Quality specialist, and AI Educator working at the intersection of AI governance, cloud strategy, quality and evaluation, cybersecurity, and digital transformation. She is an Associate Partner at Avencia Consulting, where she supports the firm's AI advisory practice, and a Technology Advisor through Connectd. Her career was forged at Workday and Huawei, where she delivered secure, compliant, and scalable solutions serving millions globally. She brings enterprise-grade discipline together with startup agility and creative problem-solving. She helps leadership teams move fast without compromising accountability or risk management. Her work is backed by world-class credentials spanning Harvard University, Anthropic Academy, FilmEU, QQI, Google, AWS, and Lakera. She teaches what she practises: as an Industry Expert Lecturer at IADT and as Programme Instructor and QA Framework Architect for two national SOLAS / Skills to Advance AI workforce programmes, she translates technical complexity into strategic clarity for both students and senior leaders.
+Janet Xiu Shi is an AI Evals and Quality Advisor working across strategic AI and cloud, and an AI Educator, at the intersection of AI governance, cloud strategy, quality and evaluation, cybersecurity, and digital transformation. She brings 20+ years across enterprise operations, procurement, and technology. She is an Associate Partner at Avencia Consulting, where she supports the firm's AI advisory practice, and a Technology Advisor through Connectd. Her career was forged at Workday and Huawei, where she delivered secure, compliant, and scalable solutions serving millions globally. She brings enterprise-grade discipline together with startup agility and creative problem-solving. She helps leadership teams move fast without compromising accountability or risk management. Her work is backed by world-class credentials spanning Harvard University, Anthropic Academy, FilmEU, QQI, Google, AWS, and Lakera. She teaches what she practises: as an Industry Expert Lecturer at IADT and as Programme Instructor and QA Framework Architect for two national SOLAS / Skills to Advance AI workforce programmes, she translates technical complexity into strategic clarity for both students and senior leaders.
 
 ## Key Points
 
-- **Current positioning**: Strategic AI and Cloud Advisor | Associate Partner at Avencia Consulting | Governance, Evals and Quality | AI Educator
+- **Current positioning**: AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator
+- **Experience line**: 20+ years across enterprise operations, procurement, and technology
 - **Guiding ethos**: "The best AI is experienced, not advertised." AI worth trusting works quietly underneath daily life and should improve decisions, operations, and quality of life; well-designed intelligence is felt as safer, more reliable, lower-friction outcomes, not as technology noise
 - **Avencia Consulting**: Associate Partner (from April 2026) supporting Avencia's AI advisory practice; partners with founders and executive teams on AI governance, evaluation quality, and responsible AI adoption
 - **Advisory**: Helps founders and senior leaders align AI and cloud strategy with business goals; moves fast without compromising accountability or risk management; also advises through Connectd (Technology Advisor, Strategic AI and Cloud)
-- **Career foundation**: Workday and Huawei; secure, compliant, scalable solutions serving millions globally; audit-ready controls and compliance-aligned delivery
+- **Career foundation**: Workday and Huawei; secure, compliant, scalable solutions serving millions globally; audit-ready controls and compliance-aligned delivery; earlier enterprise operations and procurement leadership informs how she advises on AI risk, delivery, and quality
 - **IADT Lecturer**: Industry Expert Lecturer at Dun Laoghaire Institute of Art, Design and Technology; three modules: Enterprise Cloud, Generative AI, and Web Application Development in the AI Era (QQI Level 8, Department of Entrepreneurship)
 - **SOLAS Educator**: Programme Instructor and QA Framework Architect for two national QQI-accredited AI workforce programmes (Level 4 and Level 5) under SOLAS / Skills to Advance, in partnership with Microsoft Ireland, IDA Ireland, and Enterprise Ireland (March 2026)
 - **AI Evals and Quality**: Specialist in AI evaluation frameworks, LLM quality assurance, hallucination detection, and AI output assessment; the AI-ARM framework (Accuracy, Relevance, Meaning) is her original IP
@@ -32,7 +33,7 @@ Janet Xiu Shi works at the intersection of AI governance, cloud strategy, qualit
 
 As an Associate Partner at Avencia Consulting (from April 2026), Janet supports the development of Avencia's AI advisory practice, partnering with founders and executive teams on AI governance, evaluation quality, and responsible AI adoption. She helps organisations translate technical complexity into business decisions they can act on, guided by the belief that AI worth trusting should improve decisions, operations, and quality of life. This runs alongside her Connectd advisory work (Technology Advisor, Strategic AI and Cloud) and her teaching.
 
-Her professional foundations were built at Workday, where she delivered enterprise software implementation and consulting for global SaaS platforms serving millions, and at Huawei, where she contributed to strategic telecommunications and broadband deployments with EU compliance focus. These experiences gave her a practitioner's understanding of what enterprise-grade discipline actually looks like in production environments.
+Her professional foundations were built at Workday, where she delivered enterprise software implementation and consulting for global SaaS platforms serving millions, and at Huawei, where she contributed to strategic telecommunications and broadband deployments with EU compliance focus. These experiences, together with earlier enterprise operations and procurement leadership, gave her a practitioner's understanding of what enterprise-grade discipline actually looks like in production environments.
 
 As an Industry Expert Lecturer at IADT (QQI Level 8, Department of Entrepreneurship), Janet teaches three modules: Enterprise Cloud, Generative AI, and Web Application Development in the AI Era. Her approach is foundations-first: students build genuine understanding before using AI tools, so they become creators and evaluators rather than passive consumers of AI output.
 
@@ -51,7 +52,9 @@ She is based in Ireland with deep understanding of the Irish market and EU regul
 ## Usage Guidelines
 
 - Use this bio when users ask about Janet's background, who she is, or what she does
-- Emphasise "Strategic AI and Cloud Advisor | Associate Partner at Avencia Consulting | Governance, Evals and Quality | AI Educator" as her current positioning
+- Emphasise "AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator" as her current public positioning
+- Keep Avencia Associate Partner and Connectd Technology Advisor as supporting credentials, not as a replacement for the public title line
+- Use the experience line "20+ years across enterprise operations, procurement, and technology" when asked about career depth; do not shrink this to tech-only tenure
 - When asked about teaching: include IADT (three modules), SOLAS (two national programmes), and corporate training for senior leaders
 - When asked about SOLAS enrolment or how to join: direct to FETCH waiting list at https://www.fetchcourses.ie/course/finder?sfcw-courseId=526656 and the official SOLAS programme page. Do not share learning outcomes publicly
 - When asked about credentials: lead with SOLAS appointment, Harvard, Samsara/FilmEU, Google, AWS, QQI Level 8 completed
@@ -59,7 +62,8 @@ She is based in Ireland with deep understanding of the Irish market and EU regul
 - When asked about AI evaluation or quality: reference AI-ARM framework, LLM quality assurance, and SOLAS Level 5 programme design. Always use the full canonical expansion AI-ARM (Accuracy, Relevance, Meaning) - never abbreviate to fewer than all three components.
 - When asked about community or content: reference GDG Chapter Lead, CS50 Educator, Medium and LinkedIn publishing
 - When referring to languages or international topics: use "cultural exchange" in general; do not name country pairs or bilateral framing
-- For contact: direct to info@janetxiushi.me, janetxiushi.me, or agents.janetxiushi.me (Maya)
+- For contact: direct to info@janetxiushi.me or https://janetxiushi.me
+- For Maya: direct to the live product at https://maya-agent.ai-builders.space/maya.html (do not promote a second Maya URL)
 
 ## Related Documents
 
@@ -77,3 +81,4 @@ She is based in Ireland with deep understanding of the Irish market and EU regul
 - docs/expertise/corporate-ai-training.md
 - docs/honors_awards/solas_educator_2026.md
 - docs/honors_awards/lakera-genai-report-2025.md
+- docs/context/maya-product-transparency.md

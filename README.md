@@ -58,7 +58,7 @@ Compliance is maintained, not claimed once. Questions or scrutiny welcome:
 
 ## About Janet Xiu Shi ([janetxiushi.me](https://janetxiushi.me))
 
-**Strategic AI and Cloud Advisor | AI Evals and Quality | AI Educator**
+**AI Evals and Quality Advisor | Strategic AI and Cloud | AI Educator**
 
 Janet works at the intersection of AI governance, cloud strategy, quality and evaluation,
 cybersecurity, and digital transformation. She brings enterprise-grade discipline together
@@ -364,9 +364,9 @@ This is production-ready:
 
 ## Agent Boutique by Janet
 
-Maya is one of three AI agents Janet has built. The full Agent Boutique lives at [agents.janetxiushi.me](https://agents.janetxiushi.me):
+Maya is one of three AI agents Janet has built. The Agent Boutique overview is at [agents.janetxiushi.me](https://agents.janetxiushi.me). **Maya's live chat** (canonical for now) is at [maya-agent.ai-builders.space/maya.html](https://maya-agent.ai-builders.space/maya.html):
 
-- **Maya**: AI Educator and Digital Twin (live: external user facing)
+- **Maya**: AI Evals and Quality Advisor digital twin (live chat on Space)
 - **Ming**: Already contributing in the background
 - **Maggie**: Already contributing in the background
 

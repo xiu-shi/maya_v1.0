@@ -85,7 +85,7 @@ Anyone interested in these programmes can visit the FETCH link above to register
 
 **Janet's public channels:**
 - Website: https://janetxiushi.me
-- Talk to Maya: https://agents.janetxiushi.me
+- Talk to Maya: https://maya-agent.ai-builders.space/maya.html
 - Email: info@janetxiushi.me
 
 ## Usage Guidelines
